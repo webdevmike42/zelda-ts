@@ -40,6 +40,8 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     })
 }
 
+
+
 /*
 
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
