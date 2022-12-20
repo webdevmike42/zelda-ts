@@ -1,8 +1,11 @@
 import { Animation, drawAnimation, NULL_ANIMATION, updateAnimation } from "../animation.js";
+import { handlePlayerMovementInput, Player } from "../gameActors/player.js";
+import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { NULL_STATE, State } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { compose, pipe } from "../utils.js";
-import { GameObject, GameObjectType, getCurrentAnimation } from "./gameObject.js";
+import { createVector, NULL_VECTOR, vectorSum } from "../vector.js";
+import { GameObject, GameObjectType, getCurrentAnimation, getPosition, moveGameObject, setPosition } from "./gameObject.js";
 
 let gameObjects: GameObject[] = [];
 let id: number = 0;
@@ -17,7 +20,8 @@ export function createGameObject(type: GameObjectType): GameObject {
         type: type,
         states: new Map<string, State>(),
         currentState: { ...NULL_STATE },
-        defaultState: { ...NULL_STATE }
+        defaultState: { ...NULL_STATE },
+        position: { ...NULL_VECTOR }
     }
 }
 
@@ -30,14 +34,29 @@ function register<T extends GameObject>(gameObject: T): T {
 
 export function updateGameObjects(currentGameTime: number): void {
     gameObjects.forEach(gameObject => {
+        console.log(getGameObjectCount())
+        handleGameObjectMovement(gameObject);
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
 
 export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     gameObjects.forEach(gameObject => {
-        drawAnimation(getCurrentAnimation(gameObject),ctx);
+        drawAnimation(getCurrentAnimation(gameObject), ctx);
     })
+}
+
+function handleGameObjectMovement(gameObject: GameObject): void {
+    if (isAnyMovementKeyDown()) {
+        if (isKeyDown(KEYS.RIGHT))
+            moveGameObject(gameObject, createVector(1, 0));
+        if (isKeyDown(KEYS.LEFT))
+            moveGameObject(gameObject, createVector(-1, 0));
+        if (isKeyDown(KEYS.UP))
+            moveGameObject(gameObject, createVector(0, -1));
+        if (isKeyDown(KEYS.DOWN))
+            moveGameObject(gameObject, createVector(0, 1));
+    }
 }
 
 

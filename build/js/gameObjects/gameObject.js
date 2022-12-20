@@ -1,4 +1,5 @@
 import { NULL_ANIMATION } from "../animation.js";
+import { vectorSum } from "../vector.js";
 export var GameObjectType;
 (function (GameObjectType) {
     GameObjectType[GameObjectType["PLAYER"] = 0] = "PLAYER";
@@ -11,4 +12,15 @@ export function getCurrentAnimation(gameObject) {
 }
 export function setCurrentAnimation(gameObject, animation) {
     gameObject.currentAnimation = animation;
+}
+export function setPosition(gameObject, newPosition) {
+    gameObject.position = Object.assign({}, newPosition);
+}
+export function getPosition(gameObject) {
+    return gameObject.position;
+}
+export function moveGameObject(gameObject, moveBy) {
+    setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
+    if (gameObject.currentAnimation)
+        gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
 }

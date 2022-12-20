@@ -1,13 +1,15 @@
 import { addGameObject } from "../gameObjects/gameObjectFactory.js";
-import { GameObjectType, setCurrentAnimation } from "../gameObjects/gameObject.js";
-import { registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
+import { GameObjectType, getPosition, setCurrentAnimation, setPosition } from "../gameObjects/gameObject.js";
+import { isAnyMovementKeyDown, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, CommonStates } from "../state.js";
 import { createAnimation } from "../animation.js";
+import { createVector } from "../vector.js";
 export function createPlayer(x, y) {
     const player = addGameObject(GameObjectType.PLAYER);
+    setPosition(player, createVector(x, y));
     addPlayerStates(player);
     addPlayerAnimations(player);
-    registerGameObjectForKeyBoardInput(player);
+    addPlayerMovement(player);
     return player;
 }
 function addPlayerStates(player) {
@@ -35,7 +37,16 @@ function addPlayerAnimations(player) {
 }
 function addPlayerMovingAnimations(player) {
     var _a;
-    const curAnimation = createAnimation("PlayerMoving", "./resources/link.png", { x: 100, y: 100 }, 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true);
+    const curAnimation = createAnimation("PlayerMoving", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true);
     (_a = player.animations) === null || _a === void 0 ? void 0 : _a.set("PlayerMoving", curAnimation);
     setCurrentAnimation(player, curAnimation);
+}
+function addPlayerMovement(player) {
+    registerGameObjectForKeyBoardInput(player);
+}
+export function handlePlayerMovementInput(player) {
+    if (isAnyMovementKeyDown())
+        console.log("player moving");
+    else
+        console.log("player is standing");
 }

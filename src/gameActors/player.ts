@@ -1,18 +1,20 @@
 import { addGameObject } from "../gameObjects/gameObjectFactory.js";
-import { GameObject, GameObjectType, getCurrentAnimation, setCurrentAnimation } from "../gameObjects/gameObject.js";
-import { registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
+import { GameObject, GameObjectType, getCurrentAnimation, getPosition, setCurrentAnimation, setPosition } from "../gameObjects/gameObject.js";
+import { isAnyMovementKeyDown, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStates, setDefaultState, State, setCurrentState } from "../state.js";
 import { createAnimation } from "../animation.js";
+import { createVector } from "../vector.js";
 
 export interface Player extends GameObject {
     test: boolean
 }
 
-export function createPlayer(x:number, y:number): Player {
+export function createPlayer(x: number, y: number): Player {
     const player: Player = addGameObject(GameObjectType.PLAYER) as Player;
+    setPosition(player,createVector(x,y));
     addPlayerStates(player);
     addPlayerAnimations(player);
-    registerGameObjectForKeyBoardInput(player)
+    addPlayerMovement(player);
     return player;
 }
 
@@ -44,9 +46,20 @@ function addPlayerAnimations(player: Player): void {
 }
 
 function addPlayerMovingAnimations(player: Player): void {
-    const curAnimation = createAnimation("PlayerMoving", "./resources/link.png",
-        { x: 100, y: 100 }, 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true);
+    const curAnimation = createAnimation("PlayerMoving", "./resources/link.png",getPosition(player), 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true);
 
     player.animations?.set("PlayerMoving", curAnimation);
     setCurrentAnimation(player, curAnimation);
+}
+
+function addPlayerMovement(player: Player): void {
+
+    registerGameObjectForKeyBoardInput(player)
+}
+
+export function handlePlayerMovementInput(player: Player): void {
+    if (isAnyMovementKeyDown())
+        console.log("player moving");
+    else
+        console.log("player is standing");
 }

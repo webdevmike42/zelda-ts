@@ -1,8 +1,10 @@
 import { drawAnimation, updateAnimation } from "../animation.js";
+import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { NULL_STATE } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { pipe } from "../utils.js";
-import { GameObjectType, getCurrentAnimation } from "./gameObject.js";
+import { createVector, NULL_VECTOR } from "../vector.js";
+import { GameObjectType, getCurrentAnimation, moveGameObject } from "./gameObject.js";
 let gameObjects = [];
 let id = 0;
 export const addGameObject = pipe(createGameObject, register);
@@ -14,7 +16,8 @@ export function createGameObject(type) {
         type: type,
         states: new Map(),
         currentState: Object.assign({}, NULL_STATE),
-        defaultState: Object.assign({}, NULL_STATE)
+        defaultState: Object.assign({}, NULL_STATE),
+        position: Object.assign({}, NULL_VECTOR)
     };
 }
 function register(gameObject) {
@@ -24,6 +27,8 @@ function register(gameObject) {
 }
 export function updateGameObjects(currentGameTime) {
     gameObjects.forEach(gameObject => {
+        console.log(getGameObjectCount());
+        handleGameObjectMovement(gameObject);
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
@@ -31,6 +36,18 @@ export function drawGameObjects(ctx) {
     gameObjects.forEach(gameObject => {
         drawAnimation(getCurrentAnimation(gameObject), ctx);
     });
+}
+function handleGameObjectMovement(gameObject) {
+    if (isAnyMovementKeyDown()) {
+        if (isKeyDown(KEYS.RIGHT))
+            moveGameObject(gameObject, createVector(1, 0));
+        if (isKeyDown(KEYS.LEFT))
+            moveGameObject(gameObject, createVector(-1, 0));
+        if (isKeyDown(KEYS.UP))
+            moveGameObject(gameObject, createVector(0, -1));
+        if (isKeyDown(KEYS.DOWN))
+            moveGameObject(gameObject, createVector(0, 1));
+    }
 }
 /*
 

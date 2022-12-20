@@ -1,5 +1,3 @@
-import { Functor } from "./util/functor.js";
-
 export interface Vector {
     x: number,
     y: number

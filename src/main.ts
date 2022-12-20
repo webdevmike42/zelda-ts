@@ -27,6 +27,7 @@ function startNewGame(): void {
         initKeyBoardInputHandler();
         init(ctx, "./resources/tiles-overworld.png");
         createPlayer(100, 100);
+        createPlayer(100, 140);
         loadScreens();
         switchToScreen(START_SCREEN_ID);
         /*
@@ -40,9 +41,6 @@ function startNewGame(): void {
 function setGameState(newGameState: GameState): void {
     gameState = newGameState;
 }
-
-
-
 
 function gameLoop(currentTime: number): void {
     if (startTime === -1) {
