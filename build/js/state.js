@@ -20,10 +20,8 @@ export function switchToState(gameObject, newState) {
     enterCurrentState(gameObject);
     //handleGameObjectInput(gameObject);//otherwise, on transition from idle to moving state, very short input will be ignored
 }
-export function addState(gameObject, key, newState /*, isCurrentState?: boolean, isDefaultState?: boolean*/) {
+export function addState(gameObject, key, newState) {
     gameObject.states.set(key, newState);
-    //if (isCurrentState) setCurrentState(gameObject, newState);
-    //if (isDefaultState) setDefaultState(gameObject, newState);
 }
 export function getState(gameObject, key) {
     return gameObject.states.get(key) || gameObject.defaultState;

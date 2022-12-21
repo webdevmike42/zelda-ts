@@ -32,10 +32,8 @@ export function switchToState(gameObject: GameObject, newState: State) {
     //handleGameObjectInput(gameObject);//otherwise, on transition from idle to moving state, very short input will be ignored
 }
 
-export function addState(gameObject: GameObject, key: string, newState: State/*, isCurrentState?: boolean, isDefaultState?: boolean*/): void {
+export function addState(gameObject: GameObject, key: string, newState: State): void {
     gameObject.states.set(key, newState);
-    //if (isCurrentState) setCurrentState(gameObject, newState);
-    //if (isDefaultState) setDefaultState(gameObject, newState);
 }
 
 export function getState(gameObject: GameObject, key: string): State {

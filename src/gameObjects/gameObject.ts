@@ -14,7 +14,7 @@ export interface GameObject {
     animations?: Map<string, Animation>;
     currentAnimation?: Animation,
     defaultAnimation?: Animation,
-    viewVector?: Vector,
+    viewVector: Vector,
     movementVector: Vector,
     isSolid?: boolean;
     internalId?: number;
@@ -49,6 +49,14 @@ export function setMovementVector(gameObject: GameObject, movementVector: Vector
 
 export function getMovementVector(gameObject: GameObject): Vector {
     return gameObject.movementVector;
+}
+
+export function setViewVector(gameObject: GameObject, viewVector: Vector): void {
+    gameObject.viewVector = { ...viewVector };
+}
+
+export function getViewVector(gameObject: GameObject): Vector {
+    return gameObject.viewVector;
 }
 
 export function createMovementVector(): Vector {

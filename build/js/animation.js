@@ -1,6 +1,7 @@
 import { readyForNextFrame } from "./utils.js";
 import { NULL_VECTOR } from "./vector.js";
-export const NULL_ANIMATION = Object.freeze(createAnimation("NULL_ANIMATION", "", Object.assign({}, NULL_VECTOR), 0, 0, [], 0, false));
+const NULL_FRAME = { srcX: 0, srcY: 0 };
+export const NULL_ANIMATION = Object.freeze(createAnimation("NULL_ANIMATION", "", Object.assign({}, NULL_VECTOR), 0, 0, [Object.assign({}, NULL_FRAME)], 0, false));
 export function createAnimation(uniqueName, imageSrc, position, width, height, frames, framesPerSecond, loop) {
     return {
         name: uniqueName,
@@ -47,4 +48,15 @@ function raiseAnimationFrame(animation) {
     }
     if (animation.loop)
         animation.currentFrameIndex = 0;
+}
+export function addAnimation(gameObject, animation) {
+    var _a;
+    (_a = gameObject.animations) === null || _a === void 0 ? void 0 : _a.set(animation.name, animation);
+}
+export function getAnimation(gameObject, key) {
+    var _a;
+    return ((_a = gameObject.animations) === null || _a === void 0 ? void 0 : _a.get(key)) || gameObject.defaultAnimation || Object.assign({}, NULL_ANIMATION);
+}
+export function setCurrentAnimation(gameObject, animation) {
+    gameObject.currentAnimation = animation;
 }

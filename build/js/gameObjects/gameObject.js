@@ -26,6 +26,12 @@ export function setMovementVector(gameObject, movementVector) {
 export function getMovementVector(gameObject) {
     return gameObject.movementVector;
 }
+export function setViewVector(gameObject, viewVector) {
+    gameObject.viewVector = Object.assign({}, viewVector);
+}
+export function getViewVector(gameObject) {
+    return gameObject.viewVector;
+}
 export function createMovementVector() {
     let movementVector = Object.assign({}, NULL_VECTOR);
     if (isKeyDown(KEYS.UP))

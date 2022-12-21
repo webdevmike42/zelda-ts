@@ -21,6 +21,7 @@ export function createGameObject(type: GameObjectType): GameObject {
         currentState: { ...NULL_STATE },
         defaultState: { ...NULL_STATE },
         designatedState: null,
+        viewVector: {...NULL_VECTOR},
         movementVector: { ...NULL_VECTOR },
         position: { ...NULL_VECTOR }
     }

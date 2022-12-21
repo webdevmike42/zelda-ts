@@ -17,6 +17,7 @@ export function createGameObject(type) {
         currentState: Object.assign({}, NULL_STATE),
         defaultState: Object.assign({}, NULL_STATE),
         designatedState: null,
+        viewVector: Object.assign({}, NULL_VECTOR),
         movementVector: Object.assign({}, NULL_VECTOR),
         position: Object.assign({}, NULL_VECTOR)
     };

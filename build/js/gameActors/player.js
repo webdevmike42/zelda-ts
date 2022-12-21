@@ -1,9 +1,9 @@
 import { addGameObject } from "../gameObjects/gameObjectFactory.js";
-import { createMovementVector, GameObjectType, getPosition, setCurrentAnimation, setMovementVector, setPosition } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, setCurrentAnimation, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStates, setDefaultState, switchToState, setDesignatedState } from "../state.js";
-import { createAnimation } from "../animation.js";
-import { createVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
+import { addAnimation, createAnimation, getAnimation } from "../animation.js";
+import { createVector, get4DirectionVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
 export function createPlayer(x, y) {
     const player = addGameObject(GameObjectType.PLAYER);
     setPosition(player, createVector(x, y));
@@ -45,19 +45,39 @@ function createPlayerMovingState(player) {
             setDesignatedState(player, getState(player, CommonStates.IDLE));
             return;
         }
-        setMovementVector(player, vectorScalarProduct(movingSpeed, createMovementVector()));
+        const movementVector = createMovementVector();
+        setMovementVector(player, vectorScalarProduct(movingSpeed, movementVector));
+        setViewVector(player, get4DirectionVector(movementVector));
+        updatePlayerCurrentMovingAnimationBasedOnViewVector(player, getViewVector(player));
     };
     state.exit = () => console.log("exit " + state.name);
     return state;
 }
 function addPlayerAnimations(player) {
+    player.animations = new Map();
     addPlayerMovingAnimations(player);
 }
 function addPlayerMovingAnimations(player) {
-    var _a;
-    const curAnimation = createAnimation("PlayerMoving", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true);
-    (_a = player.animations) === null || _a === void 0 ? void 0 : _a.set("PlayerMoving", curAnimation);
-    setCurrentAnimation(player, curAnimation);
+    addAnimation(player, createAnimation("PlayerMovingUp", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 62, srcY: 0 }, { srcX: 62, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation("PlayerMovingLeft", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation("PlayerMovingDown", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 0, srcY: 0 }, { srcX: 0, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation("PlayerMovingRight", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 91, srcY: 0 }, { srcX: 91, srcY: 30 }], 6, true));
+    setCurrentAnimation(player, getAnimation(player, "PlayerMovingDown"));
+}
+function updatePlayerCurrentMovingAnimationBasedOnViewVector(player, viewVector) {
+    let currentAnimation = getCurrentAnimation(player);
+    const currentPosition = currentAnimation.position;
+    console.log(viewVector);
+    if (viewVector.x === 1)
+        currentAnimation = getAnimation(player, "PlayerMovingRight");
+    if (viewVector.x === -1)
+        currentAnimation = getAnimation(player, "PlayerMovingLeft");
+    if (viewVector.y === -1)
+        currentAnimation = getAnimation(player, "PlayerMovingUp");
+    if (viewVector.y === 1)
+        currentAnimation = getAnimation(player, "PlayerMovingDown");
+    setCurrentAnimation(player, currentAnimation);
+    currentAnimation.position = Object.assign({}, currentPosition);
 }
 function addPlayerMovement(player) {
     registerGameObjectForKeyBoardInput(player);

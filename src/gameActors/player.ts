@@ -1,10 +1,9 @@
 import { addGameObject } from "../gameObjects/gameObjectFactory.js";
-import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, moveGameObject, setCurrentAnimation, setMovementVector, setPosition } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getPosition, getViewVector, moveGameObject, setCurrentAnimation, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStates, setDefaultState, State, setCurrentState, switchToState, setDesignatedState } from "../state.js";
-import { createAnimation } from "../animation.js";
-import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
-import { getVectorFrameFraction } from "../utils.js";
+import { addAnimation, createAnimation, getAnimation, Animation } from "../animation.js";
+import { createVector, get4DirectionVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 
 export interface Player extends GameObject {
     test: boolean
@@ -32,11 +31,11 @@ function createPlayerIdleState(player: Player): State {
     state.name = "player idle state";
     state.enter = () => {
         console.log("enter " + state.name);
-        setMovementVector(player, {...NULL_VECTOR});
+        setMovementVector(player, { ...NULL_VECTOR });
     }
     state.update = () => {
-        if(isAnyMovementKeyDown()){
-            setDesignatedState(player, getState(player,CommonStates.MOVING));
+        if (isAnyMovementKeyDown()) {
+            setDesignatedState(player, getState(player, CommonStates.MOVING));
             return;
         }
     }
@@ -49,26 +48,44 @@ function createPlayerMovingState(player: Player): State {
     const state: State = createEmptyState();
     state.name = "player moving state";
     state.enter = () => console.log("enter " + state.name);
-    state.update = (currentGameTime:number, timeSinceLastTick:number) => {
-        if(!isAnyMovementKeyDown()){
-            setDesignatedState(player, getState(player,CommonStates.IDLE));
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+        if (!isAnyMovementKeyDown()) {
+            setDesignatedState(player, getState(player, CommonStates.IDLE));
             return;
         }
-        setMovementVector(player, vectorScalarProduct(movingSpeed,createMovementVector()));
+        const movementVector = createMovementVector();
+        setMovementVector(player, vectorScalarProduct(movingSpeed, movementVector));
+        setViewVector(player, get4DirectionVector(movementVector));
+        updatePlayerCurrentMovingAnimationBasedOnViewVector(player, getViewVector(player));
+
     }
     state.exit = () => console.log("exit " + state.name);
     return state;
 }
 
 function addPlayerAnimations(player: Player): void {
+    player.animations = new Map<string, Animation>();
     addPlayerMovingAnimations(player);
 }
 
 function addPlayerMovingAnimations(player: Player): void {
-    const curAnimation = createAnimation("PlayerMoving", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true);
+    addAnimation(player, createAnimation("PlayerMovingUp", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 62, srcY: 0 }, { srcX: 62, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation("PlayerMovingLeft", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation("PlayerMovingDown", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 0, srcY: 0 }, { srcX: 0, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation("PlayerMovingRight", "./resources/link.png", getPosition(player), 16, 16, [{ srcX: 91, srcY: 0 }, { srcX: 91, srcY: 30 }], 6, true));
+    setCurrentAnimation(player, getAnimation(player, "PlayerMovingDown"));
+}
 
-    player.animations?.set("PlayerMoving", curAnimation);
-    setCurrentAnimation(player, curAnimation);
+function updatePlayerCurrentMovingAnimationBasedOnViewVector(player: Player, viewVector: Vector): void {
+    let currentAnimation = getCurrentAnimation(player);
+    const currentPosition = currentAnimation.position;
+    console.log(viewVector)
+    if (viewVector.x === 1) currentAnimation = getAnimation(player, "PlayerMovingRight")
+    if (viewVector.x === -1) currentAnimation = getAnimation(player, "PlayerMovingLeft")
+    if (viewVector.y === -1) currentAnimation = getAnimation(player, "PlayerMovingUp")
+    if (viewVector.y === 1) currentAnimation = getAnimation(player, "PlayerMovingDown");
+    setCurrentAnimation(player, currentAnimation);
+    currentAnimation.position = {...currentPosition};
 }
 
 function addPlayerMovement(player: Player): void {
