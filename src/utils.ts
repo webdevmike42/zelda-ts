@@ -1,4 +1,5 @@
 import { MS_PER_SECOND } from "./Global.js";
+import { Vector } from "./vector.js";
 
 export const pipe = function<I,O>(...fns: Function[]) {
     return function (val:I){
