@@ -65,7 +65,7 @@ function updateGame(currentGameTime: number, timeSinceLastTick: number): void {
             if (isKeyPressed(KEYS.START)) {
                 gameState = GameState.PAUSING;
             } else {
-                updateGameObjects(currentGameTime);
+                updateGameObjects(currentGameTime, timeSinceLastTick);
             }
             break;
         case GameState.PAUSING:

@@ -3,8 +3,8 @@ import { handlePlayerMovementInput, Player } from "../gameActors/player.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { NULL_STATE, State } from "../state.js";
 import { addTestResult } from "../tests.js";
-import { compose, pipe } from "../utils.js";
-import { createVector, NULL_VECTOR, vectorSum } from "../vector.js";
+import { compose, getVectorFrameFraction, pipe } from "../utils.js";
+import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { GameObject, GameObjectType, getCurrentAnimation, getPosition, moveGameObject, setPosition } from "./gameObject.js";
 
 let gameObjects: GameObject[] = [];
@@ -32,10 +32,9 @@ function register<T extends GameObject>(gameObject: T): T {
     return gameObject;
 }
 
-export function updateGameObjects(currentGameTime: number): void {
+export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
     gameObjects.forEach(gameObject => {
-        console.log(getGameObjectCount())
-        handleGameObjectMovement(gameObject);
+        handleGameObjectMovement(gameObject, timeSinceLastTick);
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
@@ -46,20 +45,18 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     })
 }
 
-function handleGameObjectMovement(gameObject: GameObject): void {
+function handleGameObjectMovement(gameObject: GameObject, timeSinceLastTick: number): void {
     if (isAnyMovementKeyDown()) {
-        if (isKeyDown(KEYS.RIGHT))
-            moveGameObject(gameObject, createVector(1, 0));
-        if (isKeyDown(KEYS.LEFT))
-            moveGameObject(gameObject, createVector(-1, 0));
-        if (isKeyDown(KEYS.UP))
-            moveGameObject(gameObject, createVector(0, -1));
-        if (isKeyDown(KEYS.DOWN))
-            moveGameObject(gameObject, createVector(0, 1));
+        let moveBy: Vector = { ...NULL_VECTOR };
+
+        if (isKeyDown(KEYS.UP)) moveBy = vectorSum(moveBy, createVector(0, -1))
+        if (isKeyDown(KEYS.LEFT)) moveBy = vectorSum(moveBy, createVector(-1, 0))
+        if (isKeyDown(KEYS.DOWN)) moveBy = vectorSum(moveBy, createVector(0, 1))
+        if (isKeyDown(KEYS.RIGHT)) moveBy = vectorSum(moveBy, createVector(1, 0))
+
+        moveGameObject(gameObject, getVectorFrameFraction(vectorScalarProduct(100,moveBy), timeSinceLastTick));
     }
 }
-
-
 
 /*
 
@@ -100,20 +97,6 @@ function removeGameObject<T extends GameObject>(gameObject: T): void {
 function isRegistered(gameObjectId: number): boolean {
     return gameObjects.some(go => go.id === gameObjectId);
 }
-
-/*
-function unregister(gameObject: GameObject): GameObject {
-    if (isRegistered(gameObject.id))
-        removeFromGameObjects(gameObject);
-
-    return gameObject;
-}
-*/
-/*
-function removeFromGameObjects(gameObject: GameObject): void {
-    gameObjects.splice(gameObjects.map(obj => obj.id).indexOf(gameObject.id), 1);
-}
-*/
 
 export function removeAllGameObjects() {
     gameObjects = [];

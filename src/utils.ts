@@ -22,6 +22,13 @@ export const compose = function <I,O>(...fns: Function[]) {
     }
 };
 
-export function readyForNextFrame(currentTime: number, timeOfLastTick: number, fps:number) {
+export function readyForNextFrame(currentTime: number, timeOfLastTick: number, fps: number) {
     return ((currentTime - timeOfLastTick) >= (MS_PER_SECOND / fps))
+}
+
+export function getVectorFrameFraction(vector: Vector, timeSinceLastTick: number): Vector {
+    return {
+        x: vector.x * (timeSinceLastTick / MS_PER_SECOND),
+        y: vector.y * (timeSinceLastTick / MS_PER_SECOND)
+    }
 }
