@@ -22,7 +22,6 @@ function startNewGame() {
         initKeyBoardInputHandler();
         init(ctx, "./resources/tiles-overworld.png");
         createPlayer(100, 100);
-        createPlayer(100, 140);
         loadScreens();
         switchToScreen(START_SCREEN_ID);
         /*
@@ -55,7 +54,7 @@ function updateGame(currentGameTime, timeSinceLastTick) {
                 gameState = GameState.PAUSING;
             }
             else {
-                updateGameObjects(currentGameTime);
+                updateGameObjects(currentGameTime, timeSinceLastTick);
             }
             break;
         case GameState.PAUSING:

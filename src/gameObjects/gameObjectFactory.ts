@@ -1,11 +1,10 @@
-import { Animation, drawAnimation, NULL_ANIMATION, updateAnimation } from "../animation.js";
-import { handlePlayerMovementInput, Player } from "../gameActors/player.js";
+import { drawAnimation, updateAnimation } from "../animation.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
-import { NULL_STATE, State } from "../state.js";
+import { getCurrentState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { compose, getVectorFrameFraction, pipe } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
-import { GameObject, GameObjectType, getCurrentAnimation, getPosition, moveGameObject, setPosition } from "./gameObject.js";
+import { GameObject, GameObjectType, getCurrentAnimation, getMovementVector, moveGameObject } from "./gameObject.js";
 
 let gameObjects: GameObject[] = [];
 let id: number = 0;
@@ -21,6 +20,8 @@ export function createGameObject(type: GameObjectType): GameObject {
         states: new Map<string, State>(),
         currentState: { ...NULL_STATE },
         defaultState: { ...NULL_STATE },
+        designatedState: null,
+        movementVector: { ...NULL_VECTOR },
         position: { ...NULL_VECTOR }
     }
 }
@@ -34,9 +35,19 @@ function register<T extends GameObject>(gameObject: T): T {
 
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
     gameObjects.forEach(gameObject => {
-        handleGameObjectMovement(gameObject, timeSinceLastTick);
+        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+
+        if (gameObject.designatedState !== null) {
+            switchToState(gameObject, gameObject.designatedState);
+            setDesignatedState(gameObject, null);
+        }
+        moveGameObject(gameObject, getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick));
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
+}
+
+function updateGameObjectCurrentState(gameObject: GameObject, currentGameTime: number, timeSinceLastTick: number): void {
+    getCurrentState(gameObject).update(currentGameTime, timeSinceLastTick);
 }
 
 export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
@@ -45,18 +56,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     })
 }
 
-function handleGameObjectMovement(gameObject: GameObject, timeSinceLastTick: number): void {
-    if (isAnyMovementKeyDown()) {
-        let moveBy: Vector = { ...NULL_VECTOR };
 
-        if (isKeyDown(KEYS.UP)) moveBy = vectorSum(moveBy, createVector(0, -1))
-        if (isKeyDown(KEYS.LEFT)) moveBy = vectorSum(moveBy, createVector(-1, 0))
-        if (isKeyDown(KEYS.DOWN)) moveBy = vectorSum(moveBy, createVector(0, 1))
-        if (isKeyDown(KEYS.RIGHT)) moveBy = vectorSum(moveBy, createVector(1, 0))
-
-        moveGameObject(gameObject, getVectorFrameFraction(vectorScalarProduct(100,moveBy), timeSinceLastTick));
-    }
-}
 
 /*
 

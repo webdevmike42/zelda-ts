@@ -16,3 +16,9 @@ export const compose = function (...fns) {
 export function readyForNextFrame(currentTime, timeOfLastTick, fps) {
     return ((currentTime - timeOfLastTick) >= (MS_PER_SECOND / fps));
 }
+export function getVectorFrameFraction(vector, timeSinceLastTick) {
+    return {
+        x: vector.x * (timeSinceLastTick / MS_PER_SECOND),
+        y: vector.y * (timeSinceLastTick / MS_PER_SECOND)
+    };
+}

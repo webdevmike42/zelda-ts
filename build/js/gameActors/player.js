@@ -1,34 +1,52 @@
 import { addGameObject } from "../gameObjects/gameObjectFactory.js";
-import { GameObjectType, getPosition, setCurrentAnimation, setPosition } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getPosition, setCurrentAnimation, setMovementVector, setPosition } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
-import { addState, createEmptyState, CommonStates } from "../state.js";
+import { addState, createEmptyState, getState, CommonStates, setDefaultState, switchToState, setDesignatedState } from "../state.js";
 import { createAnimation } from "../animation.js";
-import { createVector } from "../vector.js";
+import { createVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
 export function createPlayer(x, y) {
     const player = addGameObject(GameObjectType.PLAYER);
     setPosition(player, createVector(x, y));
     addPlayerStates(player);
     addPlayerAnimations(player);
     addPlayerMovement(player);
+    switchToState(player, getState(player, CommonStates.IDLE));
     return player;
 }
 function addPlayerStates(player) {
-    addState(player, CommonStates.IDLE, createPlayerIdleState(player), true, true);
+    const idleState = createPlayerIdleState(player);
+    addState(player, CommonStates.IDLE, idleState);
     addState(player, CommonStates.MOVING, createPlayerMovingState(player));
+    setDefaultState(player, idleState);
 }
 function createPlayerIdleState(player) {
     const state = createEmptyState();
     state.name = "player idle state";
-    state.enter = () => console.log("enter " + state.name);
-    state.update = () => console.log("update " + state.name);
+    state.enter = () => {
+        console.log("enter " + state.name);
+        setMovementVector(player, Object.assign({}, NULL_VECTOR));
+    };
+    state.update = () => {
+        if (isAnyMovementKeyDown()) {
+            setDesignatedState(player, getState(player, CommonStates.MOVING));
+            return;
+        }
+    };
     state.exit = () => console.log("exit " + state.name);
     return state;
 }
 function createPlayerMovingState(player) {
+    let movingSpeed = 100;
     const state = createEmptyState();
     state.name = "player moving state";
     state.enter = () => console.log("enter " + state.name);
-    state.update = () => console.log("update " + state.name);
+    state.update = (currentGameTime, timeSinceLastTick) => {
+        if (!isAnyMovementKeyDown()) {
+            setDesignatedState(player, getState(player, CommonStates.IDLE));
+            return;
+        }
+        setMovementVector(player, vectorScalarProduct(movingSpeed, createMovementVector()));
+    };
     state.exit = () => console.log("exit " + state.name);
     return state;
 }
@@ -43,10 +61,4 @@ function addPlayerMovingAnimations(player) {
 }
 function addPlayerMovement(player) {
     registerGameObjectForKeyBoardInput(player);
-}
-export function handlePlayerMovementInput(player) {
-    if (isAnyMovementKeyDown())
-        console.log("player moving");
-    else
-        console.log("player is standing");
 }

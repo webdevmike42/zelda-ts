@@ -1,5 +1,4 @@
-import { createPlayer, Player } from "./gameActors/player.js";
-import { GameObject, GameObjectType } from "./gameObjects/gameObject";
+import { GameObject } from "./gameObjects/gameObject";
 import { createTestGameObject } from "./gameObjects/gameObjectFactory.js";
 
 export interface State {
@@ -26,17 +25,17 @@ export function createEmptyState(): State {
     return { ...NULL_STATE };
 }
 
-export function switchToState(gameObject: GameObject, newStateKey: CommonStates) {
+export function switchToState(gameObject: GameObject, newState: State) {
     exitCurrentState(gameObject);
-    setCurrentState(gameObject, getState(gameObject, newStateKey));
+    setCurrentState(gameObject,newState);
     enterCurrentState(gameObject);
     //handleGameObjectInput(gameObject);//otherwise, on transition from idle to moving state, very short input will be ignored
 }
 
-export function addState(gameObject: GameObject, key: string, newState: State, isCurrentState?: boolean, isDefaultState?: boolean): void {
+export function addState(gameObject: GameObject, key: string, newState: State/*, isCurrentState?: boolean, isDefaultState?: boolean*/): void {
     gameObject.states.set(key, newState);
-    if (isCurrentState) setCurrentState(gameObject, newState);
-    if (isDefaultState) setDefaultState(gameObject, newState);
+    //if (isCurrentState) setCurrentState(gameObject, newState);
+    //if (isDefaultState) setDefaultState(gameObject, newState);
 }
 
 export function getState(gameObject: GameObject, key: string): State {
@@ -45,6 +44,10 @@ export function getState(gameObject: GameObject, key: string): State {
 
 export function setCurrentState(gameObject: GameObject, newState: State): void {
     gameObject.currentState = newState;
+}
+
+export function getCurrentState(gameObject: GameObject): State {
+    return gameObject.currentState;
 }
 
 export function setDefaultState(gameObject: GameObject, newState: State): void {
@@ -59,11 +62,15 @@ function exitCurrentState(gameObject: GameObject): void {
     gameObject.currentState.exit();
 }
 
+export function setDesignatedState(gameObject:GameObject, designatedState:State | null):void{
+    gameObject.designatedState = designatedState;
+}
+
 export function testState() {
     const dummy: GameObject = createTestGameObject();
     console.log(dummy.currentState.name);
-    switchToState(dummy,CommonStates.MOVING);
+    switchToState(dummy, getState(dummy, CommonStates.MOVING));
     console.log(dummy.currentState.name);
-    switchToState(dummy, CommonStates.ACTION);
+    switchToState(dummy, getState(dummy, CommonStates.ACTION));
     console.log(dummy.currentState.name);
 }

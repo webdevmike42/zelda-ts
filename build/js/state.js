@@ -14,24 +14,25 @@ export const NULL_STATE = Object.freeze({
 export function createEmptyState() {
     return Object.assign({}, NULL_STATE);
 }
-export function switchToState(gameObject, newStateKey) {
+export function switchToState(gameObject, newState) {
     exitCurrentState(gameObject);
-    setCurrentState(gameObject, getState(gameObject, newStateKey));
+    setCurrentState(gameObject, newState);
     enterCurrentState(gameObject);
     //handleGameObjectInput(gameObject);//otherwise, on transition from idle to moving state, very short input will be ignored
 }
-export function addState(gameObject, key, newState, isCurrentState, isDefaultState) {
+export function addState(gameObject, key, newState /*, isCurrentState?: boolean, isDefaultState?: boolean*/) {
     gameObject.states.set(key, newState);
-    if (isCurrentState)
-        setCurrentState(gameObject, newState);
-    if (isDefaultState)
-        setDefaultState(gameObject, newState);
+    //if (isCurrentState) setCurrentState(gameObject, newState);
+    //if (isDefaultState) setDefaultState(gameObject, newState);
 }
 export function getState(gameObject, key) {
     return gameObject.states.get(key) || gameObject.defaultState;
 }
 export function setCurrentState(gameObject, newState) {
     gameObject.currentState = newState;
+}
+export function getCurrentState(gameObject) {
+    return gameObject.currentState;
 }
 export function setDefaultState(gameObject, newState) {
     gameObject.defaultState = newState;
@@ -42,11 +43,14 @@ function enterCurrentState(gameObject) {
 function exitCurrentState(gameObject) {
     gameObject.currentState.exit();
 }
+export function setDesignatedState(gameObject, designatedState) {
+    gameObject.designatedState = designatedState;
+}
 export function testState() {
     const dummy = createTestGameObject();
     console.log(dummy.currentState.name);
-    switchToState(dummy, CommonStates.MOVING);
+    switchToState(dummy, getState(dummy, CommonStates.MOVING));
     console.log(dummy.currentState.name);
-    switchToState(dummy, CommonStates.ACTION);
+    switchToState(dummy, getState(dummy, CommonStates.ACTION));
     console.log(dummy.currentState.name);
 }

@@ -1,6 +1,7 @@
 import { Animation, NULL_ANIMATION } from "../animation.js";
+import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { State } from "../state.js";
-import { Vector, vectorSum } from "../vector.js";
+import { createVector, NULL_VECTOR, Vector, vectorSum } from "../vector.js";
 
 export interface GameObject {
     id: number;
@@ -8,10 +9,13 @@ export interface GameObject {
     states: Map<string, State>;
     currentState: State;
     defaultState: State;
+    designatedState: State | null;
     position: Vector;
     animations?: Map<string, Animation>;
     currentAnimation?: Animation,
     defaultAnimation?: Animation,
+    viewVector?: Vector,
+    movementVector: Vector,
     isSolid?: boolean;
     internalId?: number;
 }
@@ -37,6 +41,23 @@ export function setPosition(gameObject: GameObject, newPosition: Vector): void {
 
 export function getPosition(gameObject: GameObject): Vector {
     return gameObject.position;
+}
+
+export function setMovementVector(gameObject: GameObject, movementVector: Vector): void {
+    gameObject.movementVector = { ...movementVector };
+}
+
+export function getMovementVector(gameObject: GameObject): Vector {
+    return gameObject.movementVector;
+}
+
+export function createMovementVector(): Vector {
+    let movementVector: Vector = { ...NULL_VECTOR };
+    if (isKeyDown(KEYS.UP)) movementVector = vectorSum(movementVector, createVector(0, -1))
+    if (isKeyDown(KEYS.LEFT)) movementVector = vectorSum(movementVector, createVector(-1, 0))
+    if (isKeyDown(KEYS.DOWN)) movementVector = vectorSum(movementVector, createVector(0, 1))
+    if (isKeyDown(KEYS.RIGHT)) movementVector = vectorSum(movementVector, createVector(1, 0))
+    return movementVector;
 }
 
 export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {

@@ -3,7 +3,7 @@ export interface Vector {
     y: number
 }
 
-export const NULL_VECTOR = Object.freeze(createVector(0,0));
+export const NULL_VECTOR = Object.freeze(createVector(0, 0));
 
 
 export function createVector(x: number, y: number) {
@@ -33,6 +33,19 @@ export function vectorScalarProduct(scalar: number, vector: Vector): Vector {
     }
 }
 
-function vectorMagnitude(vector: Vector): number {
-    return 0;
+export function normalizedVector(vector: Vector): Vector {
+    const mag = vectorMagnitude(vector);
+
+    return (mag !== 0)
+        ? createVector(vector.x /= mag, vector.y /= mag)
+        : vector
+}
+
+export function vectorMagnitude(vector: Vector): number {
+    return Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
+}
+
+export function get4DirectionVector(vector: Vector): Vector {
+    //8 directions get resolved to x axis
+    return createVector(vector.x, (vector.x !== 0) ? 0 : vector.y)
 }

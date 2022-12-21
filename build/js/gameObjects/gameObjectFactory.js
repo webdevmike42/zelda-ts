@@ -1,10 +1,9 @@
 import { drawAnimation, updateAnimation } from "../animation.js";
-import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
-import { NULL_STATE } from "../state.js";
+import { getCurrentState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
-import { pipe } from "../utils.js";
-import { createVector, NULL_VECTOR } from "../vector.js";
-import { GameObjectType, getCurrentAnimation, moveGameObject } from "./gameObject.js";
+import { getVectorFrameFraction, pipe } from "../utils.js";
+import { NULL_VECTOR } from "../vector.js";
+import { GameObjectType, getCurrentAnimation, getMovementVector, moveGameObject } from "./gameObject.js";
 let gameObjects = [];
 let id = 0;
 export const addGameObject = pipe(createGameObject, register);
@@ -17,6 +16,8 @@ export function createGameObject(type) {
         states: new Map(),
         currentState: Object.assign({}, NULL_STATE),
         defaultState: Object.assign({}, NULL_STATE),
+        designatedState: null,
+        movementVector: Object.assign({}, NULL_VECTOR),
         position: Object.assign({}, NULL_VECTOR)
     };
 }
@@ -25,29 +26,24 @@ function register(gameObject) {
         gameObjects.push(gameObject);
     return gameObject;
 }
-export function updateGameObjects(currentGameTime) {
+export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     gameObjects.forEach(gameObject => {
-        console.log(getGameObjectCount());
-        handleGameObjectMovement(gameObject);
+        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+        if (gameObject.designatedState !== null) {
+            switchToState(gameObject, gameObject.designatedState);
+            setDesignatedState(gameObject, null);
+        }
+        moveGameObject(gameObject, getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick));
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
+}
+function updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick) {
+    getCurrentState(gameObject).update(currentGameTime, timeSinceLastTick);
 }
 export function drawGameObjects(ctx) {
     gameObjects.forEach(gameObject => {
         drawAnimation(getCurrentAnimation(gameObject), ctx);
     });
-}
-function handleGameObjectMovement(gameObject) {
-    if (isAnyMovementKeyDown()) {
-        if (isKeyDown(KEYS.RIGHT))
-            moveGameObject(gameObject, createVector(1, 0));
-        if (isKeyDown(KEYS.LEFT))
-            moveGameObject(gameObject, createVector(-1, 0));
-        if (isKeyDown(KEYS.UP))
-            moveGameObject(gameObject, createVector(0, -1));
-        if (isKeyDown(KEYS.DOWN))
-            moveGameObject(gameObject, createVector(0, 1));
-    }
 }
 /*
 
@@ -86,19 +82,6 @@ function removeGameObject(gameObject) {
 function isRegistered(gameObjectId) {
     return gameObjects.some(go => go.id === gameObjectId);
 }
-/*
-function unregister(gameObject: GameObject): GameObject {
-    if (isRegistered(gameObject.id))
-        removeFromGameObjects(gameObject);
-
-    return gameObject;
-}
-*/
-/*
-function removeFromGameObjects(gameObject: GameObject): void {
-    gameObjects.splice(gameObjects.map(obj => obj.id).indexOf(gameObject.id), 1);
-}
-*/
 export function removeAllGameObjects() {
     gameObjects = [];
 }
