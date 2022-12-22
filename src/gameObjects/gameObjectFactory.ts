@@ -1,16 +1,17 @@
-import { drawAnimation, updateAnimation } from "../animation.js";
+import { addAnimation, createAnimation, drawAnimation, setCurrentAnimation, updateAnimation } from "../animation.js";
+import { NULL_BOX } from "../box.js";
+import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { getCurrentState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { compose, getVectorFrameFraction, pipe } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
-import { GameObject, GameObjectType, getCurrentAnimation, getMovementVector, moveGameObject } from "./gameObject.js";
+import { GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 
 let gameObjects: GameObject[] = [];
 let id: number = 0;
 
 export const addGameObject = pipe<GameObjectType, GameObject>(createGameObject, register);
-export const addSolidGameObject = pipe<GameObjectType, GameObject>(createGameObject, register, setSolid);
 export const createTestGameObject = createGameObject.bind(null, GameObjectType.DUMMY);
 
 export function createGameObject(type: GameObjectType): GameObject {
@@ -21,9 +22,12 @@ export function createGameObject(type: GameObjectType): GameObject {
         currentState: { ...NULL_STATE },
         defaultState: { ...NULL_STATE },
         designatedState: null,
-        viewVector: {...NULL_VECTOR},
+        viewVector: { ...NULL_VECTOR },
         movementVector: { ...NULL_VECTOR },
-        position: { ...NULL_VECTOR }
+        position: { ...NULL_VECTOR },
+        width:0,
+        height:0,
+        collisionBox: {...NULL_BOX}
     }
 }
 
@@ -42,7 +46,12 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
             switchToState(gameObject, gameObject.designatedState);
             setDesignatedState(gameObject, null);
         }
-        moveGameObject(gameObject, getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick));
+
+        if (isMoving(getMovementVector(gameObject))) {
+            let resolvedMovementVector:Vector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
+            moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
+        }
+
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
@@ -55,6 +64,18 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     gameObjects.forEach(gameObject => {
         drawAnimation(getCurrentAnimation(gameObject), ctx);
     })
+}
+
+export function addSolidDummy(x: number, y: number): GameObject {
+    const dummy: GameObject = addGameObject(GameObjectType.DUMMY);
+    setPosition(dummy, createVector(x, y));
+    setBounds(dummy, 16,50);
+    setSolid(dummy);
+    setCollisionBoxFromBoundingBox(dummy);
+    const a = createAnimation("dummyFacingUp", "./resources/link.png", getPosition(dummy), dummy.width, dummy.height, [{ srcX: 62, srcY: 0 }], 1, false)
+    addAnimation(dummy, a);
+    setCurrentAnimation(dummy, a);
+    return dummy;
 }
 
 
@@ -103,15 +124,20 @@ export function removeAllGameObjects() {
     gameObjects = [];
 }
 
-function setSolid(gameObject: GameObject, isSolid: boolean = true): GameObject {
-    return {
-        ...gameObject,
-        isSolid: isSolid
-    }
+function setSolid(gameObject: GameObject, isSolid: boolean = true): void {
+    gameObject.isSolid = isSolid;
+}
+
+export function isSolid(gameObject:GameObject):boolean{
+    return gameObject.isSolid || false;
 }
 
 function getGameObjectCount() {
     return gameObjects.length;
+}
+
+export function getGameObjects() {
+    return gameObjects;
 }
 
 export function testGameObjectFactory() {
@@ -127,8 +153,8 @@ export function testGameObjectFactory() {
     let go = createTestGameObject();
     addTestResult("createTestGameObject", go.type === GameObjectType.DUMMY);
 
-    go = addSolidGameObject(GameObjectType.ITEM);
-    addTestResult("addSolidGameObject", go.type === GameObjectType.ITEM && go.isSolid === true);
+    setSolid(go);
+    addTestResult("addSolidGameObject", go.isSolid === true);
 
     removeAllGameObjects();
     addGameObject(GameObjectType.DUMMY);

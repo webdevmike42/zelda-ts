@@ -1,9 +1,11 @@
-import { addGameObject } from "../gameObjects/gameObjectFactory.js";
-import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getPosition, getViewVector, moveGameObject, setCurrentAnimation, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
+import { addGameObject, getGameObjects } from "../gameObjects/gameObjectFactory.js";
+import { createMovementVector, GameObject, GameObjectType, getBoundingBox, getCurrentAnimation, getMovementVector, getPosition, getViewVector, moveGameObject, setBounds, setCurrentAnimation, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStates, setDefaultState, State, setCurrentState, switchToState, setDesignatedState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation, Animation } from "../animation.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
+import { setCollisionBox, getCollidingBoxes, getCollidingGameObjects, getCollidingSolidGameObjects } from "../collisions.js";
+import { createBox } from "../box.js";
 
 export interface Player extends GameObject {
     test: boolean
@@ -12,9 +14,11 @@ export interface Player extends GameObject {
 export function createPlayer(x: number, y: number): Player {
     const player: Player = addGameObject(GameObjectType.PLAYER) as Player;
     setPosition(player, createVector(x, y));
+    setBounds(player, 16,16);
     addPlayerStates(player);
     addPlayerAnimations(player);
     addPlayerMovement(player);
+    setCollisionBox(player, createBox(getPosition(player).x + 2, getPosition(player).y + Math.floor(player.height / 2), player.width - 4, Math.floor(player.height / 2)));
     switchToState(player, getState(player, CommonStates.IDLE));
     return player;
 }
@@ -30,7 +34,7 @@ function createPlayerIdleState(player: Player): State {
     const state: State = createEmptyState();
     state.name = "player idle state";
     state.enter = () => {
-        console.log("enter " + state.name);
+        console.log("enter: " + state.name)
         setMovementVector(player, { ...NULL_VECTOR });
     }
     state.update = () => {
@@ -39,7 +43,7 @@ function createPlayerIdleState(player: Player): State {
             return;
         }
     }
-    state.exit = () => console.log("exit " + state.name);
+    state.exit = () => {/*console.log("exit " + state.name)*/};
     return state;
 }
 
@@ -47,7 +51,7 @@ function createPlayerMovingState(player: Player): State {
     let movingSpeed = 100;
     const state: State = createEmptyState();
     state.name = "player moving state";
-    state.enter = () => console.log("enter " + state.name);
+    state.enter = () => {/*console.log("enter " + state.name)*/};
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
         if (!isAnyMovementKeyDown()) {
             setDesignatedState(player, getState(player, CommonStates.IDLE));
@@ -59,7 +63,7 @@ function createPlayerMovingState(player: Player): State {
         updatePlayerCurrentMovingAnimationBasedOnViewVector(player, getViewVector(player));
 
     }
-    state.exit = () => console.log("exit " + state.name);
+    state.exit = () => {/*console.log("exit " + state.name)*/};
     return state;
 }
 
@@ -79,7 +83,7 @@ function addPlayerMovingAnimations(player: Player): void {
 function updatePlayerCurrentMovingAnimationBasedOnViewVector(player: Player, viewVector: Vector): void {
     let currentAnimation = getCurrentAnimation(player);
     const currentPosition = currentAnimation.position;
-    console.log(viewVector)
+
     if (viewVector.x === 1) currentAnimation = getAnimation(player, "PlayerMovingRight")
     if (viewVector.x === -1) currentAnimation = getAnimation(player, "PlayerMovingLeft")
     if (viewVector.y === -1) currentAnimation = getAnimation(player, "PlayerMovingUp")
@@ -90,4 +94,8 @@ function updatePlayerCurrentMovingAnimationBasedOnViewVector(player: Player, vie
 
 function addPlayerMovement(player: Player): void {
     registerGameObjectForKeyBoardInput(player)
+}
+
+function addPlayerCollisionBox(player:Player):void{
+
 }

@@ -1,13 +1,14 @@
-import { drawAnimation, updateAnimation } from "../animation.js";
+import { addAnimation, createAnimation, drawAnimation, setCurrentAnimation, updateAnimation } from "../animation.js";
+import { NULL_BOX } from "../box.js";
+import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCurrentState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction, pipe } from "../utils.js";
-import { NULL_VECTOR } from "../vector.js";
-import { GameObjectType, getCurrentAnimation, getMovementVector, moveGameObject } from "./gameObject.js";
+import { createVector, NULL_VECTOR } from "../vector.js";
+import { GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 let gameObjects = [];
 let id = 0;
 export const addGameObject = pipe(createGameObject, register);
-export const addSolidGameObject = pipe(createGameObject, register, setSolid);
 export const createTestGameObject = createGameObject.bind(null, GameObjectType.DUMMY);
 export function createGameObject(type) {
     return {
@@ -19,7 +20,10 @@ export function createGameObject(type) {
         designatedState: null,
         viewVector: Object.assign({}, NULL_VECTOR),
         movementVector: Object.assign({}, NULL_VECTOR),
-        position: Object.assign({}, NULL_VECTOR)
+        position: Object.assign({}, NULL_VECTOR),
+        width: 0,
+        height: 0,
+        collisionBox: Object.assign({}, NULL_BOX)
     };
 }
 function register(gameObject) {
@@ -34,7 +38,10 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
             switchToState(gameObject, gameObject.designatedState);
             setDesignatedState(gameObject, null);
         }
-        moveGameObject(gameObject, getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick));
+        if (isMoving(getMovementVector(gameObject))) {
+            let resolvedMovementVector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
+            moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
+        }
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
@@ -45,6 +52,17 @@ export function drawGameObjects(ctx) {
     gameObjects.forEach(gameObject => {
         drawAnimation(getCurrentAnimation(gameObject), ctx);
     });
+}
+export function addSolidDummy(x, y) {
+    const dummy = addGameObject(GameObjectType.DUMMY);
+    setPosition(dummy, createVector(x, y));
+    setBounds(dummy, 16, 50);
+    setSolid(dummy);
+    setCollisionBoxFromBoundingBox(dummy);
+    const a = createAnimation("dummyFacingUp", "./resources/link.png", getPosition(dummy), dummy.width, dummy.height, [{ srcX: 62, srcY: 0 }], 1, false);
+    addAnimation(dummy, a);
+    setCurrentAnimation(dummy, a);
+    return dummy;
 }
 /*
 
@@ -87,10 +105,16 @@ export function removeAllGameObjects() {
     gameObjects = [];
 }
 function setSolid(gameObject, isSolid = true) {
-    return Object.assign(Object.assign({}, gameObject), { isSolid: isSolid });
+    gameObject.isSolid = isSolid;
+}
+export function isSolid(gameObject) {
+    return gameObject.isSolid || false;
 }
 function getGameObjectCount() {
     return gameObjects.length;
+}
+export function getGameObjects() {
+    return gameObjects;
 }
 export function testGameObjectFactory() {
     removeAllGameObjects();
@@ -101,8 +125,8 @@ export function testGameObjectFactory() {
     addTestResult("removeAllGameObjects", getGameObjectCount() === 0);
     let go = createTestGameObject();
     addTestResult("createTestGameObject", go.type === GameObjectType.DUMMY);
-    go = addSolidGameObject(GameObjectType.ITEM);
-    addTestResult("addSolidGameObject", go.type === GameObjectType.ITEM && go.isSolid === true);
+    setSolid(go);
+    addTestResult("addSolidGameObject", go.isSolid === true);
     removeAllGameObjects();
     addGameObject(GameObjectType.DUMMY);
     const goToBeRemoved = addGameObject(GameObjectType.CONVEYOR);

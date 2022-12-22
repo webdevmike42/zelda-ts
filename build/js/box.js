@@ -1,3 +1,9 @@
+import { NULL_VECTOR } from "./vector.js";
+export const NULL_BOX = Object.freeze({
+    position: Object.freeze(Object.assign({}, NULL_VECTOR)),
+    width: 0,
+    height: 0
+});
 export function createBoxFromVector(position, width, height) {
     return createBox(position.x, position.y, width, height);
 }

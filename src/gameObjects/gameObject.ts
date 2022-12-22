@@ -1,4 +1,6 @@
 import { Animation, NULL_ANIMATION } from "../animation.js";
+import { Box, createBox } from "../box.js";
+import { setCollisionBoxFromBoundingBox, setCollisionBox } from "../collisions.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorSum } from "../vector.js";
@@ -11,6 +13,9 @@ export interface GameObject {
     defaultState: State;
     designatedState: State | null;
     position: Vector;
+    width: number,
+    height: number,
+    collisionBox: Box;
     animations?: Map<string, Animation>;
     currentAnimation?: Animation,
     defaultAnimation?: Animation,
@@ -37,6 +42,15 @@ export function setCurrentAnimation(gameObject: GameObject, animation: Animation
 
 export function setPosition(gameObject: GameObject, newPosition: Vector): void {
     gameObject.position = { ...newPosition };
+}
+
+export function setBounds(gameObject: GameObject, width: number, height: number): void {
+    gameObject.width = width;
+    gameObject.height = height;
+}
+
+export function getBoundingBox(gameObject: GameObject): Box {
+    return createBox(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height);
 }
 
 export function getPosition(gameObject: GameObject): Vector {
@@ -68,9 +82,13 @@ export function createMovementVector(): Vector {
     return movementVector;
 }
 
+export function isMoving(movementVector: Vector): boolean {
+    return movementVector.x !== 0 || movementVector.y !== 0;
+}
+
 export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {
     setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
     if (gameObject.currentAnimation)
-        gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy)
-
+        gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
+    gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
 }

@@ -1,4 +1,5 @@
 import { NULL_ANIMATION } from "../animation.js";
+import { createBox } from "../box.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { createVector, NULL_VECTOR, vectorSum } from "../vector.js";
 export var GameObjectType;
@@ -16,6 +17,13 @@ export function setCurrentAnimation(gameObject, animation) {
 }
 export function setPosition(gameObject, newPosition) {
     gameObject.position = Object.assign({}, newPosition);
+}
+export function setBounds(gameObject, width, height) {
+    gameObject.width = width;
+    gameObject.height = height;
+}
+export function getBoundingBox(gameObject) {
+    return createBox(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height);
 }
 export function getPosition(gameObject) {
     return gameObject.position;
@@ -44,8 +52,12 @@ export function createMovementVector() {
         movementVector = vectorSum(movementVector, createVector(1, 0));
     return movementVector;
 }
+export function isMoving(movementVector) {
+    return movementVector.x !== 0 || movementVector.y !== 0;
+}
 export function moveGameObject(gameObject, moveBy) {
     setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
     if (gameObject.currentAnimation)
         gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
+    gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
 }

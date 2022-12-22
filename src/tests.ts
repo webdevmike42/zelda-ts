@@ -1,4 +1,5 @@
 import { testAnimation } from "./animation.js";
+import { testCollisions } from "./collisions.js";
 import { testGameObjectFactory } from "./gameObjects/gameObjectFactory.js";
 import { testState } from "./state.js";
 
@@ -17,6 +18,7 @@ export function runAllTests() {
     testGameObjectFactory();
     testState();
     testAnimation();
+    testCollisions();
     printResultsToConsole();
 }
 

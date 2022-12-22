@@ -1,8 +1,8 @@
 import { MS_PER_SECOND } from "./Global.js";
 import { Vector } from "./vector.js";
 
-export const pipe = function<I,O>(...fns: Function[]) {
-    return function (val:I){
+export const pipe = function <I, O>(...fns: Function[]) {
+    return function (val: I) {
         return fns.reduce(
             (prev, fn) => {
                 return fn(prev)
@@ -12,7 +12,7 @@ export const pipe = function<I,O>(...fns: Function[]) {
     }
 };
 
-export const compose = function <I,O>(...fns: Function[]) {
+export const compose = function <I, O>(...fns: Function[]) {
     return function (val: I) {
         return fns.reduceRight(
             (prev, fn) => {

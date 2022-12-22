@@ -1,10 +1,7 @@
-
-import { Animation, createAnimation, drawAnimation, updateAnimation } from "./animation.js"
-import { createPlayer, Player } from "./gameActors/player.js"
-import { getCurrentAnimation } from "./gameObjects/gameObject.js"
-import { drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js"
-import { initKeyBoardInputHandler, isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS } from "./KeyboardInputHandler.js"
-import { drawCurrentScreen, init, loadScreens, renderTileMap, START_SCREEN_ID, switchToScreen } from "./screens.js"
+import { createPlayer } from "./gameActors/player.js"
+import { addSolidDummy, drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js"
+import { initKeyBoardInputHandler, isKeyPressed, KEYS } from "./KeyboardInputHandler.js"
+import { drawCurrentScreen, init, loadScreens,START_SCREEN_ID, switchToScreen } from "./screens.js"
 import { runAllTests } from "./tests.js"
 import { readyForNextFrame } from "./utils.js"
 
@@ -27,6 +24,7 @@ function startNewGame(): void {
         initKeyBoardInputHandler();
         init(ctx, "./resources/tiles-overworld.png");
         createPlayer(100, 100);
+        addSolidDummy(120,100);
         loadScreens();
         switchToScreen(START_SCREEN_ID);
         /*
