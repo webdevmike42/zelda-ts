@@ -25,9 +25,9 @@ export function createGameObject(type: GameObjectType): GameObject {
         viewVector: { ...NULL_VECTOR },
         movementVector: { ...NULL_VECTOR },
         position: { ...NULL_VECTOR },
-        width:0,
-        height:0,
-        collisionBox: {...NULL_BOX}
+        width: 0,
+        height: 0,
+        collisionBox: { ...NULL_BOX }
     }
 }
 
@@ -48,7 +48,7 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
         }
 
         if (isMoving(getMovementVector(gameObject))) {
-            let resolvedMovementVector:Vector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
+            let resolvedMovementVector: Vector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
             moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
         }
 
@@ -66,10 +66,10 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     })
 }
 
-export function addSolidDummy(x: number, y: number, width:number, height:number): GameObject {
+export function addSolidDummy(x: number, y: number, width: number, height: number): GameObject {
     const dummy: GameObject = addGameObject(GameObjectType.DUMMY);
     setPosition(dummy, createVector(x, y));
-    setBounds(dummy, width,height);
+    setBounds(dummy, width, height);
     setSolid(dummy);
     setCollisionBoxFromBoundingBox(dummy);
     const a = createAnimation("dummyFacingUp", "./resources/link.png", getPosition(dummy), dummy.width, dummy.height, [{ srcX: 62, srcY: 0 }], 1, false)
@@ -78,6 +78,9 @@ export function addSolidDummy(x: number, y: number, width:number, height:number)
     return dummy;
 }
 
+export function filterGameObjects(filterType: GameObjectType, gameObjectArray: GameObject[]): GameObject[] {
+    return gameObjectArray.filter(gameObject => gameObject.type === filterType);
+}
 
 
 /*
@@ -128,7 +131,7 @@ function setSolid(gameObject: GameObject, isSolid: boolean = true): void {
     gameObject.isSolid = isSolid;
 }
 
-export function isSolid(gameObject:GameObject):boolean{
+export function isSolid(gameObject: GameObject): boolean {
     return gameObject.isSolid || false;
 }
 

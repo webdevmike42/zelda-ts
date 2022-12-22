@@ -49,7 +49,7 @@ export function setCollisionBoxFromBoundingBox(gameObject: GameObject): void {
     setCollisionBox(gameObject, getBoundingBox(gameObject));
 }
 
-function getCollisionBox(gameObject: GameObject): Box {
+export function getCollisionBox(gameObject: GameObject): Box {
     return gameObject.collisionBox;
 }
 

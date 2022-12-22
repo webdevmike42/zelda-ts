@@ -1,9 +1,10 @@
 import { Animation, NULL_ANIMATION } from "../animation.js";
 import { Box, createBox } from "../box.js";
-import { setCollisionBoxFromBoundingBox, setCollisionBox } from "../collisions.js";
+import { setCollisionBoxFromBoundingBox, setCollisionBox, getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { State } from "../state.js";
-import { createVector, NULL_VECTOR, Vector, vectorSum } from "../vector.js";
+import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
+import { getGameObjects } from "./gameObjectFactory.js";
 
 export interface GameObject {
     id: number;
@@ -29,6 +30,7 @@ export enum GameObjectType {
     PLAYER,
     ITEM,
     CONVEYOR,
+    TELEPORTER,
     DUMMY
 }
 
@@ -91,4 +93,11 @@ export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {
     if (gameObject.currentAnimation)
         gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
     gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
+}
+
+export function setGameObjectPosition(gameObject: GameObject, newPosition: Vector): void {
+    const diffVector = vectorDiff(newPosition, getPosition(gameObject));
+    if (getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), getGameObjects()).length === 0) {
+        moveGameObject(gameObject, diffVector);
+    }
 }

@@ -64,6 +64,9 @@ export function addSolidDummy(x, y, width, height) {
     setCurrentAnimation(dummy, a);
     return dummy;
 }
+export function filterGameObjects(filterType, gameObjectArray) {
+    return gameObjectArray.filter(gameObject => gameObject.type === filterType);
+}
 /*
 
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {

@@ -32,7 +32,7 @@ export function setCollisionBox(gameobject, collisionBox) {
 export function setCollisionBoxFromBoundingBox(gameObject) {
     setCollisionBox(gameObject, getBoundingBox(gameObject));
 }
-function getCollisionBox(gameObject) {
+export function getCollisionBox(gameObject) {
     return gameObject.collisionBox;
 }
 export function getResolvedSolidCollisionVector(gameObject, diffVector) {

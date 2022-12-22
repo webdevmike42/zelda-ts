@@ -1,13 +1,16 @@
 import { NULL_ANIMATION } from "../animation.js";
 import { createBox } from "../box.js";
+import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
-import { createVector, NULL_VECTOR, vectorSum } from "../vector.js";
+import { createVector, NULL_VECTOR, vectorDiff, vectorSum } from "../vector.js";
+import { getGameObjects } from "./gameObjectFactory.js";
 export var GameObjectType;
 (function (GameObjectType) {
     GameObjectType[GameObjectType["PLAYER"] = 0] = "PLAYER";
     GameObjectType[GameObjectType["ITEM"] = 1] = "ITEM";
     GameObjectType[GameObjectType["CONVEYOR"] = 2] = "CONVEYOR";
-    GameObjectType[GameObjectType["DUMMY"] = 3] = "DUMMY";
+    GameObjectType[GameObjectType["TELEPORTER"] = 3] = "TELEPORTER";
+    GameObjectType[GameObjectType["DUMMY"] = 4] = "DUMMY";
 })(GameObjectType || (GameObjectType = {}));
 export function getCurrentAnimation(gameObject) {
     return gameObject.currentAnimation || gameObject.defaultAnimation || Object.assign({}, NULL_ANIMATION);
@@ -60,4 +63,10 @@ export function moveGameObject(gameObject, moveBy) {
     if (gameObject.currentAnimation)
         gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
     gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
+}
+export function setGameObjectPosition(gameObject, newPosition) {
+    const diffVector = vectorDiff(newPosition, getPosition(gameObject));
+    if (getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), getGameObjects()).length === 0) {
+        moveGameObject(gameObject, diffVector);
+    }
 }
