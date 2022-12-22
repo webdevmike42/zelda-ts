@@ -53,10 +53,10 @@ export function drawGameObjects(ctx) {
         drawAnimation(getCurrentAnimation(gameObject), ctx);
     });
 }
-export function addSolidDummy(x, y) {
+export function addSolidDummy(x, y, width, height) {
     const dummy = addGameObject(GameObjectType.DUMMY);
     setPosition(dummy, createVector(x, y));
-    setBounds(dummy, 16, 50);
+    setBounds(dummy, width, height);
     setSolid(dummy);
     setCollisionBoxFromBoundingBox(dummy);
     const a = createAnimation("dummyFacingUp", "./resources/link.png", getPosition(dummy), dummy.width, dummy.height, [{ srcX: 62, srcY: 0 }], 1, false);

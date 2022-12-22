@@ -1,4 +1,5 @@
 import { getAllScreensAsArray } from "./mockServer.js";
+import { addSolidDummy } from "./gameObjects/gameObjectFactory.js";
 export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
 export const WORLD_MAP_ROWS = 8;
@@ -43,8 +44,8 @@ function setCurrentScreen(screenId) {
         gameObjects.push(...MockServer.reloadNonPersistedGameObjectsForScreen(currentScreen.id, currentScreen.persistedObjects));
         if (currentScreen.persistedObjects)
             gameObjects.push(...currentScreen.persistedObjects);
-        gameObjects.push(...createCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
-      */
+            */
+    addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells);
     //playSoundLooped(currentScreen.music);
 }
 function unloadCurrentScreen() {
@@ -66,19 +67,15 @@ export function reloadNonPersistentGameObjects(screenId) {
         screenGameObjects.push(...MockServer.getScreenById(screenId).gameObjects.filter(go => !isPersistent(go)));
         */
 }
-function createCollisionObjectsFromTileMap(tileMapDataArray, collisionCells) {
-    /*
-    const solidDummyArray:GameObject[] = [];
+function addCollisionObjectsFromTileMap(tileMapDataArray, collisionCells) {
     for (let row = 0; row < tileMapDataArray.length; row++) {
         let arr = tileMapDataArray[row];
         arr.forEach((tile, col) => {
             if (collisionCells.indexOf(tile) !== -1) {
-                solidDummyArray.push(createSolidDummy(col * Globals.TILE_WIDTH, row * Globals.TILE_HEIGHT, Globals.TILE_WIDTH, Globals.TILE_HEIGHT));
+                addSolidDummy(col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
             }
         });
     }
-    return solidDummyArray;
-    */
 }
 function getCurrentScreenTileMap() {
     return (currentScreen === null || currentScreen === void 0 ? void 0 : currentScreen.tileMap) || [];

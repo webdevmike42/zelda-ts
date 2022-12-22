@@ -66,10 +66,10 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     })
 }
 
-export function addSolidDummy(x: number, y: number): GameObject {
+export function addSolidDummy(x: number, y: number, width:number, height:number): GameObject {
     const dummy: GameObject = addGameObject(GameObjectType.DUMMY);
     setPosition(dummy, createVector(x, y));
-    setBounds(dummy, 16,50);
+    setBounds(dummy, width,height);
     setSolid(dummy);
     setCollisionBoxFromBoundingBox(dummy);
     const a = createAnimation("dummyFacingUp", "./resources/link.png", getPosition(dummy), dummy.width, dummy.height, [{ srcX: 62, srcY: 0 }], 1, false)

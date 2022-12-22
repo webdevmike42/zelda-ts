@@ -1,5 +1,5 @@
 import { createPlayer } from "./gameActors/player.js";
-import { addSolidDummy, drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js";
+import { drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { initKeyBoardInputHandler, isKeyPressed, KEYS } from "./KeyboardInputHandler.js";
 import { drawCurrentScreen, init, loadScreens, START_SCREEN_ID, switchToScreen } from "./screens.js";
 import { runAllTests } from "./tests.js";
@@ -22,7 +22,6 @@ function startNewGame() {
         initKeyBoardInputHandler();
         init(ctx, "./resources/tiles-overworld.png");
         createPlayer(100, 100);
-        addSolidDummy(120, 100);
         loadScreens();
         switchToScreen(START_SCREEN_ID);
         /*
