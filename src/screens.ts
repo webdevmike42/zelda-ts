@@ -78,6 +78,7 @@ function setCurrentScreen(screenId: number): void {
 function loadCurrentScreen(screenId: number) {
     currentScreen = loadScreenById(screenId);
     currentScreen.gameObjects.push(...getGlobalGameObjects());
+    currentScreen.gameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
 }
 
 function unloadCurrentScreen() {
@@ -85,15 +86,17 @@ function unloadCurrentScreen() {
 }
 
 
-function addCollisionObjectsFromTileMap(tileMapDataArray: number[][], collisionCells: number[]): void {
+function addCollisionObjectsFromTileMap(tileMapDataArray: number[][], collisionCells: number[]): GameObject[] {
+    const solidDummies:GameObject[] = [];
     for (let row = 0; row < tileMapDataArray.length; row++) {
         let arr = tileMapDataArray[row];
         arr.forEach((tile, col) => {
             if (collisionCells.indexOf(tile) !== -1) {
-                createSolidDummy(col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                solidDummies.push(createSolidDummy(col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT));
             }
         });
     }
+    return solidDummies;
 }
 
 function getCurrentScreenTileMap() {
