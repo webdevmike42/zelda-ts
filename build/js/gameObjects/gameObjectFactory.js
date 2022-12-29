@@ -1,4 +1,4 @@
-import { addAnimation, createAnimation, drawAnimation, setCurrentAnimation, updateAnimation } from "../animation.js";
+import { addAnimation, createAnimation, drawAnimationAt, setCurrentAnimation, updateAnimation } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { currentScreen, getCurrentGameObjects } from "../screens.js";
@@ -63,7 +63,7 @@ function updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLast
 }
 export function drawGameObjects(ctx) {
     getCurrentGameObjects().forEach(gameObject => {
-        drawAnimation(getCurrentAnimation(gameObject), ctx);
+        drawAnimationAt(getCurrentAnimation(gameObject), ctx, getPosition(gameObject).x, getPosition(gameObject).y);
     });
 }
 export function createSolidDummy(x, y, width, height) {

@@ -1,10 +1,12 @@
-export var CommonStates;
-(function (CommonStates) {
-    CommonStates["IDLE"] = "idle";
-    CommonStates["MOVING"] = "moving";
-    CommonStates["ACTION"] = "action";
-})(CommonStates || (CommonStates = {}));
+export var CommonStateTypes;
+(function (CommonStateTypes) {
+    CommonStateTypes["NULL"] = "Null";
+    CommonStateTypes["IDLE"] = "Idle";
+    CommonStateTypes["MOVING"] = "Moving";
+    CommonStateTypes["ACTION"] = "Action";
+})(CommonStateTypes || (CommonStateTypes = {}));
 export const NULL_STATE = Object.freeze({
+    type: CommonStateTypes.NULL,
     name: "NULL_STATE",
     enter: () => { console.log("enter null state"); },
     update: () => { },

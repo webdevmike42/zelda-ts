@@ -1,7 +1,7 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { EMPTY_SCREEN_ID, switchToScreen } from "../screens.js";
-import { addState, CommonStates, createEmptyState, getState, setDefaultState, State, switchToState } from "../state.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
 import { createGameObject, filterGameObjects, getGameObjects } from "./gameObjectFactory.js";

@@ -1,19 +1,22 @@
 import { GameObject } from "./gameObjects/gameObject";
 
 export interface State {
+    type:string,
     name: string,
     enter: Function,
     update: Function,
     exit: Function
 }
 
-export enum CommonStates {
-    IDLE = "idle",
-    MOVING = "moving",
-    ACTION = "action"
+export enum CommonStateTypes {
+    NULL = "Null",
+    IDLE = "Idle",
+    MOVING = "Moving",
+    ACTION = "Action"
 }
 
 export const NULL_STATE: State = Object.freeze({
+    type: CommonStateTypes.NULL,
     name: "NULL_STATE",
     enter: () => { console.log("enter null state") },
     update: () => { },

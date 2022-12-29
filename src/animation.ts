@@ -1,5 +1,4 @@
 import { GameObject } from "./gameObjects/gameObject.js";
-import { MS_PER_SECOND } from "./Global.js";
 import { readyForNextFrame } from "./utils.js";
 import { NULL_VECTOR, Vector } from "./vector.js";
 
@@ -22,7 +21,7 @@ export interface Animation {
 }
 
 const NULL_FRAME: Frame = { srcX: 0, srcY: 0 };
-export const NULL_ANIMATION: Animation = Object.freeze(createAnimation("NULL_ANIMATION", "", { ...NULL_VECTOR }, 0, 0, [{...NULL_FRAME}], 0, false));
+export const NULL_ANIMATION: Animation = Object.freeze(createAnimation("NULL_ANIMATION", "", { ...NULL_VECTOR }, 0, 0, [{ ...NULL_FRAME }], 0, false));
 
 
 export function createAnimation(uniqueName: string, imageSrc: string, position: Vector, width: number, height: number, frames: Frame[], framesPerSecond: number, loop: boolean): Animation {
@@ -61,9 +60,15 @@ function setTimeOfLastFrame(animation: Animation, timeInMs: number): void {
     animation.timeOfLastFrame = timeInMs;
 }
 
-export function drawAnimation(animation: Animation, ctx: CanvasRenderingContext2D) {
+export function drawAnimation(animation: Animation, ctx: CanvasRenderingContext2D): void {
+    drawAnimationAt(animation,ctx,animation.position.x, animation.position.y);
+    //const curFrame: Frame = animation.frames[animation.currentFrameIndex]
+    //ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, animation.position.x, animation.position.y, animation.width, animation.height);
+}
+
+export function drawAnimationAt(animation: Animation, ctx: CanvasRenderingContext2D, x: number, y: number): void {
     const curFrame: Frame = animation.frames[animation.currentFrameIndex]
-    ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, animation.position.x, animation.position.y, animation.width, animation.height);
+    ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, x, y, animation.width, animation.height);
 }
 
 export function testAnimation() {

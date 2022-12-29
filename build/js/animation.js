@@ -35,8 +35,13 @@ function setTimeOfLastFrame(animation, timeInMs) {
     animation.timeOfLastFrame = timeInMs;
 }
 export function drawAnimation(animation, ctx) {
+    drawAnimationAt(animation, ctx, animation.position.x, animation.position.y);
+    //const curFrame: Frame = animation.frames[animation.currentFrameIndex]
+    //ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, animation.position.x, animation.position.y, animation.width, animation.height);
+}
+export function drawAnimationAt(animation, ctx, x, y) {
     const curFrame = animation.frames[animation.currentFrameIndex];
-    ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, animation.position.x, animation.position.y, animation.width, animation.height);
+    ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, x, y, animation.width, animation.height);
 }
 export function testAnimation() {
     const test = createAnimation("PlayerIdle", "./resources/link.png", { x: 100, y: 100 }, 16, 16, [{ srcX: 62, srcY: 0 }], 6, false);

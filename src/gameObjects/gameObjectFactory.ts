@@ -1,4 +1,4 @@
-import { addAnimation, createAnimation, drawAnimation, setCurrentAnimation, updateAnimation } from "../animation.js";
+import { addAnimation, createAnimation, drawAnimation, drawAnimationAt, setCurrentAnimation, updateAnimation } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
@@ -76,7 +76,7 @@ function updateGameObjectCurrentState(gameObject: GameObject, currentGameTime: n
 
 export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     getCurrentGameObjects().forEach(gameObject => {
-        drawAnimation(getCurrentAnimation(gameObject), ctx);
+        drawAnimationAt(getCurrentAnimation(gameObject), ctx, getPosition(gameObject).x, getPosition(gameObject).y);
     })
 }
 
