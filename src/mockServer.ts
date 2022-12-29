@@ -1,8 +1,16 @@
-import { GameObject } from "./gameObjects/gameObject";
-import { Screen } from "./screens.js";
+import { GameObject } from "./gameObjects/gameObject.js";
+import { createSolidDummy } from "./gameObjects/gameObjectFactory.js";
+import { createTeleporter } from "./gameObjects/teleporter.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, Screen, WORLD_MAP_COLS } from "./screens.js";
 
-export function getScreenById(screenId: number) {
-    const screen: Screen = { id: screenId, music: "", tileMap: [], gameObjects: [], collisionCells: [1, 3, 4, 5, 7, 9, 10, 11, 13, 15, 16, 17, 19, 20, 21, 23, 25, 26, 27, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 65, 66, 67, 68, 69, 71, 72, 73, 74, 78, 79, 80, 84, 85, 86, 90, 91, 92, 96, 97, 98, 103, 104, 108, 109, 110, 114, 115, 116, 120, 121, 122, 130, 136, 142] };
+export function loadScreenById(screenId: number) {
+    const screen: Screen = {
+        id: screenId,
+        music: "",
+        tileMap: [],
+        gameObjects: [],
+        collisionCells: [1, 3, 4, 5, 7, 9, 10, 11, 13, 15, 16, 17, 19, 20, 21, 23, 25, 26, 27, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 65, 66, 67, 68, 69, 71, 72, 73, 74, 78, 79, 80, 84, 85, 86, 90, 91, 92, 96, 97, 98, 103, 104, 108, 109, 110, 114, 115, 116, 120, 121, 122, 130, 136, 142]
+    };
     //screen.music = SOUND.OVERWORLD;
 
     switch (screenId) {
@@ -2361,6 +2369,10 @@ export function getScreenById(screenId: number) {
                 [61, 61, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 61, 61],
                 [61, 61, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 61, 61],
                 [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]];
+                screen.gameObjects = [
+                    createTeleporter(120, 100, 16, 16),
+                    createSolidDummy(120,120,16,16)
+                ];
             /*
                         screen.gameObjects = [
                             //createPushBox(120, 120),
@@ -2580,24 +2592,15 @@ export function getScreenById(screenId: number) {
 
 
     //add screen switch trigger
-    /*
-    screen.gameObjects.push(
-        createTeleportTrigger(0, 52, CANVAS_WIDTH, 16, createTeleporterDto(Math.max(0, screenId - WORLD_MAP_COLS), undefined, 220))
-    );
+    
+    screen.gameObjects.push(createTeleporter(0, 52, CANVAS_WIDTH, 16, Math.max(0, screenId - WORLD_MAP_COLS), undefined, 220));
 
-    screen.gameObjects.push(
-        createTeleportTrigger(0, CANVAS_HEIGHT, CANVAS_WIDTH, 16, createTeleporterDto(screenId + WORLD_MAP_COLS, undefined, 60))
-    );
+    screen.gameObjects.push(createTeleporter(0, CANVAS_HEIGHT, CANVAS_WIDTH, 16, screenId + WORLD_MAP_COLS, undefined, 60));
 
-    screen.gameObjects.push(
-        createTeleportTrigger(0, -16, 16, CANVAS_HEIGHT, createTeleporterDto(screenId - 1, 220, undefined))
-    );
+    screen.gameObjects.push(createTeleporter(0, -16, 16, CANVAS_HEIGHT, screenId - 1, 220, undefined));
 
-    screen.gameObjects.push(
-        createTeleportTrigger(CANVAS_WIDTH, 0, 16, CANVAS_HEIGHT, createTeleporterDto(screenId + 1, 16, undefined))
-    );
-*/
-
+    screen.gameObjects.push(createTeleporter(CANVAS_WIDTH, 0, 16, CANVAS_HEIGHT, screenId + 1, 16, undefined));
+    
     setInternalIds(screen.gameObjects);
 
     return screen;
@@ -2608,27 +2611,25 @@ export function getAllScreensAsArray(): Screen[] {
     let screen: Screen;
     let screenId: number = 0;
 
-    screen = getScreenById(screenId++);
+    screen = loadScreenById(screenId++);
 
     while (screen.tileMap.length > 0) {
         screens.push(screen);
-        screen = getScreenById(screenId++);
+        screen = loadScreenById(screenId++);
     }
     return screens;
 }
 
 function setInternalIds(gameObjects: GameObject[]): void {
-
-    if (!gameObjects) return;
-
     for (let i = 0; i < gameObjects.length; i++)
         gameObjects[i].internalId = i;
 }
-
-export function reloadNonPersistedGameObjectsForScreen(screenId: number, persistedGameObjects: GameObject[]) {
+/*
+export function getNonPersistedGameObjects(screenId: number, persistedGameObjects: GameObject[]) {
     const screen = getScreenById(screenId);
     if (!screen) return [];
     const persistedGameObjectIds = persistedGameObjects?.map(go => go.internalId) || [];
     const result = screen.gameObjects.filter(gameObject => !persistedGameObjectIds.includes(gameObject.internalId));
     return result;
 }
+*/

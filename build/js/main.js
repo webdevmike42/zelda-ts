@@ -1,8 +1,7 @@
 import { createPlayer } from "./gameActors/player.js";
 import { drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js";
-import { createTeleporter } from "./gameObjects/teleporter.js";
 import { initKeyBoardInputHandler, isKeyPressed, KEYS } from "./KeyboardInputHandler.js";
-import { drawCurrentScreen, init, loadScreens, START_SCREEN_ID, switchToScreen } from "./screens.js";
+import { drawCurrentScreen, init, START_SCREEN_ID, switchToScreen } from "./screens.js";
 import { runAllTests } from "./tests.js";
 import { readyForNextFrame } from "./utils.js";
 var GameState;
@@ -23,12 +22,7 @@ function startNewGame() {
         initKeyBoardInputHandler();
         init(ctx, "./resources/tiles-overworld.png");
         createPlayer(100, 100);
-        createTeleporter(120, 100, 16, 16);
-        loadScreens();
         switchToScreen(START_SCREEN_ID);
-        /*
-        loadHud(ctx, "/resources/pausescreen.png");
-        */
         setGameState(GameState.RUNNING);
         requestAnimationFrame(gameLoop);
     }
@@ -85,5 +79,5 @@ function drawGame() {
     drawHUD(createHudDtoFromGameObject(player));
     */
 }
-runAllTests();
 startNewGame();
+runAllTests();

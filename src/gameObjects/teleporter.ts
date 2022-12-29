@@ -1,34 +1,34 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { switchToScreen } from "../screens.js";
+import { EMPTY_SCREEN_ID, switchToScreen } from "../screens.js";
 import { addState, CommonStates, createEmptyState, getState, setDefaultState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
-import { addGameObject, filterGameObjects, getGameObjects } from "./gameObjectFactory.js";
+import { createGameObject, filterGameObjects, getGameObjects } from "./gameObjectFactory.js";
 
 export interface Teleporter extends GameObject {
     targetScreenId: number,
-    targetX: number,
-    targetY: number
+    targetX: number | undefined,
+    targetY: number | undefined
 }
 
 enum TeleporterStates {
     ACTIVE = "active"
 }
 
-export function createTeleporter(x: number, y: number, width: number, height: number): Teleporter {
-    const teleporter: Teleporter = addGameObject(GameObjectType.TELEPORTER) as Teleporter;
+export function createTeleporter(x: number, y: number, width: number, height: number, targetScreenId?: number, targetX?: number, targetY?: number): Teleporter {
+    const teleporter: Teleporter = createGameObject(GameObjectType.TELEPORTER) as Teleporter;//addGameObject(GameObjectType.TELEPORTER) as Teleporter;
     setPosition(teleporter, createVector(x, y));
     setBounds(teleporter, width, height);
     addTeleporterStates(teleporter);
     addTeleporterAnimations(teleporter);
     setCollisionBoxFromBoundingBox(teleporter);
-    setTarget(teleporter, 119, 100, 180);
+    setTarget(teleporter, targetScreenId || EMPTY_SCREEN_ID, targetX, targetY);
     switchToState(teleporter, getState(teleporter, TeleporterStates.ACTIVE));
     return teleporter;
 }
 
-export function setTarget(teleporter: Teleporter, targetScreenId: number, targetX: number, targetY: number): void {
+export function setTarget(teleporter: Teleporter, targetScreenId: number, targetX: number | undefined, targetY: number | undefined): void {
     teleporter.targetScreenId = targetScreenId;
     teleporter.targetX = targetX;
     teleporter.targetY = targetY;
@@ -42,7 +42,7 @@ function addTeleporterStates(teleporter: Teleporter): void {
 
 function addTeleporterAnimations(teleporter: Teleporter): void {
     teleporter.animations = new Map<string, Animation>();
-    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 0 }], 1, false));
+    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 30 }], 1, false));
     setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
 }
 
@@ -65,7 +65,7 @@ function createTeleporterActiveState(teleporter: Teleporter): State {
     return state;
 }
 
-export function teleport(gameObject: GameObject, targetScreenId: number, targetX: number, targetY: number) {
+export function teleport(gameObject: GameObject, targetScreenId: number, targetX: number | undefined, targetY: number | undefined) {
     switchToScreen(targetScreenId);
-    setGameObjectPosition(gameObject, createVector(targetX, targetY));
+    setGameObjectPosition(gameObject, createVector(targetX || getPosition(gameObject).x, targetY || getPosition(gameObject).y));
 }

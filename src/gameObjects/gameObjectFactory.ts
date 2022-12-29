@@ -2,17 +2,19 @@ import { addAnimation, createAnimation, drawAnimation, setCurrentAnimation, upda
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
+import { currentScreen, getCurrentGameObjects } from "../screens.js";
 import { getCurrentState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { compose, getVectorFrameFraction, pipe } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 
-let gameObjects: GameObject[] = [];
+//let currentGameObjects: GameObject[] = [];
+const globalGameObjects: GameObject[] = [];
 let id: number = 0;
 
-export const addGameObject = pipe<GameObjectType, GameObject>(createGameObject, register);
-export const createTestGameObject = createGameObject.bind(null, GameObjectType.DUMMY);
+//export const addGameObject = pipe<GameObjectType, GameObject>(createGameObject, register);
+//export const createTestGameObject = createGameObject.bind(null, GameObjectType.DUMMY);
 
 export function createGameObject(type: GameObjectType): GameObject {
     return {
@@ -31,15 +33,27 @@ export function createGameObject(type: GameObjectType): GameObject {
     }
 }
 
+export function createGlobalGameObject(type: GameObjectType): GameObject {
+    const go = createGameObject(type);
+    addToGlobalList(go);
+    return go;
+}
+
+function addToGlobalList(gameObject: GameObject): void {
+    globalGameObjects.push(gameObject);
+}
+
+/*
 function register<T extends GameObject>(gameObject: T): T {
     if (!isRegistered(gameObject.id))
-        gameObjects.push(gameObject);
+        currentGameObjects.push(gameObject);
 
     return gameObject;
 }
+*/
 
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
-    gameObjects.forEach(gameObject => {
+    getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
 
         if (gameObject.designatedState !== null) {
@@ -61,13 +75,13 @@ function updateGameObjectCurrentState(gameObject: GameObject, currentGameTime: n
 }
 
 export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
-    gameObjects.forEach(gameObject => {
+    getCurrentGameObjects().forEach(gameObject => {
         drawAnimation(getCurrentAnimation(gameObject), ctx);
     })
 }
 
-export function addSolidDummy(x: number, y: number, width: number, height: number): GameObject {
-    const dummy: GameObject = addGameObject(GameObjectType.DUMMY);
+export function createSolidDummy(x: number, y: number, width: number, height: number): GameObject {
+    const dummy: GameObject = createGameObject(GameObjectType.DUMMY);
     setPosition(dummy, createVector(x, y));
     setBounds(dummy, width, height);
     setSolid(dummy);
@@ -115,18 +129,19 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
 
 */
 
+/*
 function removeGameObject<T extends GameObject>(gameObject: T): void {
-    gameObjects = gameObjects.filter(go => go.id !== gameObject.id);
+    currentGameObjects = currentGameObjects.filter(go => go.id !== gameObject.id);
 }
 
 function isRegistered(gameObjectId: number): boolean {
-    return gameObjects.some(go => go.id === gameObjectId);
+    return currentGameObjects.some(go => go.id === gameObjectId);
 }
 
 export function removeAllGameObjects() {
-    gameObjects = [];
+    currentGameObjects = [];
 }
-
+*/
 function setSolid(gameObject: GameObject, isSolid: boolean = true): void {
     gameObject.isSolid = isSolid;
 }
@@ -135,15 +150,40 @@ export function isSolid(gameObject: GameObject): boolean {
     return gameObject.isSolid || false;
 }
 
-function getGameObjectCount() {
-    return gameObjects.length;
+function getGameObjectCount(): number {
+    return currentScreen.gameObjects.length;
+    //return currentGameObjects.length;
 }
 
-export function getGameObjects() {
-    return gameObjects;
+export function getGameObjects(): GameObject[] {
+    return currentScreen.gameObjects;
+    //return currentGameObjects;
 }
 
+
+
+/*
+export function setCurrentGameObjects(gameObjects: GameObject[]): void {
+    currentGameObjects = gameObjects;
+}
+*/
+
+export function getGlobalGameObjects(): GameObject[] {
+    return globalGameObjects;
+}
+/*
+
+export function addToCurrentGameObjects(newGameObjects: GameObject[]): void {
+    currentGameObjects.push(...newGameObjects);
+}
+
+export function removeNonGlobalGameObjects(): void {
+    currentScreen.gameObjects.filter(gameObject => !gameObject.global);
+}
+*/
 export function testGameObjectFactory() {
+    addTestResult("gameObjectsFactory: ", true);
+    /*
     removeAllGameObjects();
 
     addGameObject(GameObjectType.ITEM);
@@ -165,4 +205,5 @@ export function testGameObjectFactory() {
     removeGameObject(goToBeRemoved);
     addTestResult("removeGameObject", getGameObjectCount() === 1 && !isRegistered(goToBeRemoved.id));
     removeAllGameObjects();
+    */
 }

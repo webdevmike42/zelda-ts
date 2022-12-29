@@ -1,4 +1,3 @@
-import { createTestGameObject } from "./gameObjects/gameObjectFactory.js";
 export var CommonStates;
 (function (CommonStates) {
     CommonStates["IDLE"] = "idle";
@@ -45,10 +44,12 @@ export function setDesignatedState(gameObject, designatedState) {
     gameObject.designatedState = designatedState;
 }
 export function testState() {
-    const dummy = createTestGameObject();
+    /*
+    const dummy: GameObject = createTestGameObject();
     console.log(dummy.currentState.name);
     switchToState(dummy, getState(dummy, CommonStates.MOVING));
     console.log(dummy.currentState.name);
     switchToState(dummy, getState(dummy, CommonStates.ACTION));
     console.log(dummy.currentState.name);
+    */
 }

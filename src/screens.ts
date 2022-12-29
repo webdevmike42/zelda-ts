@@ -1,6 +1,6 @@
 import { GameObject } from "./gameObjects/gameObject.js";
-import { getAllScreensAsArray } from "./mockServer.js";
-import { addSolidDummy } from "./gameObjects/gameObjectFactory.js"
+import { loadScreenById } from "./mockServer.js";
+import { createSolidDummy, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js"
 
 export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
@@ -23,8 +23,8 @@ export interface Screen {
 
 let tileMapImage: HTMLImageElement;
 let ctx: CanvasRenderingContext2D;
-let currentScreen: Screen;
-let screens: Screen[];
+export let currentScreen: Screen;
+//let screens: Screen[];
 
 export function init(renderingContext: CanvasRenderingContext2D, imageUrl: string): void {
     tileMapImage = new Image();
@@ -52,57 +52,45 @@ export function renderTileMap(tileMapDataArray: number[][]) {
 
 export function switchToScreen(screenId: number) {
     if (isValidScreenId(screenId)) {
-        unloadCurrentScreen();
-        setCurrentScreen(screenId);
+        //unloadCurrentScreen();
+        //setCurrentScreen(screenId);
+        loadCurrentScreen(screenId);
     }
+}
+
+export function getCurrentGameObjects(): GameObject[] {
+    return currentScreen?.gameObjects || [];
 }
 
 export function drawCurrentScreen() {
     renderTileMap(getCurrentScreenTileMap());
 }
 
+/*
 export function loadScreens() {
     screens = getAllScreensAsArray();
 }
+*/
+function setCurrentScreen(screenId: number): void {
+    //currentScreen = screens[screenId];
+}
 
-function setCurrentScreen(screenId: number) {
-    currentScreen = screens[screenId];
-    /*
-        gameObjects.push(...MockServer.reloadNonPersistedGameObjectsForScreen(currentScreen.id, currentScreen.persistedObjects));
-        if (currentScreen.persistedObjects)
-            gameObjects.push(...currentScreen.persistedObjects);
-            */
-    addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells);
-
-    //playSoundLooped(currentScreen.music);
+function loadCurrentScreen(screenId: number) {
+    currentScreen = loadScreenById(screenId);
+    currentScreen.gameObjects.push(...getGlobalGameObjects());
 }
 
 function unloadCurrentScreen() {
-    if (!currentScreen) return;
-    /*
-        currentScreen.persistedObjects = gameObjects.filter(go => go.persistOnUnload);
-        removeNonGlobalGameObjects();
-        */
+    //removeNonGlobalGameObjects();
 }
 
-export function reloadNonPersistentGameObjects(screenId: number) {
-    /*
-        const screenGameObjects = screens[screenId].gameObjects;
-    
-        screenGameObjects.filter(gameObject => !isPersistent(gameObject) || gameObject.persistentDirtyFlag).forEach((nonPersistent) => {
-            removeObjectFromArray(nonPersistent.id, screenGameObjects);
-        })
-    
-        screenGameObjects.push(...MockServer.getScreenById(screenId).gameObjects.filter(go => !isPersistent(go)));
-        */
-}
 
 function addCollisionObjectsFromTileMap(tileMapDataArray: number[][], collisionCells: number[]): void {
     for (let row = 0; row < tileMapDataArray.length; row++) {
         let arr = tileMapDataArray[row];
         arr.forEach((tile, col) => {
             if (collisionCells.indexOf(tile) !== -1) {
-                addSolidDummy(col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+                createSolidDummy(col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
             }
         });
     }

@@ -1,5 +1,4 @@
 import { GameObject } from "./gameObjects/gameObject";
-import { createTestGameObject } from "./gameObjects/gameObjectFactory.js";
 
 export interface State {
     name: string,
@@ -65,10 +64,12 @@ export function setDesignatedState(gameObject:GameObject, designatedState:State 
 }
 
 export function testState() {
+    /*
     const dummy: GameObject = createTestGameObject();
     console.log(dummy.currentState.name);
     switchToState(dummy, getState(dummy, CommonStates.MOVING));
     console.log(dummy.currentState.name);
     switchToState(dummy, getState(dummy, CommonStates.ACTION));
     console.log(dummy.currentState.name);
+    */
 }
