@@ -1,5 +1,5 @@
 import { createMovementVector, GameObject, GameObjectType, getBoundingBox, getCurrentAnimation, getMovementVector, getPosition, getViewVector, moveGameObject, setBounds, setCurrentAnimation, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
-import { isAnyMovementKeyDown, isKeyDown, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
+import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, setCurrentState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation, Animation } from "../animation.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
@@ -29,6 +29,7 @@ function addPlayerStates(player: Player): void {
     const idleState: State = createPlayerIdleState(player);
     addState(player, CommonStateTypes.IDLE, idleState);
     addState(player, CommonStateTypes.MOVING, createPlayerMovingState(player));
+    addState(player, CommonStateTypes.ACTION, createPlayerActionState(player));
     setDefaultState(player, idleState);
 }
 
@@ -43,6 +44,10 @@ function createPlayerIdleState(player: Player): State {
     state.update = () => {
         if (isAnyMovementKeyDown()) {
             setDesignatedState(player, getState(player, CommonStateTypes.MOVING));
+            return;
+        }
+        if (isKeyPressed(KEYS.ACTION)) {
+            setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             return;
         }
     }
@@ -71,10 +76,34 @@ function createPlayerMovingState(player: Player): State {
     return state;
 }
 
+function createPlayerActionState(player: Player): State {
+    let startTime: number, duration: number = 50;
+    const state: State = createEmptyState();
+    state.type = CommonStateTypes.ACTION;
+    state.name = "player action state";
+    state.enter = () => {
+        startTime = -1;
+        updateCurrentAnimationBasedOnViewVector(player);
+        setMovementVector(player, { ...NULL_VECTOR });
+    }
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+        if (startTime === -1) {
+            startTime = currentGameTime;
+        }
+        if ((currentGameTime - startTime) >= duration) {
+            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            return;
+        }
+    }
+    state.exit = () => {};
+    return state;
+}
+
 function addPlayerAnimations(player: Player): void {
     player.animations = new Map<string, Animation>();
     addPlayerIdleAnimations(player);
     addPlayerMovingAnimations(player);
+    addPlayerAttackingAnimations(player);
 }
 
 function addPlayerIdleAnimations(player: Player): void {
@@ -82,7 +111,6 @@ function addPlayerIdleAnimations(player: Player): void {
     addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Left", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 30, srcY: 0 }], 1, false));
     addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Down", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 0, srcY: 0 }], 1, false));
     addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Right", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 91, srcY: 0 }], 1, false));
-    setCurrentAnimation(player, getAnimation(player, CommonStateTypes.IDLE + "Down"));
 }
 
 function addPlayerMovingAnimations(player: Player): void {
@@ -90,7 +118,13 @@ function addPlayerMovingAnimations(player: Player): void {
     addAnimation(player, createAnimation(CommonStateTypes.MOVING + "Left", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true));
     addAnimation(player, createAnimation(CommonStateTypes.MOVING + "Down", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 0, srcY: 0 }, { srcX: 0, srcY: 30 }], 6, true));
     addAnimation(player, createAnimation(CommonStateTypes.MOVING + "Right", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 91, srcY: 0 }, { srcX: 91, srcY: 30 }], 6, true));
-    setCurrentAnimation(player, getAnimation(player, CommonStateTypes.MOVING + "Down"));
+}
+
+function addPlayerAttackingAnimations(player: Player): void {
+    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Up", "./resources/link.png", getPosition(player), player.width, 27, [{ srcX: 60, srcY: 84 }], 1, false,createVector(0,-11)));
+    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Left", "./resources/link.png", getPosition(player), 28, player.height, [{ srcX: 24, srcY: 90 }], 1, false,createVector(-11,0)));
+    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Down", "./resources/link.png", getPosition(player), player.width, 27, [{ srcX: 0, srcY: 84 }], 1, false));
+    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Right", "./resources/link.png", getPosition(player), 28, player.height, [{ srcX: 85, srcY: 90 }], 1, false));
 }
 
 function updateCurrentAnimationBasedOnViewVector(player: Player): void {

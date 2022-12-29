@@ -11,6 +11,7 @@ export interface Animation {
     name: string,
     image: HTMLImageElement,
     position: Vector,
+    offset?:Vector,
     width: number,
     height: number,
     frames: Frame[],
@@ -24,7 +25,7 @@ const NULL_FRAME: Frame = { srcX: 0, srcY: 0 };
 export const NULL_ANIMATION: Animation = Object.freeze(createAnimation("NULL_ANIMATION", "", { ...NULL_VECTOR }, 0, 0, [{ ...NULL_FRAME }], 0, false));
 
 
-export function createAnimation(uniqueName: string, imageSrc: string, position: Vector, width: number, height: number, frames: Frame[], framesPerSecond: number, loop: boolean): Animation {
+export function createAnimation(uniqueName: string, imageSrc: string, position: Vector, width: number, height: number, frames: Frame[], framesPerSecond: number, loop: boolean, offset?:Vector): Animation {
     return {
         name: uniqueName,
         image: (() => {
@@ -39,7 +40,8 @@ export function createAnimation(uniqueName: string, imageSrc: string, position: 
         framesPerSecond: framesPerSecond,
         loop: loop,
         currentFrameIndex: 0,
-        timeOfLastFrame: 0
+        timeOfLastFrame: 0,
+        offset:offset
     };
 }
 
@@ -54,6 +56,14 @@ export function updateAnimation(animation: Animation, currentGameTime: number): 
         raiseAnimationFrame(animation);
         setTimeOfLastFrame(animation, currentGameTime);
     }
+}
+
+export function getOffsetX(animation:Animation):number{
+    return animation.offset?.x || 0;
+}
+
+export function getOffsetY(animation:Animation):number{
+    return animation.offset?.y || 0;
 }
 
 function setTimeOfLastFrame(animation: Animation, timeInMs: number): void {

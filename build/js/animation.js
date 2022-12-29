@@ -2,7 +2,7 @@ import { readyForNextFrame } from "./utils.js";
 import { NULL_VECTOR } from "./vector.js";
 const NULL_FRAME = { srcX: 0, srcY: 0 };
 export const NULL_ANIMATION = Object.freeze(createAnimation("NULL_ANIMATION", "", Object.assign({}, NULL_VECTOR), 0, 0, [Object.assign({}, NULL_FRAME)], 0, false));
-export function createAnimation(uniqueName, imageSrc, position, width, height, frames, framesPerSecond, loop) {
+export function createAnimation(uniqueName, imageSrc, position, width, height, frames, framesPerSecond, loop, offset) {
     return {
         name: uniqueName,
         image: (() => {
@@ -17,7 +17,8 @@ export function createAnimation(uniqueName, imageSrc, position, width, height, f
         framesPerSecond: framesPerSecond,
         loop: loop,
         currentFrameIndex: 0,
-        timeOfLastFrame: 0
+        timeOfLastFrame: 0,
+        offset: offset
     };
 }
 export function updateAnimation(animation, currentGameTime) {
@@ -30,6 +31,14 @@ export function updateAnimation(animation, currentGameTime) {
         raiseAnimationFrame(animation);
         setTimeOfLastFrame(animation, currentGameTime);
     }
+}
+export function getOffsetX(animation) {
+    var _a;
+    return ((_a = animation.offset) === null || _a === void 0 ? void 0 : _a.x) || 0;
+}
+export function getOffsetY(animation) {
+    var _a;
+    return ((_a = animation.offset) === null || _a === void 0 ? void 0 : _a.y) || 0;
 }
 function setTimeOfLastFrame(animation, timeInMs) {
     animation.timeOfLastFrame = timeInMs;
