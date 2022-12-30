@@ -10,7 +10,8 @@ export var GameObjectType;
     GameObjectType[GameObjectType["ITEM"] = 1] = "ITEM";
     GameObjectType[GameObjectType["CONVEYOR"] = 2] = "CONVEYOR";
     GameObjectType[GameObjectType["TELEPORTER"] = 3] = "TELEPORTER";
-    GameObjectType[GameObjectType["DUMMY"] = 4] = "DUMMY";
+    GameObjectType[GameObjectType["HAZARD"] = 4] = "HAZARD";
+    GameObjectType[GameObjectType["DUMMY"] = 5] = "DUMMY";
 })(GameObjectType || (GameObjectType = {}));
 export function getCurrentAnimation(gameObject) {
     return gameObject.currentAnimation || gameObject.defaultAnimation || Object.assign({}, NULL_ANIMATION);

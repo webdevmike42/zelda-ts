@@ -110,7 +110,6 @@ function createPlayerActionState(player: Player): State {
 }
 
 function addPlayerAnimations(player: Player): void {
-    player.animations = new Map<string, Animation>();
     addPlayerIdleAnimations(player);
     addPlayerMovingAnimations(player);
     addPlayerAttackingAnimations(player);

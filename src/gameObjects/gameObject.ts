@@ -1,6 +1,7 @@
 import { Animation, NULL_ANIMATION } from "../animation.js";
 import { Box, createBox } from "../box.js";
 import { setCollisionBoxFromBoundingBox, setCollisionBox, getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
+import { HitBox } from "../hitbox.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
@@ -24,6 +25,7 @@ export interface GameObject {
     movementVector: Vector,
     isSolid?: boolean;
     internalId?: number;
+    hitBox?:HitBox;
 }
 
 export enum GameObjectType {
@@ -31,6 +33,7 @@ export enum GameObjectType {
     ITEM,
     CONVEYOR,
     TELEPORTER,
+    HAZARD,
     DUMMY
 }
 

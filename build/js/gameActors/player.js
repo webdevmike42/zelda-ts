@@ -97,7 +97,6 @@ function createPlayerActionState(player) {
     return state;
 }
 function addPlayerAnimations(player) {
-    player.animations = new Map();
     addPlayerIdleAnimations(player);
     addPlayerMovingAnimations(player);
     addPlayerAttackingAnimations(player);

@@ -1,4 +1,5 @@
 import { createSolidDummy } from "./gameObjects/gameObjectFactory.js";
+import { createStaticHazard } from "./gameObjects/staticHazard.js";
 import { createTeleporter } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
 export function loadScreenById(screenId) {
@@ -2294,8 +2295,8 @@ export function loadScreenById(screenId) {
                 [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]
             ];
             screen.gameObjects = [
-                createTeleporter(120, 100, 16, 16),
-                createSolidDummy(120, 120, 16, 16)
+                createSolidDummy(120, 120, 16, 16),
+                createStaticHazard(120, 150, 48, 32, 1)
             ];
             /*
                         screen.gameObjects = [

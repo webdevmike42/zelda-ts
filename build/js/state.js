@@ -25,7 +25,7 @@ export function addState(gameObject, key, newState) {
     gameObject.states.set(key, newState);
 }
 export function getState(gameObject, key) {
-    return gameObject.states.get(key) || gameObject.defaultState;
+    return gameObject.states.get(key) || gameObject.defaultState || Object.assign({}, NULL_STATE);
 }
 export function setCurrentState(gameObject, newState) {
     gameObject.currentState = newState;

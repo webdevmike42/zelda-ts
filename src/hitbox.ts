@@ -1,13 +1,13 @@
 import { Box, createBoxInFront } from "./box.js";
-import { GameObject } from "./gameObjects/gameObject.js";
+import { GameObject, getPosition } from "./gameObjects/gameObject.js";
 import { removeObjectFromArray } from "./utils.js";
 import { Vector } from "./vector.js";
 
-export const hitBoxes: HitBox[] = [];
+export let hitBoxes: HitBox[] = [];
 let id: number = 0;
 
 export interface HitBox extends Box {
-    id:number,
+    id: number,
     owner: GameObject,
     damage: number
 }
@@ -30,6 +30,15 @@ export function spawnHitBoxInFrontOf(gameObject: GameObject, damage: number): Hi
     return hitBox;
 }
 
-export function removeHitBox(hitBoxId:number):void{
+export function setHitBoxFromBoundingBox(gameObject: GameObject, damage: number): void {
+    const hitBox: HitBox = createHitBox(getPosition(gameObject), gameObject.width, gameObject.height, gameObject, damage);
+    hitBoxes.push(hitBox);
+    gameObject.hitBox = hitBox;
+}
+export function removeHitBox(hitBoxId: number): void {
     removeObjectFromArray(hitBoxId, hitBoxes);
+}
+
+export function removeAllHitBoxes():void{
+    hitBoxes = [];
 }

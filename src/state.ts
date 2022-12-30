@@ -39,7 +39,7 @@ export function addState(gameObject: GameObject, key: string, newState: State): 
 }
 
 export function getState(gameObject: GameObject, key: string): State {
-    return gameObject.states.get(key) || gameObject.defaultState;
+    return gameObject.states.get(key) || gameObject.defaultState || {...NULL_STATE};
 }
 
 export function setCurrentState(gameObject: GameObject, newState: State): void {

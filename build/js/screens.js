@@ -1,5 +1,6 @@
 import { loadScreenById } from "./mockServer.js";
 import { createSolidDummy, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js";
+import { removeAllHitBoxes } from "./hitbox.js";
 export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
 export const WORLD_MAP_ROWS = 8;
@@ -28,10 +29,13 @@ export function renderTileMap(tileMapDataArray) {
 }
 export function switchToScreen(screenId) {
     if (isValidScreenId(screenId)) {
-        //unloadCurrentScreen();
+        cleanupCurrentScreen();
         //setCurrentScreen(screenId);
         loadCurrentScreen(screenId);
     }
+}
+function cleanupCurrentScreen() {
+    removeAllHitBoxes();
 }
 export function getCurrentGameObjects() {
     return (currentScreen === null || currentScreen === void 0 ? void 0 : currentScreen.gameObjects) || [];
@@ -39,21 +43,10 @@ export function getCurrentGameObjects() {
 export function drawCurrentScreen() {
     renderTileMap(getCurrentScreenTileMap());
 }
-/*
-export function loadScreens() {
-    screens = getAllScreensAsArray();
-}
-*/
-function setCurrentScreen(screenId) {
-    //currentScreen = screens[screenId];
-}
 function loadCurrentScreen(screenId) {
     currentScreen = loadScreenById(screenId);
     currentScreen.gameObjects.push(...getGlobalGameObjects());
     currentScreen.gameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
-}
-function unloadCurrentScreen() {
-    //removeNonGlobalGameObjects();
 }
 function addCollisionObjectsFromTileMap(tileMapDataArray, collisionCells) {
     const solidDummies = [];

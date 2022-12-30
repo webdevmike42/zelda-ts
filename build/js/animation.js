@@ -64,8 +64,9 @@ function raiseAnimationFrame(animation) {
         animation.currentFrameIndex = 0;
 }
 export function addAnimation(gameObject, animation) {
-    var _a;
-    (_a = gameObject.animations) === null || _a === void 0 ? void 0 : _a.set(animation.name, animation);
+    if (!gameObject.animations)
+        gameObject.animations = new Map();
+    gameObject.animations.set(animation.name, animation);
 }
 export function getAnimation(gameObject, key) {
     var _a;
