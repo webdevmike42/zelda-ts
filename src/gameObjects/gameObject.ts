@@ -2,6 +2,7 @@ import { Animation, NULL_ANIMATION } from "../animation.js";
 import { Box, createBox } from "../box.js";
 import { setCollisionBoxFromBoundingBox, setCollisionBox, getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { HitBox } from "../hitbox.js";
+import { HurtBox } from "../hurtbox.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
@@ -25,7 +26,8 @@ export interface GameObject {
     movementVector: Vector,
     isSolid?: boolean;
     internalId?: number;
-    hitBox?:HitBox;
+    hitBox?: HitBox;
+    hurtBox?: HurtBox;
 }
 
 export enum GameObjectType {
@@ -100,6 +102,10 @@ export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {
     setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
     if (gameObject.currentAnimation)
         gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
+    if (gameObject.hitBox)
+        gameObject.hitBox.position = vectorSum(gameObject.hitBox.position, moveBy);
+    if (gameObject.hurtBox)
+        gameObject.hurtBox.position = vectorSum(gameObject.hurtBox.position, moveBy);
     gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
 }
 

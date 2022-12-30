@@ -77,8 +77,14 @@ function updateGameObjectCurrentState(gameObject: GameObject, currentGameTime: n
 
 export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     getCurrentGameObjects().forEach(gameObject => {
-        const curAnimation:Animation = getCurrentAnimation(gameObject);
-        drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y+getOffsetY(curAnimation));
+        const curAnimation: Animation = getCurrentAnimation(gameObject);
+        drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
+
+        if (gameObject.hurtBox) {
+            //draw hurtbox
+            ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
+            ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
+        }
     });
 
     //draw hitBoxes

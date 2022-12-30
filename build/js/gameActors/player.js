@@ -7,6 +7,7 @@ import { setCollisionBox } from "../collisions.js";
 import { createBox } from "../box.js";
 import { createGlobalGameObject } from "../gameObjects/gameObjectFactory.js";
 import { removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
+import { setHurtBoxFromBoundingBox } from "../hurtbox.js";
 const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16;
 export function createPlayer(x, y) {
     const player = createGlobalGameObject(GameObjectType.PLAYER);
@@ -16,6 +17,7 @@ export function createPlayer(x, y) {
     addPlayerAnimations(player);
     addPlayerMovement(player);
     setCollisionBox(player, createBox(getPosition(player).x + 2, getPosition(player).y + Math.floor(player.height / 2), player.width - 4, Math.floor(player.height / 2)));
+    setHurtBoxFromBoundingBox(player);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     return player;
 }
