@@ -4,8 +4,9 @@ import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState
 import { addAnimation, createAnimation, getAnimation, Animation } from "../animation.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { setCollisionBox, getCollidingBoxes, getCollidingGameObjects, getCollidingSolidGameObjects } from "../collisions.js";
-import { createBox } from "../box.js";
+import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject } from "../gameObjects/gameObjectFactory.js";
+import { HitBox, hitBoxes, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 
 const PLAYER_WIDTH: number = 16, PLAYER_HEIGHT: number = 16;
 
@@ -62,6 +63,10 @@ function createPlayerMovingState(player: Player): State {
     state.name = "player moving state";
     state.enter = () => {/*console.log("enter " + state.name)*/ };
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+        if (isKeyPressed(KEYS.ACTION)) {
+            setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+            return;
+        }
         if (!isAnyMovementKeyDown()) {
             setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
             return;
@@ -72,12 +77,14 @@ function createPlayerMovingState(player: Player): State {
         updateCurrentAnimationBasedOnViewVector(player);
 
     }
-    state.exit = () => {/*console.log("exit " + state.name)*/ };
+    state.exit = () => {};
     return state;
 }
 
 function createPlayerActionState(player: Player): State {
     let startTime: number, duration: number = 50;
+    let hitBox : HitBox; 
+
     const state: State = createEmptyState();
     state.type = CommonStateTypes.ACTION;
     state.name = "player action state";
@@ -85,6 +92,7 @@ function createPlayerActionState(player: Player): State {
         startTime = -1;
         updateCurrentAnimationBasedOnViewVector(player);
         setMovementVector(player, { ...NULL_VECTOR });
+        hitBox = spawnHitBoxInFrontOf(player, 1);
     }
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
         if (startTime === -1) {
@@ -95,7 +103,9 @@ function createPlayerActionState(player: Player): State {
             return;
         }
     }
-    state.exit = () => {};
+    state.exit = () => {
+        removeHitBox(hitBox.id)
+    };
     return state;
 }
 

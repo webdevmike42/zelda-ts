@@ -6,6 +6,7 @@ import { createVector, get4DirectionVector, NULL_VECTOR, vectorScalarProduct } f
 import { setCollisionBox } from "../collisions.js";
 import { createBox } from "../box.js";
 import { createGlobalGameObject } from "../gameObjects/gameObjectFactory.js";
+import { removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16;
 export function createPlayer(x, y) {
     const player = createGlobalGameObject(GameObjectType.PLAYER);
@@ -53,6 +54,10 @@ function createPlayerMovingState(player) {
     state.name = "player moving state";
     state.enter = () => { };
     state.update = (currentGameTime, timeSinceLastTick) => {
+        if (isKeyPressed(KEYS.ACTION)) {
+            setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+            return;
+        }
         if (!isAnyMovementKeyDown()) {
             setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
             return;
@@ -67,6 +72,7 @@ function createPlayerMovingState(player) {
 }
 function createPlayerActionState(player) {
     let startTime, duration = 50;
+    let hitBox;
     const state = createEmptyState();
     state.type = CommonStateTypes.ACTION;
     state.name = "player action state";
@@ -74,6 +80,7 @@ function createPlayerActionState(player) {
         startTime = -1;
         updateCurrentAnimationBasedOnViewVector(player);
         setMovementVector(player, Object.assign({}, NULL_VECTOR));
+        hitBox = spawnHitBoxInFrontOf(player, 1);
     };
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (startTime === -1) {
@@ -84,7 +91,9 @@ function createPlayerActionState(player) {
             return;
         }
     };
-    state.exit = () => { };
+    state.exit = () => {
+        removeHitBox(hitBox.id);
+    };
     return state;
 }
 function addPlayerAnimations(player) {

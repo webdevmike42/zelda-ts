@@ -22,3 +22,8 @@ export function getVectorFrameFraction(vector, timeSinceLastTick) {
         y: vector.y * (timeSinceLastTick / MS_PER_SECOND)
     };
 }
+export function removeObjectFromArray(objectId, arr) {
+    if (!arr)
+        return;
+    arr.splice(arr.map(obj => obj.id).indexOf(objectId), 1);
+}

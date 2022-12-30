@@ -1,5 +1,5 @@
-import { GameObject } from "./gameObjects/gameObject.js";
-import { NULL_VECTOR, Vector } from "./vector.js";
+import { GameObject, getBoundingBox, getCenter, getPosition, getViewVector } from "./gameObjects/gameObject.js";
+import { NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "./vector.js";
 
 export interface Box {
     position: Vector,
@@ -26,4 +26,13 @@ export function createBox(x: number, y: number, width: number, height: number): 
         width: width,
         height: height
     }
+}
+
+export function createBoxInFront(gameObject: GameObject, width: number, height: number): Box {
+    const position: Vector = getPosition(gameObject);
+    const viewVector:Vector = getViewVector(gameObject);
+    const offsetX: number = viewVector.x * ((viewVector.x === 1) ? gameObject.width : width);
+    const offsetY: number = viewVector.y * ((viewVector.y === 1) ? gameObject.height : height);
+    
+    return createBox(position.x + offsetX, position.y + offsetY, width, height);
 }

@@ -1,6 +1,7 @@
 import { addAnimation, createAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { hitBoxes } from "../hitbox.js";
 import { currentScreen, getCurrentGameObjects } from "../screens.js";
 import { getCurrentState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
@@ -65,6 +66,11 @@ export function drawGameObjects(ctx) {
     getCurrentGameObjects().forEach(gameObject => {
         const curAnimation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
+    });
+    //draw hitBoxes
+    ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+    hitBoxes.forEach(hitBox => {
+        ctx.fillRect(hitBox.position.x, hitBox.position.y, hitBox.width, hitBox.height);
     });
 }
 export function createSolidDummy(x, y, width, height) {

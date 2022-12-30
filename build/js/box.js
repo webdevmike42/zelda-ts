@@ -1,3 +1,4 @@
+import { getPosition, getViewVector } from "./gameObjects/gameObject.js";
 import { NULL_VECTOR } from "./vector.js";
 export const NULL_BOX = Object.freeze({
     position: Object.freeze(Object.assign({}, NULL_VECTOR)),
@@ -16,4 +17,11 @@ export function createBox(x, y, width, height) {
         width: width,
         height: height
     };
+}
+export function createBoxInFront(gameObject, width, height) {
+    const position = getPosition(gameObject);
+    const viewVector = getViewVector(gameObject);
+    const offsetX = viewVector.x * ((viewVector.x === 1) ? gameObject.width : width);
+    const offsetY = viewVector.y * ((viewVector.y === 1) ? gameObject.height : height);
+    return createBox(position.x + offsetX, position.y + offsetY, width, height);
 }

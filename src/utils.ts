@@ -33,3 +33,8 @@ export function getVectorFrameFraction(vector: Vector, timeSinceLastTick: number
         y: vector.y * (timeSinceLastTick / MS_PER_SECOND)
     }
 }
+
+export function removeObjectFromArray(objectId: number, arr: any[]) :void {
+    if (!arr) return;
+    arr.splice(arr.map(obj => obj.id).indexOf(objectId), 1);
+}
