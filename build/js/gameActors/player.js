@@ -28,7 +28,6 @@ function addPlayerStates(player) {
     addState(player, CommonStateTypes.MOVING, createPlayerMovingState(player));
     addState(player, CommonStateTypes.ACTION, createPlayerActionState(player));
     addState(player, CommonStateTypes.HIT, createPlayerHitState(player));
-    //addState(player, CommonStateTypes.KNOCKBACK, createPlayerKnockBackState(player));
     setDefaultState(player, idleState);
 }
 function createPlayerIdleState(player) {
@@ -138,54 +137,6 @@ function createPlayerHitState(player) {
     };
     return state;
 }
-/*
-
-export function createPlayerKnockBackState(player: Player): State {
-    let startTime = -1;
-    
-
-    const state: State = createEmptyState();
-    state.type = CommonStateTypes.KNOCKBACK;
-    state.name = "player knockback state";
-    state.enter = () => {
-        console.log("enter player knockback state");
-
-        knockBackAngle = player.stateArgs[0] as number;
-        knockBackSpeed = player.stateArgs[1] as number;
-        knockBackDurationInMs = player.stateArgs[2] as number;
-        knockBackVector = player.stateArgs[3] as Vector;
-
-        if (player.hurtBox)
-            disableHurtBox(player.hurtBox);
-    }
-    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-
-
-
-        if (startTime === -1) {
-            startTime = currentGameTime;
-        }
-
-        if ((currentGameTime - startTime) >= knockBackDurationInMs) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE))
-            //return GameObjectModule.isDead(player) ? player.getState(PLAYER_STATES.DEATH) : player.getState(PLAYER_STATES.IDLE);
-        }
-
-        setMovementVector(player, knockBackVector);
-        //addToEnvironmentVector(player, knockBackVector);
-        
-    };
-    state.exit = () => {
-        console.log("exit knockback state")
-        if (player.hurtBox)
-            enableHurtBox(player.hurtBox);
-
-        startTime = -1;
-    };
-    return state;
-}
-
-*/
 function addPlayerAnimations(player) {
     addPlayerIdleAnimations(player);
     addPlayerMovingAnimations(player);

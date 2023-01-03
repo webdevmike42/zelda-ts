@@ -13,8 +13,7 @@ export enum CommonStateTypes {
     IDLE = "Idle",
     MOVING = "Moving",
     ACTION = "Action",
-    HIT = "Hit",
-    KNOCKBACK = "KnockBack"
+    HIT = "Hit"
 }
 
 export const NULL_STATE: State = Object.freeze({
