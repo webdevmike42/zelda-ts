@@ -49,8 +49,10 @@ function register<T extends GameObject>(gameObject: T): T {
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
-        if (gameObject.hurtBox && gameObject.hurtBox.enabled && boxOverlapSome(gameObject.hurtBox, hitBoxes))
+        if (gameObject.hurtBox && gameObject.hurtBox.enabled && boxOverlapSome(gameObject.hurtBox, hitBoxes)) {
+            console.log("check");
             setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), getCollidingBoxes(gameObject.hurtBox, hitBoxes));
+        }
         if (gameObject.designatedState !== null) {
             switchToState(gameObject, gameObject.designatedState);
             setDesignatedState(gameObject, null);

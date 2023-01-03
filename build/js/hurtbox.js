@@ -22,3 +22,9 @@ export function setHurtBoxFromBoundingBox(gameObject, enabled = true) {
     const hurtBox = createHurtBox(getPosition(gameObject), gameObject.width, gameObject.height, gameObject, enabled);
     gameObject.hurtBox = hurtBox;
 }
+export function disableHurtBox(hurtBox) {
+    hurtBox.enabled = false;
+}
+export function enableHurtBox(hurtBox) {
+    hurtBox.enabled = true;
+}

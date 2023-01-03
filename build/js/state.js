@@ -5,6 +5,7 @@ export var CommonStateTypes;
     CommonStateTypes["MOVING"] = "Moving";
     CommonStateTypes["ACTION"] = "Action";
     CommonStateTypes["HIT"] = "Hit";
+    CommonStateTypes["KNOCKBACK"] = "KnockBack";
 })(CommonStateTypes || (CommonStateTypes = {}));
 export const NULL_STATE = Object.freeze({
     type: CommonStateTypes.NULL,

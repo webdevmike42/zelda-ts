@@ -2,12 +2,12 @@ import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition,
 import { isAnyMovementKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
-import { createVector, get4DirectionVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
+import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
 import { setCollisionBox } from "../collisions.js";
 import { createBox } from "../box.js";
 import { createGlobalGameObject } from "../gameObjects/gameObjectFactory.js";
 import { removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
-import { setHurtBoxFromBoundingBox } from "../hurtbox.js";
+import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16;
 export function createPlayer(x, y) {
     const player = createGlobalGameObject(GameObjectType.PLAYER);
@@ -28,6 +28,7 @@ function addPlayerStates(player) {
     addState(player, CommonStateTypes.MOVING, createPlayerMovingState(player));
     addState(player, CommonStateTypes.ACTION, createPlayerActionState(player));
     addState(player, CommonStateTypes.HIT, createPlayerHitState(player));
+    //addState(player, CommonStateTypes.KNOCKBACK, createPlayerKnockBackState(player));
     setDefaultState(player, idleState);
 }
 function createPlayerIdleState(player) {
@@ -101,21 +102,90 @@ function createPlayerActionState(player) {
     return state;
 }
 function createPlayerHitState(player) {
+    let hitBox;
+    let startTime = -1;
+    let knockBackAngle, knockBackDurationInMs, knockBackVector;
     const state = createEmptyState();
     state.type = CommonStateTypes.HIT;
     state.name = "player hit state";
     state.enter = () => {
-        console.log("enter player hit state with args: ");
-        console.log(player.stateArgs);
+        console.log("enter player hit state");
+        hitBox = player.stateArgs[0];
         if (player.health)
-            //player.health -= hitBox.damage;
-            player.health -= 1;
-        console.log(player.health);
+            player.health -= hitBox.damage;
+        if (player.hurtBox)
+            disableHurtBox(player.hurtBox);
+        knockBackAngle = 90;
+        knockBackDurationInMs = 50;
+        knockBackVector =
+            vectorScalarProduct(200, normalizedVector(createVector(player.position.x - hitBox.position.x, player.position.y - hitBox.position.y)));
     };
-    state.update = () => { setDesignatedState(player, getState(player, CommonStateTypes.IDLE)); };
-    state.exit = () => { console.log("exit hit state"); };
+    state.update = (currentGameTime, timeSinceLastTick) => {
+        if (startTime === -1) {
+            startTime = currentGameTime;
+        }
+        if ((currentGameTime - startTime) >= knockBackDurationInMs) {
+            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            //return GameObjectModule.isDead(player) ? player.getState(PLAYER_STATES.DEATH) : player.getState(PLAYER_STATES.IDLE);
+        }
+        setMovementVector(player, knockBackVector);
+    };
+    state.exit = () => {
+        startTime = -1;
+        if (player.hurtBox)
+            enableHurtBox(player.hurtBox);
+        console.log("exit hit state");
+    };
     return state;
 }
+/*
+
+export function createPlayerKnockBackState(player: Player): State {
+    let startTime = -1;
+    
+
+    const state: State = createEmptyState();
+    state.type = CommonStateTypes.KNOCKBACK;
+    state.name = "player knockback state";
+    state.enter = () => {
+        console.log("enter player knockback state");
+
+        knockBackAngle = player.stateArgs[0] as number;
+        knockBackSpeed = player.stateArgs[1] as number;
+        knockBackDurationInMs = player.stateArgs[2] as number;
+        knockBackVector = player.stateArgs[3] as Vector;
+
+        if (player.hurtBox)
+            disableHurtBox(player.hurtBox);
+    }
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+
+
+
+        if (startTime === -1) {
+            startTime = currentGameTime;
+        }
+
+        if ((currentGameTime - startTime) >= knockBackDurationInMs) {
+            setDesignatedState(player, getState(player, CommonStateTypes.IDLE))
+            //return GameObjectModule.isDead(player) ? player.getState(PLAYER_STATES.DEATH) : player.getState(PLAYER_STATES.IDLE);
+        }
+
+        setMovementVector(player, knockBackVector);
+        //addToEnvironmentVector(player, knockBackVector);
+        
+    };
+    state.exit = () => {
+        console.log("exit knockback state")
+        if (player.hurtBox)
+            enableHurtBox(player.hurtBox);
+
+        startTime = -1;
+    };
+    return state;
+}
+
+*/
 function addPlayerAnimations(player) {
     addPlayerIdleAnimations(player);
     addPlayerMovingAnimations(player);
