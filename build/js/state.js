@@ -4,6 +4,7 @@ export var CommonStateTypes;
     CommonStateTypes["IDLE"] = "Idle";
     CommonStateTypes["MOVING"] = "Moving";
     CommonStateTypes["ACTION"] = "Action";
+    CommonStateTypes["HIT"] = "Hit";
 })(CommonStateTypes || (CommonStateTypes = {}));
 export const NULL_STATE = Object.freeze({
     type: CommonStateTypes.NULL,
@@ -42,8 +43,9 @@ function enterCurrentState(gameObject) {
 function exitCurrentState(gameObject) {
     gameObject.currentState.exit();
 }
-export function setDesignatedState(gameObject, designatedState) {
+export function setDesignatedState(gameObject, designatedState, designatedStateArgs) {
     gameObject.designatedState = designatedState;
+    gameObject.stateArgs = designatedStateArgs || [];
 }
 export function testState() {
     /*

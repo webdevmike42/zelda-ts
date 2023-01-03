@@ -1,10 +1,10 @@
 import { Animation, addAnimation, createAnimation, drawAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
-import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { boxesOverlap, boxOverlapSome, getCollidingBoxes, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { hitBoxes } from "../hitbox.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { currentScreen, getCurrentGameObjects } from "../screens.js";
-import { getCurrentState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
+import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { compose, getVectorFrameFraction, pipe } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
@@ -25,6 +25,7 @@ export function createGameObject(type: GameObjectType): GameObject {
         currentState: { ...NULL_STATE },
         defaultState: { ...NULL_STATE },
         designatedState: null,
+        stateArgs: [],
         viewVector: { ...NULL_VECTOR },
         movementVector: { ...NULL_VECTOR },
         position: { ...NULL_VECTOR },
@@ -57,15 +58,23 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
 
+        if (gameObject.hurtBox && gameObject.hurtBox.enabled && boxOverlapSome(gameObject.hurtBox, hitBoxes))
+            setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), getCollidingBoxes(gameObject.hurtBox, hitBoxes));
+
         if (gameObject.designatedState !== null) {
             switchToState(gameObject, gameObject.designatedState);
             setDesignatedState(gameObject, null);
         }
 
+
+
         if (isMoving(getMovementVector(gameObject))) {
             let resolvedMovementVector: Vector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
             moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
         }
+
+
+
 
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });

@@ -1,9 +1,9 @@
 import { addAnimation, createAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
-import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { boxOverlapSome, getCollidingBoxes, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { hitBoxes } from "../hitbox.js";
 import { currentScreen, getCurrentGameObjects } from "../screens.js";
-import { getCurrentState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
+import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
@@ -21,6 +21,7 @@ export function createGameObject(type) {
         currentState: Object.assign({}, NULL_STATE),
         defaultState: Object.assign({}, NULL_STATE),
         designatedState: null,
+        stateArgs: [],
         viewVector: Object.assign({}, NULL_VECTOR),
         movementVector: Object.assign({}, NULL_VECTOR),
         position: Object.assign({}, NULL_VECTOR),
@@ -48,6 +49,8 @@ function register<T extends GameObject>(gameObject: T): T {
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+        if (gameObject.hurtBox && gameObject.hurtBox.enabled && boxOverlapSome(gameObject.hurtBox, hitBoxes))
+            setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), getCollidingBoxes(gameObject.hurtBox, hitBoxes));
         if (gameObject.designatedState !== null) {
             switchToState(gameObject, gameObject.designatedState);
             setDesignatedState(gameObject, null);

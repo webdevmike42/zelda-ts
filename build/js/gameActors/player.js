@@ -18,6 +18,7 @@ export function createPlayer(x, y) {
     addPlayerMovement(player);
     setCollisionBox(player, createBox(getPosition(player).x + 2, getPosition(player).y + Math.floor(player.height / 2), player.width - 4, Math.floor(player.height / 2)));
     setHurtBoxFromBoundingBox(player);
+    player.health = player.maxHealth = 100;
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     return player;
 }
@@ -26,6 +27,7 @@ function addPlayerStates(player) {
     addState(player, CommonStateTypes.IDLE, idleState);
     addState(player, CommonStateTypes.MOVING, createPlayerMovingState(player));
     addState(player, CommonStateTypes.ACTION, createPlayerActionState(player));
+    addState(player, CommonStateTypes.HIT, createPlayerHitState(player));
     setDefaultState(player, idleState);
 }
 function createPlayerIdleState(player) {
@@ -96,6 +98,22 @@ function createPlayerActionState(player) {
     state.exit = () => {
         removeHitBox(hitBox.id);
     };
+    return state;
+}
+function createPlayerHitState(player) {
+    const state = createEmptyState();
+    state.type = CommonStateTypes.HIT;
+    state.name = "player hit state";
+    state.enter = () => {
+        console.log("enter player hit state with args: ");
+        console.log(player.stateArgs);
+        if (player.health)
+            //player.health -= hitBox.damage;
+            player.health -= 1;
+        console.log(player.health);
+    };
+    state.update = () => { setDesignatedState(player, getState(player, CommonStateTypes.IDLE)); };
+    state.exit = () => { console.log("exit hit state"); };
     return state;
 }
 function addPlayerAnimations(player) {

@@ -1,7 +1,7 @@
-import { GameObject } from "./gameObjects/gameObject";
+import { GameObject } from "./gameObjects/gameObject.js";
 
 export interface State {
-    type:string,
+    type: string,
     name: string,
     enter: Function,
     update: Function,
@@ -12,7 +12,8 @@ export enum CommonStateTypes {
     NULL = "Null",
     IDLE = "Idle",
     MOVING = "Moving",
-    ACTION = "Action"
+    ACTION = "Action",
+    HIT = "Hit"
 }
 
 export const NULL_STATE: State = Object.freeze({
@@ -29,7 +30,7 @@ export function createEmptyState(): State {
 
 export function switchToState(gameObject: GameObject, newState: State) {
     exitCurrentState(gameObject);
-    setCurrentState(gameObject,newState);
+    setCurrentState(gameObject, newState);
     enterCurrentState(gameObject);
     //handleGameObjectInput(gameObject);//otherwise, on transition from idle to moving state, very short input will be ignored
 }
@@ -39,7 +40,7 @@ export function addState(gameObject: GameObject, key: string, newState: State): 
 }
 
 export function getState(gameObject: GameObject, key: string): State {
-    return gameObject.states.get(key) || gameObject.defaultState || {...NULL_STATE};
+    return gameObject.states.get(key) || gameObject.defaultState || { ...NULL_STATE };
 }
 
 export function setCurrentState(gameObject: GameObject, newState: State): void {
@@ -62,8 +63,9 @@ function exitCurrentState(gameObject: GameObject): void {
     gameObject.currentState.exit();
 }
 
-export function setDesignatedState(gameObject:GameObject, designatedState:State | null):void{
+export function setDesignatedState(gameObject: GameObject, designatedState: State | null, designatedStateArgs?: any[]): void {
     gameObject.designatedState = designatedState;
+    gameObject.stateArgs = designatedStateArgs || [];
 }
 
 export function testState() {

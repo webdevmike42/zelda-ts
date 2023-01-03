@@ -24,6 +24,7 @@ export function createPlayer(x: number, y: number): Player {
     addPlayerMovement(player);
     setCollisionBox(player, createBox(getPosition(player).x + 2, getPosition(player).y + Math.floor(player.height / 2), player.width - 4, Math.floor(player.height / 2)));
     setHurtBoxFromBoundingBox(player);
+    player.health = player.maxHealth = 100;
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     return player;
 }
@@ -33,6 +34,7 @@ function addPlayerStates(player: Player): void {
     addState(player, CommonStateTypes.IDLE, idleState);
     addState(player, CommonStateTypes.MOVING, createPlayerMovingState(player));
     addState(player, CommonStateTypes.ACTION, createPlayerActionState(player));
+    addState(player, CommonStateTypes.HIT, createPlayerHitState(player));
     setDefaultState(player, idleState);
 }
 
@@ -79,13 +81,13 @@ function createPlayerMovingState(player: Player): State {
         updateCurrentAnimationBasedOnViewVector(player);
 
     }
-    state.exit = () => {};
+    state.exit = () => { };
     return state;
 }
 
 function createPlayerActionState(player: Player): State {
     let startTime: number, duration: number = 50;
-    let hitBox : HitBox; 
+    let hitBox: HitBox;
 
     const state: State = createEmptyState();
     state.type = CommonStateTypes.ACTION;
@@ -111,6 +113,24 @@ function createPlayerActionState(player: Player): State {
     return state;
 }
 
+function createPlayerHitState(player: Player): State {
+    const state: State = createEmptyState();
+    state.type = CommonStateTypes.HIT;
+    state.name = "player hit state";
+    state.enter = () => {
+        console.log("enter player hit state with args: ")
+        console.log(player.stateArgs);
+
+        if (player.health)
+            //player.health -= hitBox.damage;
+            player.health -= 1;
+        console.log(player.health)
+    }
+    state.update = () => { setDesignatedState(player, getState(player, CommonStateTypes.IDLE)) };
+    state.exit = () => { console.log("exit hit state") };
+    return state;
+}
+
 function addPlayerAnimations(player: Player): void {
     addPlayerIdleAnimations(player);
     addPlayerMovingAnimations(player);
@@ -132,8 +152,8 @@ function addPlayerMovingAnimations(player: Player): void {
 }
 
 function addPlayerAttackingAnimations(player: Player): void {
-    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Up", "./resources/link.png", getPosition(player), player.width, 27, [{ srcX: 60, srcY: 84 }], 1, false,createVector(0,-11)));
-    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Left", "./resources/link.png", getPosition(player), 28, player.height, [{ srcX: 24, srcY: 90 }], 1, false,createVector(-11,0)));
+    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Up", "./resources/link.png", getPosition(player), player.width, 27, [{ srcX: 60, srcY: 84 }], 1, false, createVector(0, -11)));
+    addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Left", "./resources/link.png", getPosition(player), 28, player.height, [{ srcX: 24, srcY: 90 }], 1, false, createVector(-11, 0)));
     addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Down", "./resources/link.png", getPosition(player), player.width, 27, [{ srcX: 0, srcY: 84 }], 1, false));
     addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Right", "./resources/link.png", getPosition(player), 28, player.height, [{ srcX: 85, srcY: 90 }], 1, false));
 }

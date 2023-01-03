@@ -15,6 +15,7 @@ export interface GameObject {
     currentState: State;
     defaultState: State;
     designatedState: State | null;
+    stateArgs: any[]
     position: Vector;
     width: number,
     height: number,
@@ -28,6 +29,8 @@ export interface GameObject {
     internalId?: number;
     hitBox?: HitBox;
     hurtBox?: HurtBox;
+    health?:number;
+    maxHealth?:number;
 }
 
 export enum GameObjectType {
