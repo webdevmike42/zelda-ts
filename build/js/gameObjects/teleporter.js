@@ -9,12 +9,11 @@ var TeleporterStates;
 (function (TeleporterStates) {
     TeleporterStates["ACTIVE"] = "active";
 })(TeleporterStates || (TeleporterStates = {}));
-export function createTeleporter(x, y, width, height, targetScreenId, targetX, targetY) {
+export function createTeleporterTrigger(x, y, width, height, targetScreenId, targetX, targetY) {
     const teleporter = createGameObject(GameObjectType.TELEPORTER); //addGameObject(GameObjectType.TELEPORTER) as Teleporter;
     setPosition(teleporter, createVector(x, y));
     setBounds(teleporter, width, height);
     addTeleporterStates(teleporter);
-    addTeleporterAnimations(teleporter);
     setCollisionBoxFromBoundingBox(teleporter);
     setTarget(teleporter, targetScreenId || EMPTY_SCREEN_ID, targetX, targetY);
     switchToState(teleporter, getState(teleporter, TeleporterStates.ACTIVE));

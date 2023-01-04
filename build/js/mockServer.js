@@ -1,6 +1,6 @@
 import { createSolidDummy } from "./gameObjects/gameObjectFactory.js";
 import { createStaticHazard } from "./gameObjects/staticHazard.js";
-import { createTeleporter } from "./gameObjects/teleporter.js";
+import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
 export function loadScreenById(screenId) {
     const screen = {
@@ -2518,10 +2518,10 @@ export function loadScreenById(screenId) {
             break;
     }
     //add screen switch trigger
-    screen.gameObjects.push(createTeleporter(0, 52, CANVAS_WIDTH, 16, Math.max(0, screenId - WORLD_MAP_COLS), undefined, 220));
-    screen.gameObjects.push(createTeleporter(0, CANVAS_HEIGHT, CANVAS_WIDTH, 16, screenId + WORLD_MAP_COLS, undefined, 60));
-    screen.gameObjects.push(createTeleporter(0, -16, 16, CANVAS_HEIGHT, screenId - 1, 220, undefined));
-    screen.gameObjects.push(createTeleporter(CANVAS_WIDTH, 0, 16, CANVAS_HEIGHT, screenId + 1, 16, undefined));
+    screen.gameObjects.push(createTeleporterTrigger(0, 52, CANVAS_WIDTH, 16, Math.max(0, screenId - WORLD_MAP_COLS), undefined, 220));
+    screen.gameObjects.push(createTeleporterTrigger(0, CANVAS_HEIGHT, CANVAS_WIDTH, 16, screenId + WORLD_MAP_COLS, undefined, 60));
+    screen.gameObjects.push(createTeleporterTrigger(0, -16, 16, CANVAS_HEIGHT, screenId - 1, 220, undefined));
+    screen.gameObjects.push(createTeleporterTrigger(CANVAS_WIDTH, 0, 16, CANVAS_HEIGHT, screenId + 1, 16, undefined));
     setInternalIds(screen.gameObjects);
     return screen;
 }

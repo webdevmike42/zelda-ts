@@ -1,6 +1,5 @@
-import { createPlayer } from "./gameActors/player.js"
-import { createSolidDummy, drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js"
-import { createTeleporter } from "./gameObjects/teleporter.js"
+import { createPlayer, isPlayerDead } from "./gameActors/player.js"
+import { drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js"
 import { initKeyBoardInputHandler, isKeyPressed, KEYS } from "./KeyboardInputHandler.js"
 import { drawCurrentScreen, init, START_SCREEN_ID, switchToScreen } from "./screens.js"
 import { runAllTests } from "./tests.js"
@@ -10,7 +9,8 @@ enum GameState {
     RUNNING,
     PAUSING,
     PAUSED,
-    UNPAUSING
+    UNPAUSING,
+    GAME_OVER
 }
 
 let canvas: HTMLCanvasElement | null = null;
@@ -19,6 +19,7 @@ let gameState: GameState | null = null;
 let startTime: number = -1;
 let fps: number = 60;
 let timeOfLastTick: number = 0;
+let quitGame:boolean = false;
 
 function startNewGame(): void {
     if ((canvas = document.getElementById("myCanvas") as HTMLCanvasElement) !== null && (ctx = canvas.getContext("2d")) !== null) {
@@ -49,12 +50,16 @@ function gameLoop(currentTime: number): void {
         timeOfLastTick = currentTime;
     }
 
-    requestAnimationFrame(gameLoop);
+    if (!quitGame)
+        requestAnimationFrame(gameLoop);
 }
 
 function updateGame(currentGameTime: number, timeSinceLastTick: number): void {
     switch (gameState) {
         case GameState.RUNNING:
+            if (isPlayerDead())
+                setGameState(GameState.GAME_OVER);
+
             if (isKeyPressed(KEYS.START)) {
                 gameState = GameState.PAUSING;
             } else {
@@ -75,7 +80,12 @@ function updateGame(currentGameTime: number, timeSinceLastTick: number): void {
         case GameState.UNPAUSING:
             gameState = GameState.RUNNING;
             console.log("game continues");
-            return;
+            break;
+
+        case GameState.GAME_OVER:
+            console.log("GAME OVER");
+            quitGame = true;
+            break;
     }
 }
 

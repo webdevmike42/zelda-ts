@@ -9,8 +9,9 @@ import { createGlobalGameObject } from "../gameObjects/gameObjectFactory.js";
 import { removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16;
+let player;
 export function createPlayer(x, y) {
-    const player = createGlobalGameObject(GameObjectType.PLAYER);
+    player = createGlobalGameObject(GameObjectType.PLAYER);
     setPosition(player, createVector(x, y));
     setBounds(player, PLAYER_WIDTH, PLAYER_HEIGHT);
     addPlayerStates(player);
@@ -18,9 +19,16 @@ export function createPlayer(x, y) {
     addPlayerMovement(player);
     setCollisionBox(player, createBox(getPosition(player).x + 2, getPosition(player).y + Math.floor(player.height / 2), player.width - 4, Math.floor(player.height / 2)));
     setHurtBoxFromBoundingBox(player);
-    player.health = player.maxHealth = 100;
+    setPlayerHealth(8);
+    setPlayerMaxHealth(8);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     return player;
+}
+function setPlayerHealth(health) {
+    player.health = health;
+}
+function setPlayerMaxHealth(maxHealth) {
+    player.maxHealth = maxHealth;
 }
 function addPlayerStates(player) {
     const idleState = createPlayerIdleState(player);
@@ -178,4 +186,10 @@ function getDirectionNameFromViewVector(viewVector) {
     if (viewVector.y === -1)
         return "Up";
     return "Down";
+}
+export function isPlayerDead() {
+    return getPlayerHealth() <= 0;
+}
+export function getPlayerHealth() {
+    return player.health || 0;
 }

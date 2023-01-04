@@ -74,9 +74,6 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
             moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
         }
 
-
-
-
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }

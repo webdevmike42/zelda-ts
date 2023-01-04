@@ -1,4 +1,4 @@
-import { createPlayer } from "./gameActors/player.js";
+import { createPlayer, isPlayerDead } from "./gameActors/player.js";
 import { drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { initKeyBoardInputHandler, isKeyPressed, KEYS } from "./KeyboardInputHandler.js";
 import { drawCurrentScreen, init, START_SCREEN_ID, switchToScreen } from "./screens.js";
@@ -10,6 +10,7 @@ var GameState;
     GameState[GameState["PAUSING"] = 1] = "PAUSING";
     GameState[GameState["PAUSED"] = 2] = "PAUSED";
     GameState[GameState["UNPAUSING"] = 3] = "UNPAUSING";
+    GameState[GameState["GAME_OVER"] = 4] = "GAME_OVER";
 })(GameState || (GameState = {}));
 let canvas = null;
 let ctx = null;
@@ -17,6 +18,7 @@ let gameState = null;
 let startTime = -1;
 let fps = 60;
 let timeOfLastTick = 0;
+let quitGame = false;
 function startNewGame() {
     if ((canvas = document.getElementById("myCanvas")) !== null && (ctx = canvas.getContext("2d")) !== null) {
         initKeyBoardInputHandler();
@@ -41,11 +43,14 @@ function gameLoop(currentTime) {
         drawGame();
         timeOfLastTick = currentTime;
     }
-    requestAnimationFrame(gameLoop);
+    if (!quitGame)
+        requestAnimationFrame(gameLoop);
 }
 function updateGame(currentGameTime, timeSinceLastTick) {
     switch (gameState) {
         case GameState.RUNNING:
+            if (isPlayerDead())
+                setGameState(GameState.GAME_OVER);
             if (isKeyPressed(KEYS.START)) {
                 gameState = GameState.PAUSING;
             }
@@ -67,7 +72,11 @@ function updateGame(currentGameTime, timeSinceLastTick) {
         case GameState.UNPAUSING:
             gameState = GameState.RUNNING;
             console.log("game continues");
-            return;
+            break;
+        case GameState.GAME_OVER:
+            console.log("GAME OVER");
+            quitGame = true;
+            break;
     }
 }
 function drawGame() {
