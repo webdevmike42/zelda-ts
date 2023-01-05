@@ -87,12 +87,12 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
         }
 
-
         if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
         }
+        
     });
 /*
     //draw hitBoxes

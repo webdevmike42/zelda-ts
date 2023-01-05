@@ -1,15 +1,8 @@
+import { createBox } from "./box.js";
 import { getPosition } from "./gameObjects/gameObject.js";
-let id = 0;
 const NULL_HURTBOX = Object.freeze({});
 export function createHurtBox(position, width, height, owner, enabled = true) {
-    return {
-        id: id++,
-        position: Object.assign({}, position),
-        width: width,
-        height: height,
-        owner: owner,
-        enabled: enabled
-    };
+    return Object.assign(Object.assign({}, createBox(position.x, position.y, width, height)), { owner: owner, enabled: enabled });
 }
 /*
 export function spawnHitBoxInFrontOf(gameObject: GameObject, damage: number): HurtBox {

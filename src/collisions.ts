@@ -27,7 +27,7 @@ export function getCollidingSolidGameObjects(gameObject: GameObject, collisionBo
 }
 
 export function getCollidingBoxes(box1: Box, boxArray: Box[]): Box[] {
-    return boxArray.filter(box => box1.id !== box.id && boxesOverlap(box1, box));
+    return boxArray.filter(box => boxesOverlap(box1, box));
 }
 
 export function boxOverlapSome(box1: Box, boxArray: Box[]): boolean {

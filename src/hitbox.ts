@@ -1,14 +1,13 @@
-import { Box, createBoxInFront, NULL_BOX } from "./box.js";
+import { Box, createBox, createBoxInFront, NULL_BOX } from "./box.js";
 import { getCollidingBoxes } from "./collisions.js";
 import { GameObject, getPosition } from "./gameObjects/gameObject.js";
+import { isHurtBoxEnabled } from "./hurtbox.js";
 import { removeObjectFromArray } from "./utils.js";
 import { Vector } from "./vector.js";
 
 export let hitBoxes: HitBox[] = [];
-let id: number = 0;
 
 export interface HitBox extends Box {
-    id: number,
     owner: GameObject,
     damage: number,
     enabled: boolean
@@ -16,10 +15,7 @@ export interface HitBox extends Box {
 
 export function createHitBox(position: Vector, width: number, height: number, owner: GameObject, damage: number, enabled: boolean = true) {
     return {
-        id: id++,
-        position: { ...position },
-        width: width,
-        height: height,
+        ... createBox(position.x, position.y, width, height),
         owner: owner,
         damage: (damage >= 0 ? damage : 0),
         enabled: enabled
@@ -60,6 +56,8 @@ export function isHitBoxEnabled(gameObject:GameObject):boolean{
 }
 
 export function getCollidingHitBoxes(gameObject: GameObject): HitBox[] {
-    return (getCollidingBoxes(gameObject.hurtBox || { ...NULL_BOX }, hitBoxes) as HitBox[]).filter(hb => hb.enabled);
+    return (gameObject.hurtBox && isHurtBoxEnabled(gameObject))
+    ? (getCollidingBoxes(gameObject.hurtBox || { ...NULL_BOX }, hitBoxes) as HitBox[]).filter(hb => hb.enabled && hb.owner.id !== gameObject.id)
+    : [];
 }
 

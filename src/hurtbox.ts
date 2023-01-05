@@ -1,9 +1,7 @@
-import { Box, createBoxInFront } from "./box.js";
+import { Box, createBox, createBoxInFront } from "./box.js";
 import { GameObject, getPosition } from "./gameObjects/gameObject.js";
 import { removeObjectFromArray } from "./utils.js";
 import { Vector } from "./vector.js";
-
-let id: number = 0;
 
 export interface HurtBox extends Box {
     id: number,
@@ -17,10 +15,7 @@ const NULL_HURTBOX = Object.freeze({
 
 export function createHurtBox(position: Vector, width: number, height: number, owner: GameObject, enabled: boolean = true) {
     return {
-        id: id++,
-        position: { ...position },
-        width: width,
-        height: height,
+        ... createBox(position.x, position.y, width, height),
         owner: owner,
         enabled: enabled
     }
