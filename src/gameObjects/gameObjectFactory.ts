@@ -61,8 +61,6 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
             setDesignatedState(gameObject, null);
         }
 
-
-
         if (isMoving(getMovementVector(gameObject))) {
             let resolvedMovementVector: Vector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
             moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
@@ -91,16 +89,8 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-        }
-        
+        } 
     });
-/*
-    //draw hitBoxes
-    
-    hitBoxes.forEach(hitBox => {
-        ctx.fillRect(hitBox.position.x, hitBox.position.y, hitBox.width, hitBox.height)
-    });
-    */
 }
 
 export function createSolidDummy(x: number, y: number, width: number, height: number): GameObject {

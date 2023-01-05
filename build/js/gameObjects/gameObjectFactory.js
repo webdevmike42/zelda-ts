@@ -77,13 +77,6 @@ export function drawGameObjects(ctx) {
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height);
         }
     });
-    /*
-        //draw hitBoxes
-        
-        hitBoxes.forEach(hitBox => {
-            ctx.fillRect(hitBox.position.x, hitBox.position.y, hitBox.width, hitBox.height)
-        });
-        */
 }
 export function createSolidDummy(x, y, width, height) {
     const dummy = createGameObject(GameObjectType.DUMMY);
