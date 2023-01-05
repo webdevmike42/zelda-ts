@@ -155,7 +155,7 @@ export function removeAllGameObjects() {
     currentGameObjects = [];
 }
 */
-function setSolid(gameObject: GameObject, isSolid: boolean = true): void {
+export function setSolid(gameObject: GameObject, isSolid: boolean = true): void {
     gameObject.isSolid = isSolid;
 }
 

@@ -13,6 +13,7 @@ export var GameObjectType;
     GameObjectType[GameObjectType["HAZARD"] = 4] = "HAZARD";
     GameObjectType[GameObjectType["DUMMY"] = 5] = "DUMMY";
     GameObjectType[GameObjectType["FLOOR_SWITCH"] = 6] = "FLOOR_SWITCH";
+    GameObjectType[GameObjectType["DOOR"] = 7] = "DOOR";
 })(GameObjectType || (GameObjectType = {}));
 export function getCurrentAnimation(gameObject) {
     return gameObject.currentAnimation || gameObject.defaultAnimation || Object.assign({}, NULL_ANIMATION);

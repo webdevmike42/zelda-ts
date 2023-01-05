@@ -4,8 +4,9 @@ import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBo
 import { EMPTY_SCREEN_ID, getCurrentGameObjects, switchToScreen } from "../screens.js";
 import { addState, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
+import { closeDoor, Door, openDoor } from "./door.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
-import { createGameObject } from "./gameObjectFactory.js";
+import { createGameObject, filterGameObjects, getGameObjects } from "./gameObjectFactory.js";
 
 export interface FloorSwitch extends GameObject {
     pressed: boolean,
@@ -49,9 +50,10 @@ function createFloorSwitchPressedState(floorSwitch: FloorSwitch): State {
     state.enter = () => {
         console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.PRESSED));
+        openDoor(filterGameObjects(GameObjectType.DOOR,getCurrentGameObjects())[0] as Door)
     }
     state.update = () => {
-        if (getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length === 0)
+        if (!floorSwitch.staysPressed && getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length === 0)
             setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
     }
     state.exit = () => {
@@ -66,6 +68,8 @@ function createFloorSwitchReleasedState(floorSwitch: FloorSwitch): State {
     state.enter = () => {
         console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.RELEASED));
+        if(filterGameObjects(GameObjectType.DOOR,getCurrentGameObjects()).length > 0)
+        closeDoor(filterGameObjects(GameObjectType.DOOR,getCurrentGameObjects())[0] as Door)
     }
     state.update = () => {
         if (getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length > 0)

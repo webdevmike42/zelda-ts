@@ -136,7 +136,7 @@ export function removeAllGameObjects() {
     currentGameObjects = [];
 }
 */
-function setSolid(gameObject, isSolid = true) {
+export function setSolid(gameObject, isSolid = true) {
     gameObject.isSolid = isSolid;
 }
 export function isSolid(gameObject) {

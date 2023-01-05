@@ -1,3 +1,4 @@
+import { createDoor } from "./gameObjects/door.js";
 import { createFloorSwitch } from "./gameObjects/floorSwitch.js";
 import { createSolidDummy } from "./gameObjects/gameObjectFactory.js";
 import { createDestroyableStaticHazard } from "./gameObjects/staticHazard.js";
@@ -2296,9 +2297,10 @@ export function loadScreenById(screenId) {
                 [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]
             ];
             screen.gameObjects = [
-                createSolidDummy(120, 120, 16, 16),
+                createSolidDummy(120, 80, 16, 16),
                 //createStaticHazard(120,150,48,32,1),
-                createFloorSwitch(90, 120, 16, 16, true),
+                createFloorSwitch(120, 100, 16, 16, true),
+                createDoor(110, 120, 16, 16, false),
                 createDestroyableStaticHazard(70, 150, 48, 32, 1, 10)
             ];
             /*

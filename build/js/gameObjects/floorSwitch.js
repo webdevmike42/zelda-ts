@@ -3,8 +3,9 @@ import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBo
 import { getCurrentGameObjects } from "../screens.js";
 import { addState, createEmptyState, getState, setDefaultState, setDesignatedState, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
+import { closeDoor, openDoor } from "./door.js";
 import { GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
-import { createGameObject } from "./gameObjectFactory.js";
+import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
 var FloorSwitchStates;
 (function (FloorSwitchStates) {
     FloorSwitchStates["PRESSED"] = "Pressed";
@@ -39,9 +40,10 @@ function createFloorSwitchPressedState(floorSwitch) {
     state.enter = () => {
         console.log("enter: " + state.name);
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.PRESSED));
+        openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
     };
     state.update = () => {
-        if (getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length === 0)
+        if (!floorSwitch.staysPressed && getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length === 0)
             setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
     };
     state.exit = () => {
@@ -55,6 +57,8 @@ function createFloorSwitchReleasedState(floorSwitch) {
     state.enter = () => {
         console.log("enter: " + state.name);
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.RELEASED));
+        if (filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects()).length > 0)
+            closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
     };
     state.update = () => {
         if (getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length > 0)

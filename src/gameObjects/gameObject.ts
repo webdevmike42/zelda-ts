@@ -40,7 +40,8 @@ export enum GameObjectType {
     TELEPORTER,
     HAZARD,
     DUMMY,
-    FLOOR_SWITCH
+    FLOOR_SWITCH,
+    DOOR
 }
 
 export function getCurrentAnimation(gameObject: GameObject): Animation {
