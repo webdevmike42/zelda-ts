@@ -1,8 +1,10 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { setHitBoxFromBoundingBox } from "../hitbox.js";
+import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
+import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState } from "../state.js";
 import { createVector } from "../vector.js";
-import { GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
+import { GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
 export function createStaticHazard(x, y, width, height, damage) {
     const staticHazard = createGameObject(GameObjectType.HAZARD);
@@ -14,40 +16,49 @@ export function createStaticHazard(x, y, width, height, damage) {
     setCurrentAnimation(staticHazard, getAnimation(staticHazard, "StaticHazardActive"));
     return staticHazard;
 }
-/*
-function addTeleporterStates(teleporter: Hazard): void {
-    const activeState: State = createTeleporterActiveState(teleporter);
-    addState(teleporter, TeleporterStates.ACTIVE, activeState);
-    setDefaultState(teleporter, activeState);
+export function createDestroyableStaticHazard(x, y, width, height, damage, health) {
+    const hazard = createStaticHazard(x, y, width, height, damage);
+    setHurtBoxFromBoundingBox(hazard);
+    setHealth(hazard, health);
+    setMaxHealth(hazard, health);
+    addDestroyableHazardStates(hazard);
+    return hazard;
 }
-
-function addTeleporterAnimations(teleporter: Hazard): void {
-    teleporter.animations = new Map<string, Animation>();
-    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 30 }], 1, false));
-    setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
+function addDestroyableHazardStates(hazard) {
+    const hitState = createDestroyableStaticHazardHitState(hazard);
+    addState(hazard, CommonStateTypes.HIT, hitState);
+    addState(hazard, CommonStateTypes.DEATH, createDestroyableStaticHazardDeathState(hazard));
+    setDefaultState(hazard, hitState);
 }
-
-function createTeleporterActiveState(teleporter: Hazard): State {
-    const state: State = createEmptyState();
-    state.name = "teleporter active state";
+function createDestroyableStaticHazardHitState(hazard) {
+    const state = createEmptyState();
+    state.type = CommonStateTypes.HIT;
+    state.name = "hazard hit state";
     state.enter = () => {
-        console.log("enter: " + state.name)
-        setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
-    }
+        console.log("enter hazard hit state");
+        console.log(hazard.health);
+        const hitBox = hazard.stateArgs[0];
+        if (hazard.health) {
+            hazard.health -= hitBox.damage;
+        }
+    };
     state.update = () => {
-        getCollidingGameObjects(teleporter, getCollisionBox(teleporter), filterGameObjects(GameObjectType.PLAYER, getGameObjects()))
-            .forEach(gameObject => {
-                teleport(gameObject, teleporter.targetScreenId, teleporter.targetX, teleporter.targetY);
-            });
-    }
-    state.exit = () => {
-        console.log("exit " + state.name)
+        if (isGameObjectDead(hazard)) {
+            console.log("MUH");
+            setDesignatedState(hazard, getState(hazard, CommonStateTypes.DEATH));
+        }
     };
     return state;
 }
-
-export function teleport(gameObject: GameObject, targetScreenId: number, targetX: number | undefined, targetY: number | undefined) {
-    switchToScreen(targetScreenId);
-    setGameObjectPosition(gameObject, createVector(targetX || getPosition(gameObject).x, targetY || getPosition(gameObject).y));
+function createDestroyableStaticHazardDeathState(hazard) {
+    const state = createEmptyState();
+    state.type = CommonStateTypes.DEATH;
+    state.name = "hazard death state";
+    state.enter = () => {
+        console.log("enter hazard death state");
+        if (hazard.hurtBox)
+            disableHurtBox(hazard.hurtBox);
+        disableHitBox(hazard);
+    };
+    return state;
 }
-*/ 

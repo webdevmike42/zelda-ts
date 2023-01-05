@@ -1,4 +1,4 @@
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, setBounds, setCurrentAnimation, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
@@ -19,16 +19,10 @@ export function createPlayer(x, y) {
     addPlayerMovement(player);
     setCollisionBox(player, createBox(getPosition(player).x + 2, getPosition(player).y + Math.floor(player.height / 2), player.width - 4, Math.floor(player.height / 2)));
     setHurtBoxFromBoundingBox(player);
-    setPlayerHealth(8);
-    setPlayerMaxHealth(8);
+    setHealth(player, 8);
+    setMaxHealth(player, 8);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     return player;
-}
-function setPlayerHealth(health) {
-    player.health = health;
-}
-function setPlayerMaxHealth(maxHealth) {
-    player.maxHealth = maxHealth;
 }
 function addPlayerStates(player) {
     const idleState = createPlayerIdleState(player);
@@ -188,8 +182,5 @@ function getDirectionNameFromViewVector(viewVector) {
     return "Down";
 }
 export function isPlayerDead() {
-    return getPlayerHealth() <= 0;
-}
-export function getPlayerHealth() {
-    return player.health || 0;
+    return isGameObjectDead(player);
 }

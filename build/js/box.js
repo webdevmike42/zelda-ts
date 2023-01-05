@@ -1,6 +1,9 @@
 import { getPosition, getViewVector } from "./gameObjects/gameObject.js";
 import { NULL_VECTOR } from "./vector.js";
+export const INVALID_BOX_ID = -1;
+let id = 0;
 export const NULL_BOX = Object.freeze({
+    id: INVALID_BOX_ID,
     position: Object.freeze(Object.assign({}, NULL_VECTOR)),
     width: 0,
     height: 0
@@ -10,6 +13,7 @@ export function createBoxFromVector(position, width, height) {
 }
 export function createBox(x, y, width, height) {
     return {
+        id: id++,
         position: {
             x: x,
             y: y

@@ -79,3 +79,15 @@ export function setGameObjectPosition(gameObject, newPosition) {
         moveGameObject(gameObject, diffVector);
     }
 }
+export function setHealth(gameObject, health) {
+    gameObject.health = health;
+}
+export function setMaxHealth(gameObject, maxHealth) {
+    gameObject.maxHealth = maxHealth;
+}
+export function isGameObjectDead(gameObject) {
+    return getHealth(gameObject) <= 0;
+}
+export function getHealth(gameObject) {
+    return gameObject.health || 0;
+}

@@ -1,7 +1,8 @@
 import { Animation, addAnimation, createAnimation, drawAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { boxesOverlap, boxOverlapSome, getCollidingBoxes, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { hitBoxes } from "../hitbox.js";
+import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
+import { isHurtBoxEnabled } from "../hurtbox.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { currentScreen, getCurrentGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
@@ -45,22 +46,15 @@ function addToGlobalList(gameObject: GameObject): void {
     globalGameObjects.push(gameObject);
 }
 
-/*
-function register<T extends GameObject>(gameObject: T): T {
-    if (!isRegistered(gameObject.id))
-        currentGameObjects.push(gameObject);
-
-    return gameObject;
-}
-*/
-
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
 
-        if (gameObject.hurtBox && gameObject.hurtBox.enabled && boxOverlapSome(gameObject.hurtBox, hitBoxes)){
-            console.log("check")
-            setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), getCollidingBoxes(gameObject.hurtBox, hitBoxes));
+        if (isHurtBoxEnabled(gameObject)){
+            const chb:HitBox[] = getCollidingHitBoxes(gameObject);
+            if(chb.length > 0){
+                setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
+            }
         }
         if (gameObject.designatedState !== null) {
             switchToState(gameObject, gameObject.designatedState);
@@ -87,18 +81,26 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
         const curAnimation: Animation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
 
-        if (gameObject.hurtBox) {
+        if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
             //draw hurtbox
             ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
             ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
         }
-    });
 
+
+        if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
+            //draw hitbox
+            ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
+        }
+    });
+/*
     //draw hitBoxes
-    ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+    
     hitBoxes.forEach(hitBox => {
         ctx.fillRect(hitBox.position.x, hitBox.position.y, hitBox.width, hitBox.height)
     });
+    */
 }
 
 export function createSolidDummy(x: number, y: number, width: number, height: number): GameObject {

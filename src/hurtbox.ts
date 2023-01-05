@@ -11,6 +11,10 @@ export interface HurtBox extends Box {
     enabled: boolean
 }
 
+const NULL_HURTBOX = Object.freeze({
+
+})
+
 export function createHurtBox(position: Vector, width: number, height: number, owner: GameObject, enabled: boolean = true) {
     return {
         id: id++,
@@ -41,3 +45,13 @@ export function disableHurtBox(hurtBox:HurtBox):void{
 export function enableHurtBox(hurtBox:HurtBox):void{
     hurtBox.enabled = true;
 }
+
+export function isHurtBoxEnabled(gameObject:GameObject):boolean{
+    return gameObject.hurtBox?.enabled || false;
+}
+
+/*
+export function getHurtBox(gameObject:GameObject):HurtBox{
+    //return gameObject.hurtBox ? ;
+}
+*/

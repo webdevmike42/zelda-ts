@@ -2,12 +2,17 @@ import { GameObject, getBoundingBox, getCenter, getPosition, getViewVector } fro
 import { NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "./vector.js";
 
 export interface Box {
+    id:number,
     position: Vector,
     width: number,
     height: number
 }
 
+export const INVALID_BOX_ID = -1;
+let id:number = 0;
+
 export const NULL_BOX = Object.freeze({
+    id:INVALID_BOX_ID,
     position: Object.freeze({ ...NULL_VECTOR }),
     width: 0,
     height: 0
@@ -19,6 +24,7 @@ export function createBoxFromVector(position: Vector, width: number, height: num
 
 export function createBox(x: number, y: number, width: number, height: number): Box {
     return {
+        id:id++,
         position: {
             x: x,
             y: y

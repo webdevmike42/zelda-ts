@@ -1,4 +1,4 @@
-import { createMovementVector, GameObject, GameObjectType, getBoundingBox, getCurrentAnimation, getMovementVector, getPosition, getViewVector, moveGameObject, setBounds, setCurrentAnimation, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObject, GameObjectType, getBoundingBox, getCurrentAnimation, getMovementVector, getPosition, getViewVector, isGameObjectDead, moveGameObject, setBounds, setCurrentAnimation, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, setCurrentState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation, Animation } from "../animation.js";
@@ -24,18 +24,10 @@ export function createPlayer(x: number, y: number): Player {
     addPlayerMovement(player);
     setCollisionBox(player, createBox(getPosition(player).x + 2, getPosition(player).y + Math.floor(player.height / 2), player.width - 4, Math.floor(player.height / 2)));
     setHurtBoxFromBoundingBox(player);
-    setPlayerHealth(8);
-    setPlayerMaxHealth(8);
+    setHealth(player,8);
+    setMaxHealth(player, 8);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     return player;
-}
-
-function setPlayerHealth(health: number): void {
-    player.health = health;
-}
-
-function setPlayerMaxHealth(maxHealth:number):void{
-    player.maxHealth = maxHealth;
 }
 
 function addPlayerStates(player: Player): void {
@@ -220,10 +212,6 @@ function getDirectionNameFromViewVector(viewVector: Vector): string {
     return "Down";
 }
 
-export function isPlayerDead(): boolean {
-    return getPlayerHealth() <= 0;
-}
-
-export function getPlayerHealth(): number {
-    return player.health || 0;
+export function isPlayerDead():boolean{
+    return isGameObjectDead(player);
 }

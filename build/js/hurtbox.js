@@ -1,5 +1,6 @@
 import { getPosition } from "./gameObjects/gameObject.js";
 let id = 0;
+const NULL_HURTBOX = Object.freeze({});
 export function createHurtBox(position, width, height, owner, enabled = true) {
     return {
         id: id++,
@@ -28,3 +29,12 @@ export function disableHurtBox(hurtBox) {
 export function enableHurtBox(hurtBox) {
     hurtBox.enabled = true;
 }
+export function isHurtBoxEnabled(gameObject) {
+    var _a;
+    return ((_a = gameObject.hurtBox) === null || _a === void 0 ? void 0 : _a.enabled) || false;
+}
+/*
+export function getHurtBox(gameObject:GameObject):HurtBox{
+    //return gameObject.hurtBox ? ;
+}
+*/ 

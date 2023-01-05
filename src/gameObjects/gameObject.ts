@@ -29,8 +29,8 @@ export interface GameObject {
     internalId?: number;
     hitBox?: HitBox;
     hurtBox?: HurtBox;
-    health?:number;
-    maxHealth?:number;
+    health?: number;
+    maxHealth?: number;
 }
 
 export enum GameObjectType {
@@ -117,4 +117,20 @@ export function setGameObjectPosition(gameObject: GameObject, newPosition: Vecto
     if (getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), getGameObjects()).length === 0) {
         moveGameObject(gameObject, diffVector);
     }
+}
+
+export function setHealth(gameObject: GameObject, health: number): void {
+    gameObject.health = health;
+}
+
+export function setMaxHealth(gameObject: GameObject, maxHealth: number): void {
+    gameObject.maxHealth = maxHealth;
+}
+
+export function isGameObjectDead(gameObject: GameObject): boolean {
+    return getHealth(gameObject) <= 0;
+}
+
+export function getHealth(gameObject: GameObject): number {
+    return gameObject.health || 0;
 }
