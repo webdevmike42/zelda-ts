@@ -1,7 +1,7 @@
 import { addAnimation, createAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { getCollidingHitBoxes, isHitBoxEnabled } from "../hitbox.js";
+import { getCollidingHitBoxes } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
 import { currentScreen, getCurrentGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
@@ -66,16 +66,19 @@ export function drawGameObjects(ctx) {
     getCurrentGameObjects().forEach(gameObject => {
         const curAnimation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
-        if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
-            //draw hurtbox
-            ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
-            ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height);
-        }
-        if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
-            //draw hitbox
-            ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height);
-        }
+        /*
+                if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
+                    //draw hurtbox
+                    ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
+                    ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
+                }
+        
+                if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
+                    //draw hitbox
+                    ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+                    ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
+                }
+                */
     });
 }
 export function createSolidDummy(x, y, width, height) {

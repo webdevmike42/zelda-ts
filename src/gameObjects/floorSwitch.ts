@@ -1,16 +1,17 @@
 
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { EMPTY_SCREEN_ID, getCurrentGameObjects, switchToScreen } from "../screens.js";
+import { getCurrentGameObjects } from "../screens.js";
 import { addState, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
-import { closeDoor, Door, openDoor } from "./door.js";
-import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
-import { createGameObject, filterGameObjects, getGameObjects } from "./gameObjectFactory.js";
+import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
+import { createGameObject} from "./gameObjectFactory.js";
 
 export interface FloorSwitch extends GameObject {
     pressed: boolean,
-    staysPressed: boolean
+    staysPressed: boolean,
+    onPressed: Function,
+    onReleased: Function
 }
 
 enum FloorSwitchStates {
@@ -18,13 +19,15 @@ enum FloorSwitchStates {
     RELEASED = "Released"
 }
 
-export function createFloorSwitch(x: number, y: number, width: number, height: number, staysPressed: boolean): FloorSwitch {
+export function createFloorSwitch(x: number, y: number, width: number, height: number, staysPressed: boolean, onPressed: Function = () => { }, onReleased: Function = () => { }): FloorSwitch {
     const floorSwitch: FloorSwitch = createGameObject(GameObjectType.FLOOR_SWITCH) as FloorSwitch;
     setPosition(floorSwitch, createVector(x, y));
     setBounds(floorSwitch, width, height);
     addFloorSwitchStates(floorSwitch);
     addFloorSwitchAnimations(floorSwitch);
     setCollisionBoxFromBoundingBox(floorSwitch);
+    setFloorSwitchPressedCallback(floorSwitch, onPressed);
+    setFloorSwitchReleasedCallback(floorSwitch, onReleased);
     floorSwitch.pressed = false;
     floorSwitch.staysPressed = staysPressed;
     switchToState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
@@ -50,7 +53,7 @@ function createFloorSwitchPressedState(floorSwitch: FloorSwitch): State {
     state.enter = () => {
         console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.PRESSED));
-        openDoor(filterGameObjects(GameObjectType.DOOR,getCurrentGameObjects())[0] as Door)
+        floorSwitch.onPressed(floorSwitch);
     }
     state.update = () => {
         if (!floorSwitch.staysPressed && getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length === 0)
@@ -68,8 +71,7 @@ function createFloorSwitchReleasedState(floorSwitch: FloorSwitch): State {
     state.enter = () => {
         console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.RELEASED));
-        if(filterGameObjects(GameObjectType.DOOR,getCurrentGameObjects()).length > 0)
-        closeDoor(filterGameObjects(GameObjectType.DOOR,getCurrentGameObjects())[0] as Door)
+        floorSwitch.onReleased(floorSwitch);
     }
     state.update = () => {
         if (getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length > 0)
@@ -79,4 +81,12 @@ function createFloorSwitchReleasedState(floorSwitch: FloorSwitch): State {
         console.log("exit " + state.name)
     };
     return state;
+}
+
+export function setFloorSwitchPressedCallback(floorSwitch: FloorSwitch, callback: Function): void {
+    floorSwitch.onPressed = callback;
+}
+
+export function setFloorSwitchReleasedCallback(floorSwitch: FloorSwitch, callback: Function): void {
+    floorSwitch.onReleased = callback;
 }

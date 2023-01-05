@@ -1,9 +1,10 @@
-import { createDoor } from "./gameObjects/door.js";
+import { closeDoor, createDoor, openDoor } from "./gameObjects/door.js";
 import { createFloorSwitch } from "./gameObjects/floorSwitch.js";
-import { createSolidDummy } from "./gameObjects/gameObjectFactory.js";
+import { GameObjectType } from "./gameObjects/gameObject.js";
+import { createSolidDummy, filterGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { createDestroyableStaticHazard } from "./gameObjects/staticHazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, WORLD_MAP_COLS } from "./screens.js";
 export function loadScreenById(screenId) {
     const screen = {
         id: screenId,
@@ -2299,26 +2300,15 @@ export function loadScreenById(screenId) {
             screen.gameObjects = [
                 createSolidDummy(120, 80, 16, 16),
                 //createStaticHazard(120,150,48,32,1),
-                createFloorSwitch(120, 100, 16, 16, true),
+                createFloorSwitch(120, 100, 16, 16, false, () => {
+                    openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
+                }, () => {
+                    if (filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects()).length > 0)
+                        closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
+                }),
                 createDoor(110, 120, 16, 16, false),
                 createDestroyableStaticHazard(70, 150, 48, 32, 1, 10)
             ];
-            /*
-                        screen.gameObjects = [
-                            //createPushBox(120, 120),
-                            //createPushBox(100, 150),
-                            //createPlayerLikeEnemy(150, 160),
-                            //createRedOctorok(150,160),
-                            //createBoomerang(150,160),
-                            //createRedGoriya(150,160),
-                            //createBlueGoriya(170,160),
-                            //createBlueOctorok(100,160),
-                            
-                            createBlueTektite(100, 160),
-                            createSword(100, 100),
-                            createBoomerang(120, 100),
-                            createTeleportTrigger(64, 80, 16, 16, createTeleporterDto(128, 128, 200))
-                        ];*/
             break;
         case 120:
             screen.tileMap = [

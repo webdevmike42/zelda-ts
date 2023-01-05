@@ -1,10 +1,10 @@
-import { createDoor } from "./gameObjects/door.js";
-import { createFloorSwitch } from "./gameObjects/floorSwitch.js";
-import { GameObject } from "./gameObjects/gameObject.js";
-import { createSolidDummy } from "./gameObjects/gameObjectFactory.js";
+import { closeDoor, createDoor, Door, openDoor } from "./gameObjects/door.js";
+import { setFloorSwitchPressedCallback, setFloorSwitchReleasedCallback, createFloorSwitch, FloorSwitch } from "./gameObjects/floorSwitch.js";
+import { GameObject, GameObjectType } from "./gameObjects/gameObject.js";
+import { createSolidDummy, filterGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { createDestroyableStaticHazard, createStaticHazard } from "./gameObjects/staticHazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, Screen, WORLD_MAP_COLS } from "./screens.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, Screen, WORLD_MAP_COLS } from "./screens.js";
 
 export function loadScreenById(screenId: number) {
     const screen: Screen = {
@@ -2372,29 +2372,19 @@ export function loadScreenById(screenId: number) {
                 [61, 61, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 61, 61],
                 [61, 61, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 61, 61],
                 [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]];
-                screen.gameObjects = [
-                    createSolidDummy(120,80,16,16),
-                    //createStaticHazard(120,150,48,32,1),
-                    createFloorSwitch(120,100,16,16,true),
-                    createDoor(110,120,16,16,false),
-                    createDestroyableStaticHazard(70,150,48,32,1,10)
-                ];
-            /*
-                        screen.gameObjects = [
-                            //createPushBox(120, 120),
-                            //createPushBox(100, 150),
-                            //createPlayerLikeEnemy(150, 160),
-                            //createRedOctorok(150,160),
-                            //createBoomerang(150,160),
-                            //createRedGoriya(150,160),
-                            //createBlueGoriya(170,160),
-                            //createBlueOctorok(100,160),
-                            
-                            createBlueTektite(100, 160),
-                            createSword(100, 100),
-                            createBoomerang(120, 100),
-                            createTeleportTrigger(64, 80, 16, 16, createTeleporterDto(128, 128, 200))
-                        ];*/
+
+            screen.gameObjects = [
+                createSolidDummy(120, 80, 16, 16),
+                //createStaticHazard(120,150,48,32,1),
+                createFloorSwitch(120, 100, 16, 16, false, () => {
+                    openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
+                }, () => {
+                    if (filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects()).length > 0)
+                        closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
+                }),
+                createDoor(110, 120, 16, 16, false),
+                createDestroyableStaticHazard(70, 150, 48, 32, 1, 10)
+            ];
             break;
         case 120:
 
@@ -2598,7 +2588,7 @@ export function loadScreenById(screenId: number) {
 
 
     //add screen switch trigger
-    
+
     screen.gameObjects.push(createTeleporterTrigger(0, 52, CANVAS_WIDTH, 16, Math.max(0, screenId - WORLD_MAP_COLS), undefined, 220));
 
     screen.gameObjects.push(createTeleporterTrigger(0, CANVAS_HEIGHT, CANVAS_WIDTH, 16, screenId + WORLD_MAP_COLS, undefined, 60));
@@ -2606,7 +2596,7 @@ export function loadScreenById(screenId: number) {
     screen.gameObjects.push(createTeleporterTrigger(0, -16, 16, CANVAS_HEIGHT, screenId - 1, 220, undefined));
 
     screen.gameObjects.push(createTeleporterTrigger(CANVAS_WIDTH, 0, 16, CANVAS_HEIGHT, screenId + 1, 16, undefined));
-    
+
     setInternalIds(screen.gameObjects);
 
     return screen;

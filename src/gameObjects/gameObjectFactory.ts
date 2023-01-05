@@ -78,7 +78,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     getCurrentGameObjects().forEach(gameObject => {
         const curAnimation: Animation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
-
+/*
         if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
             //draw hurtbox
             ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
@@ -89,7 +89,8 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-        } 
+        }
+        */ 
     });
 }
 
