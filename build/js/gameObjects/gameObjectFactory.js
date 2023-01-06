@@ -1,4 +1,4 @@
-import { addAnimation, createAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
+import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCollidingHitBoxes } from "../hitbox.js";
@@ -87,9 +87,6 @@ export function createSolidDummy(x, y, width, height) {
     setBounds(dummy, width, height);
     setSolid(dummy);
     setCollisionBoxFromBoundingBox(dummy);
-    const a = createAnimation("dummyFacingUp", "./resources/link.png", getPosition(dummy), dummy.width, dummy.height, [{ srcX: 62, srcY: 0 }], 1, false);
-    addAnimation(dummy, a);
-    setCurrentAnimation(dummy, a);
     return dummy;
 }
 export function filterGameObjects(filterType, gameObjectArray) {

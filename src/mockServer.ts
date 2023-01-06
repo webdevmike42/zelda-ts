@@ -2,6 +2,7 @@ import { closeDoor, createDoor, Door, openDoor } from "./gameObjects/door.js";
 import { setFloorSwitchPressedCallback, setFloorSwitchReleasedCallback, createFloorSwitch, FloorSwitch } from "./gameObjects/floorSwitch.js";
 import { GameObject, GameObjectType } from "./gameObjects/gameObject.js";
 import { createSolidDummy, filterGameObjects } from "./gameObjects/gameObjectFactory.js";
+import { createSword } from "./gameObjects/item.js";
 import { createDestroyableStaticHazard, createStaticHazard } from "./gameObjects/staticHazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, Screen, WORLD_MAP_COLS } from "./screens.js";
@@ -2383,7 +2384,8 @@ export function loadScreenById(screenId: number) {
                         closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }),
                 createDoor(110, 120, 16, 16, false),
-                createDestroyableStaticHazard(70, 150, 48, 32, 1, 10)
+                createDestroyableStaticHazard(70, 150, 48, 32, 1, 10),
+                createSword(80,100)
             ];
             break;
         case 120:

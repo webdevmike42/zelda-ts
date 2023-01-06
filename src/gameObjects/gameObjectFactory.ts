@@ -100,9 +100,7 @@ export function createSolidDummy(x: number, y: number, width: number, height: nu
     setBounds(dummy, width, height);
     setSolid(dummy);
     setCollisionBoxFromBoundingBox(dummy);
-    const a = createAnimation("dummyFacingUp", "./resources/link.png", getPosition(dummy), dummy.width, dummy.height, [{ srcX: 62, srcY: 0 }], 1, false)
-    addAnimation(dummy, a);
-    setCurrentAnimation(dummy, a);
+    
     return dummy;
 }
 
