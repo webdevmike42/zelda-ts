@@ -1,3 +1,4 @@
+import { ActionBox } from "../actionBox.js";
 import { Animation, NULL_ANIMATION } from "../animation.js";
 import { Box, createBox } from "../box.js";
 import { setCollisionBoxFromBoundingBox, setCollisionBox, getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
@@ -31,6 +32,7 @@ export interface GameObject {
     hurtBox?: HurtBox;
     health?: number;
     maxHealth?: number;
+    actionBox?:ActionBox
 }
 
 export enum GameObjectType {

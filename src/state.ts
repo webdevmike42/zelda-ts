@@ -65,8 +65,10 @@ function exitCurrentState(gameObject: GameObject): void {
 }
 
 export function setDesignatedState(gameObject: GameObject, designatedState: State | null, designatedStateArgs?: any[]): void {
-    gameObject.designatedState = designatedState;
-    gameObject.stateArgs = designatedStateArgs || [];
+    if (gameObject.designatedState === null) {
+        gameObject.designatedState = designatedState;
+        gameObject.stateArgs = designatedStateArgs || [];
+    }
 }
 
 export function testState() {
