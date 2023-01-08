@@ -67,6 +67,10 @@ export function getCurrentGameObjects(): GameObject[] {
     return currentScreen?.gameObjects || [];
 }
 
+export function removeGameObject(gameObject: GameObject): void {
+    currentScreen.gameObjects = getCurrentGameObjects().filter(go => go.id !== gameObject.id);
+}
+
 export function drawCurrentScreen() {
     renderTileMap(getCurrentScreenTileMap());
 }

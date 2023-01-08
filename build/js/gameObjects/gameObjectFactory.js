@@ -3,12 +3,14 @@ import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCollidingHitBoxes } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
-import { currentScreen, getCurrentGameObjects } from "../screens.js";
+import { addToInventory } from "../inventory.js";
+import { currentScreen, getCurrentGameObjects, removeGameObject } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
 import { GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
+import { getCollidingItems } from "./item.js";
 //let currentGameObjects: GameObject[] = [];
 const globalGameObjects = [];
 let id = 0;
@@ -42,6 +44,12 @@ function addToGlobalList(gameObject) {
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+        if (gameObject.type === GameObjectType.PLAYER) {
+            getCollidingItems(gameObject).forEach(item => {
+                addToInventory(gameObject, item);
+                removeGameObject(item);
+            });
+        }
         if (isHurtBoxEnabled(gameObject)) {
             const chb = getCollidingHitBoxes(gameObject);
             if (chb.length > 0) {
@@ -124,10 +132,6 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
 
 */
 /*
-function removeGameObject<T extends GameObject>(gameObject: T): void {
-    currentGameObjects = currentGameObjects.filter(go => go.id !== gameObject.id);
-}
-
 function isRegistered(gameObjectId: number): boolean {
     return currentGameObjects.some(go => go.id === gameObjectId);
 }

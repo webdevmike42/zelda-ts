@@ -1,9 +1,10 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
-import { setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
-import { createGameObject } from "./gameObjectFactory.js";
+import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
 export var ItemType;
 (function (ItemType) {
     ItemType[ItemType["SWORD"] = 0] = "SWORD";
@@ -62,4 +63,7 @@ function createItemPickedUpState(item) {
 }
 function setItemType(item, itemType) {
     item.itemType = itemType;
+}
+export function getCollidingItems(gameObject) {
+    return getCollidingGameObjects(gameObject, getCollisionBox(gameObject), filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects()));
 }

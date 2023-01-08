@@ -12,7 +12,7 @@ import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hur
 const PLAYER_WIDTH: number = 16, PLAYER_HEIGHT: number = 16;
 let player: Player;
 export interface Player extends GameObject {
-    test: boolean
+    hasSword: boolean
 }
 
 export function createPlayer(x: number, y: number): Player {
@@ -27,6 +27,7 @@ export function createPlayer(x: number, y: number): Player {
     setHealth(player,8);
     setMaxHealth(player, 8);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
+    player.hasSword = false;
     return player;
 }
 

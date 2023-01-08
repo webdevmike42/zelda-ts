@@ -1,15 +1,18 @@
 import { Animation, addAnimation, createAnimation, drawAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
-import { boxesOverlap, boxOverlapSome, getCollidingBoxes, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { boxesOverlap, boxOverlapSome, getCollidingBoxes, getCollidingGameObjects, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { Player } from "../gameActors/player.js";
 import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
+import { addToInventory } from "../inventory.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
-import { currentScreen, getCurrentGameObjects } from "../screens.js";
+import { currentScreen, getCurrentGameObjects, removeGameObject } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { compose, getVectorFrameFraction, pipe } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
+import { getCollidingItems, Item } from "./item.js";
 
 //let currentGameObjects: GameObject[] = [];
 const globalGameObjects: GameObject[] = [];
@@ -50,9 +53,16 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
 
-        if (isHurtBoxEnabled(gameObject)){
-            const chb:HitBox[] = getCollidingHitBoxes(gameObject);
-            if(chb.length > 0){
+        if (gameObject.type === GameObjectType.PLAYER) {
+            getCollidingItems(gameObject).forEach(item => {
+                addToInventory(gameObject as Player, item);
+                removeGameObject(item);
+            });
+        }
+
+        if (isHurtBoxEnabled(gameObject)) {
+            const chb: HitBox[] = getCollidingHitBoxes(gameObject);
+            if (chb.length > 0) {
                 setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
             }
         }
@@ -78,19 +88,19 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
     getCurrentGameObjects().forEach(gameObject => {
         const curAnimation: Animation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
-/*
-        if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
-            //draw hurtbox
-            ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
-            ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
-        }
-
-        if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
-            //draw hitbox
-            ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-        }
-        */ 
+        /*
+                if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
+                    //draw hurtbox
+                    ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
+                    ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
+                }
+        
+                if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
+                    //draw hitbox
+                    ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+                    ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
+                }
+                */
     });
 }
 
@@ -100,7 +110,7 @@ export function createSolidDummy(x: number, y: number, width: number, height: nu
     setBounds(dummy, width, height);
     setSolid(dummy);
     setCollisionBoxFromBoundingBox(dummy);
-    
+
     return dummy;
 }
 
@@ -142,10 +152,6 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
 */
 
 /*
-function removeGameObject<T extends GameObject>(gameObject: T): void {
-    currentGameObjects = currentGameObjects.filter(go => go.id !== gameObject.id);
-}
-
 function isRegistered(gameObjectId: number): boolean {
     return currentGameObjects.some(go => go.id === gameObjectId);
 }

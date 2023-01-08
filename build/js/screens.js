@@ -40,6 +40,9 @@ function cleanupCurrentScreen() {
 export function getCurrentGameObjects() {
     return (currentScreen === null || currentScreen === void 0 ? void 0 : currentScreen.gameObjects) || [];
 }
+export function removeGameObject(gameObject) {
+    currentScreen.gameObjects = getCurrentGameObjects().filter(go => go.id !== gameObject.id);
+}
 export function drawCurrentScreen() {
     renderTileMap(getCurrentScreenTileMap());
 }

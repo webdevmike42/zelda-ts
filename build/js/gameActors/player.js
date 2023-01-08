@@ -22,6 +22,7 @@ export function createPlayer(x, y) {
     setHealth(player, 8);
     setMaxHealth(player, 8);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
+    player.hasSword = false;
     return player;
 }
 function addPlayerStates(player) {

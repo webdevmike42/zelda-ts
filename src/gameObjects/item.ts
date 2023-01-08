@@ -1,9 +1,10 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
-import { setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
-import { createGameObject } from "./gameObjectFactory.js";
+import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
 
 export enum ItemType {
     SWORD
@@ -32,12 +33,12 @@ export function createSword(x: number, y: number): Item {
 
 function addSwordAnimations(sword: Item): void {
     sword.animations = new Map<string, Animation>();
-    addAnimation(sword, createAnimation("idle", "./resources/pausescreen.png", getPosition(sword), sword.width, sword.height, [{ srcX: 555, srcY: 137 }], 1, false));   
+    addAnimation(sword, createAnimation("idle", "./resources/pausescreen.png", getPosition(sword), sword.width, sword.height, [{ srcX: 555, srcY: 137 }], 1, false));
 }
 
-function addSwordStates(sword:Item):void{
+function addSwordStates(sword: Item): void {
     const idleState: State = createItemIdleState(sword);
-    addState(sword,CommonStateTypes.IDLE,idleState);
+    addState(sword, CommonStateTypes.IDLE, idleState);
     setDefaultState(sword, idleState);
 }
 
@@ -73,4 +74,8 @@ function createItemPickedUpState(item: Item): State {
 
 function setItemType(item: Item, itemType: ItemType): void {
     item.itemType = itemType;
+}
+
+export function getCollidingItems(gameObject: GameObject): Item[] {
+    return getCollidingGameObjects(gameObject, getCollisionBox(gameObject), filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects())) as Item[];
 }
