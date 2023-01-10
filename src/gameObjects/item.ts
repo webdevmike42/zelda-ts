@@ -11,20 +11,24 @@ export enum ItemType {
 }
 
 export interface Item extends GameObject {
-    itemType: ItemType
+    itemType: ItemType,
+    isMajorItem: boolean,
+    isCollectable:boolean
 }
 
-function createItem(x: number, y: number, width: number, height: number, itemType: ItemType): Item {
+function createItem(x: number, y: number, width: number, height: number, itemType: ItemType, isMajorItem: boolean, isCollectable = true): Item {
     const item: Item = createGameObject(GameObjectType.ITEM) as Item;
     setPosition(item, createVector(x, y));
     setBounds(item, width, height);
     setCollisionBoxFromBoundingBox(item);
     setItemType(item, itemType);
+    item.isMajorItem = isMajorItem;
+    item.isCollectable = isCollectable;
     return item;
 }
 
 export function createSword(x: number, y: number): Item {
-    const sword: Item = createItem(x, y, 8, 16, ItemType.SWORD);
+    const sword: Item = createItem(x, y, 8, 16, ItemType.SWORD, true);
     addSwordAnimations(sword);
     addSwordStates(sword);
     switchToState(sword, getState(sword, CommonStateTypes.IDLE));
@@ -45,6 +49,7 @@ function addSwordStates(sword: Item): void {
 function createItemIdleState(item: Item): State {
     const state: State = createEmptyState();
     state.name = "item idle state";
+    state.type = CommonStateTypes.IDLE;
     state.enter = () => {
         console.log("enter: " + state.name)
         setCurrentAnimation(item, getAnimation(item, "idle"));
@@ -76,6 +81,10 @@ function setItemType(item: Item, itemType: ItemType): void {
     item.itemType = itemType;
 }
 
-export function getCollidingItems(gameObject: GameObject): Item[] {
+function getCollidingItems(gameObject: GameObject): Item[] {
     return getCollidingGameObjects(gameObject, getCollisionBox(gameObject), filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects())) as Item[];
+}
+
+export function getCollidingCollectableItems(gameObject: GameObject): Item[] {
+    return getCollidingItems(gameObject).filter(item => item.isCollectable);
 }

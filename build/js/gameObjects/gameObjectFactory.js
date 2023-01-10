@@ -1,21 +1,18 @@
 import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { playerPickUpItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
-import { addToInventory } from "../inventory.js";
-import { currentScreen, getCurrentGameObjects, removeGameObject } from "../screens.js";
+import { currentScreen, getCurrentGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
 import { GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
-import { getCollidingItems } from "./item.js";
-//let currentGameObjects: GameObject[] = [];
+import { getCollidingCollectableItems } from "./item.js";
 const globalGameObjects = [];
 let id = 0;
-//export const addGameObject = pipe<GameObjectType, GameObject>(createGameObject, register);
-//export const createTestGameObject = createGameObject.bind(null, GameObjectType.DUMMY);
 export function createGameObject(type) {
     return {
         id: id++,
@@ -44,21 +41,18 @@ function addToGlobalList(gameObject) {
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
-        if (gameObject.type === GameObjectType.PLAYER) {
-            getCollidingItems(gameObject).forEach(item => {
-                addToInventory(gameObject, item);
-                removeGameObject(item);
-            });
-        }
         if (isHurtBoxEnabled(gameObject)) {
             const chb = getCollidingHitBoxes(gameObject);
             if (chb.length > 0) {
                 setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
             }
         }
+        if (gameObject.type === GameObjectType.PLAYER)
+            playerPickUpItems(getCollidingCollectableItems(gameObject));
         if (gameObject.designatedState !== null) {
+            console.log(gameObject.designatedState);
             switchToState(gameObject, gameObject.designatedState);
-            setDesignatedState(gameObject, null);
+            gameObject.designatedState = null;
         }
         if (isMoving(getMovementVector(gameObject))) {
             let resolvedMovementVector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);

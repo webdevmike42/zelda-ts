@@ -1,7 +1,7 @@
 import { Animation, addAnimation, createAnimation, drawAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { boxesOverlap, boxOverlapSome, getCollidingBoxes, getCollidingGameObjects, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { Player } from "../gameActors/player.js";
+import { Player, playerPickUpItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
 import { addToInventory } from "../inventory.js";
@@ -12,14 +12,10 @@ import { addTestResult } from "../tests.js";
 import { compose, getVectorFrameFraction, pipe } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
-import { getCollidingItems, Item } from "./item.js";
+import { getCollidingCollectableItems, Item } from "./item.js";
 
-//let currentGameObjects: GameObject[] = [];
 const globalGameObjects: GameObject[] = [];
 let id: number = 0;
-
-//export const addGameObject = pipe<GameObjectType, GameObject>(createGameObject, register);
-//export const createTestGameObject = createGameObject.bind(null, GameObjectType.DUMMY);
 
 export function createGameObject(type: GameObjectType): GameObject {
     return {
@@ -53,22 +49,21 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
 
-        if (gameObject.type === GameObjectType.PLAYER) {
-            getCollidingItems(gameObject).forEach(item => {
-                addToInventory(gameObject as Player, item);
-                removeGameObject(item);
-            });
-        }
-
         if (isHurtBoxEnabled(gameObject)) {
             const chb: HitBox[] = getCollidingHitBoxes(gameObject);
             if (chb.length > 0) {
                 setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
             }
         }
+
+        if (gameObject.type === GameObjectType.PLAYER)
+            playerPickUpItems(getCollidingCollectableItems(gameObject));
+
+        
         if (gameObject.designatedState !== null) {
+            console.log(gameObject.designatedState)
             switchToState(gameObject, gameObject.designatedState);
-            setDesignatedState(gameObject, null);
+            gameObject.designatedState = null;
         }
 
         if (isMoving(getMovementVector(gameObject))) {

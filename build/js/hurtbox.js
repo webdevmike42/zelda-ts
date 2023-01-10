@@ -16,11 +16,15 @@ export function setHurtBoxFromBoundingBox(gameObject, enabled = true) {
     const hurtBox = createHurtBox(getPosition(gameObject), gameObject.width, gameObject.height, gameObject, enabled);
     gameObject.hurtBox = hurtBox;
 }
-export function disableHurtBox(hurtBox) {
-    hurtBox.enabled = false;
+export function disableHurtBox(gameObject) {
+    setHurtBoxEnabled(gameObject.hurtBox, false);
 }
-export function enableHurtBox(hurtBox) {
-    hurtBox.enabled = true;
+export function enableHurtBox(gameObject) {
+    setHurtBoxEnabled(gameObject.hurtBox, true);
+}
+function setHurtBoxEnabled(hurtBox, isEnabled) {
+    if (hurtBox !== undefined)
+        hurtBox.enabled = isEnabled;
 }
 export function isHurtBoxEnabled(gameObject) {
     var _a;

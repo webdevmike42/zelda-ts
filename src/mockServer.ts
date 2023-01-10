@@ -2384,8 +2384,8 @@ export function loadScreenById(screenId: number) {
                         closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }),
                 createDoor(110, 120, 16, 16, false),
-                createDestroyableStaticHazard(70, 150, 48, 32, 1, 10),
-                createSword(80,100)
+                createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                createSword(80,140)
             ];
             break;
         case 120:

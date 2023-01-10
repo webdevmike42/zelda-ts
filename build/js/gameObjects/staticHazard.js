@@ -56,8 +56,7 @@ function createDestroyableStaticHazardDeathState(hazard) {
     state.name = "hazard death state";
     state.enter = () => {
         console.log("enter hazard death state");
-        if (hazard.hurtBox)
-            disableHurtBox(hazard.hurtBox);
+        disableHurtBox(hazard);
         disableHitBox(hazard);
     };
     return state;
