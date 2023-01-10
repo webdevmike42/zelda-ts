@@ -3,6 +3,7 @@ import { createBox } from "../box.js";
 import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { createVector, NULL_VECTOR, vectorDiff, vectorSum } from "../vector.js";
+import { getCollidingActiveConveyors, getConveyingVectorSum } from "./conveyor.js";
 import { getGameObjects } from "./gameObjectFactory.js";
 export var GameObjectType;
 (function (GameObjectType) {
@@ -39,6 +40,9 @@ export function setMovementVector(gameObject, movementVector) {
 }
 export function getMovementVector(gameObject) {
     return gameObject.movementVector;
+}
+export function getOverallVector(gameObject) {
+    return vectorSum(getMovementVector(gameObject), getConveyingVectorSum(getCollidingActiveConveyors(gameObject)));
 }
 export function setViewVector(gameObject, viewVector) {
     gameObject.viewVector = Object.assign({}, viewVector);

@@ -9,8 +9,7 @@ import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedS
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
-import { getCollidingActiveConveyors } from "./conveyor.js";
-import { GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
+import { GameObjectType, getCurrentAnimation, getOverallVector, getPosition, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 import { getCollidingCollectableItems } from "./item.js";
 const globalGameObjects = [];
 let id = 0;
@@ -54,12 +53,14 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
             switchToState(gameObject, gameObject.designatedState);
             gameObject.designatedState = null;
         }
-        if (isMoving(getMovementVector(gameObject))) {
-            let resolvedMovementVector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
-            moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
-        }
-        if (getCollidingActiveConveyors(gameObject).length > 0)
-            console.log("overlapping conveyor");
+        //if (isMoving(getMovementVector(gameObject))) {
+        let resolvedMovementVector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
+        moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
+        //}
+        /*
+                if(getCollidingActiveConveyors(gameObject).length > 0)
+                    console.log("overlapping conveyor")
+                    */
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }

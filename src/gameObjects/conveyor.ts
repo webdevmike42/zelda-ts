@@ -2,7 +2,7 @@ import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnima
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { addState, createEmptyState, getState, setDefaultState, State, switchToState } from "../state.js";
-import { createVector, Vector, vectorScalarProduct } from "../vector.js";
+import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
 
@@ -86,4 +86,8 @@ function getCollidingConveyors(gameObject:GameObject):Conveyor[]{
 
 export function getCollidingActiveConveyors(gameObject:GameObject):Conveyor[]{
     return getCollidingConveyors(gameObject).filter(conveyor => conveyor.isActive);
+}
+
+export function getConveyingVectorSum(conveyors:Conveyor[]):Vector{
+    return conveyors.reduce((resultVector, conveyor) => vectorSum(resultVector,conveyor.conveyingVector),{...NULL_VECTOR});
 }

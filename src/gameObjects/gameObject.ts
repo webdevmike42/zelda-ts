@@ -7,6 +7,7 @@ import { HurtBox } from "../hurtbox.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
+import { getCollidingActiveConveyors, getConveyingVectorSum } from "./conveyor.js";
 import { getGameObjects } from "./gameObjectFactory.js";
 
 export interface GameObject {
@@ -77,6 +78,10 @@ export function setMovementVector(gameObject: GameObject, movementVector: Vector
 
 export function getMovementVector(gameObject: GameObject): Vector {
     return gameObject.movementVector;
+}
+
+export function getOverallVector(gameObject:GameObject):Vector{
+    return vectorSum(getMovementVector(gameObject), getConveyingVectorSum(getCollidingActiveConveyors(gameObject)));
 }
 
 export function setViewVector(gameObject: GameObject, viewVector: Vector): void {
