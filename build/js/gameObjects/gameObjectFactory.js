@@ -9,6 +9,7 @@ import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedS
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
+import { getCollidingActiveConveyors } from "./conveyor.js";
 import { GameObjectType, getCurrentAnimation, getMovementVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 import { getCollidingCollectableItems } from "./item.js";
 const globalGameObjects = [];
@@ -50,7 +51,6 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
         if (gameObject.type === GameObjectType.PLAYER)
             playerPickUpItems(getCollidingCollectableItems(gameObject));
         if (gameObject.designatedState !== null) {
-            console.log(gameObject.designatedState);
             switchToState(gameObject, gameObject.designatedState);
             gameObject.designatedState = null;
         }
@@ -58,6 +58,8 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
             let resolvedMovementVector = getVectorFrameFraction(getMovementVector(gameObject), timeSinceLastTick);
             moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
         }
+        if (getCollidingActiveConveyors(gameObject).length > 0)
+            console.log("overlapping conveyor");
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
