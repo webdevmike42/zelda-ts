@@ -1,12 +1,12 @@
-import { createMovementVector, GameObject, GameObjectType, getBoundingBox, getCurrentAnimation, getMovementVector, getPosition, getViewVector, isGameObjectDead, moveGameObject, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
-import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
-import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, setCurrentState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
-import { addAnimation, createAnimation, getAnimation, Animation } from "../animation.js";
+import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
+import { isAnyMovementKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
+import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, switchToState, setDesignatedState, getCurrentState } from "../state.js";
+import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
-import { setCollisionBox, getCollidingBoxes, getCollidingGameObjects, getCollidingSolidGameObjects } from "../collisions.js";
-import { createBox, createBoxInFront } from "../box.js";
-import { createGlobalGameObject, filterGameObjects, getGlobalGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { HitBox, hitBoxes, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
+import { setCollisionBox } from "../collisions.js";
+import { createBox } from "../box.js";
+import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
+import { HitBox, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { Item } from "../gameObjects/item.js";
 import { addToInventory } from "../inventory.js";
@@ -21,7 +21,8 @@ enum PlayerStateTypes {
 
 export interface Player extends GameObject {
     hasSword: boolean,
-    pickUpMajorItemState: State
+    pickUpMajorItemState: State,
+    keys:number
 }
 
 export function createPlayer(x: number, y: number): Player {
@@ -37,6 +38,7 @@ export function createPlayer(x: number, y: number): Player {
     setMaxHealth(player, 8);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     player.hasSword = false;
+    player.keys = 0;
     return player;
 }
 
@@ -48,7 +50,6 @@ function addPlayerStates(player: Player): void {
     addState(player, CommonStateTypes.HIT, createPlayerHitState(player));
     addState(player, PlayerStateTypes.PickUpMajorItem, createPlayerPickUpmajorItemState(player));
     setDefaultState(player, idleState);
-    //player.pickUpMajorItemState = 
 }
 
 function createPlayerIdleState(player: Player): State {
@@ -195,7 +196,7 @@ function createPlayerPickUpmajorItemState(player: Player): State {
             majorItem = player.stateArgs[0];
 
             if (majorItem) {
-                majorItem.isCollectable = false;
+                majorItem.isCollected = true;
                 disableHurtBox(player);
                 setMovementVector(player, { ...NULL_VECTOR });
                 setCurrentAnimation(player, getAnimation(player, PlayerStateTypes.PickUpMajorItem));
@@ -291,6 +292,10 @@ export function playerPickUpItems(items: Item[]): void {
     const majorItems: Item[] = items.filter(item => item.isMajorItem);
 
     if (majorItems.length > 0) {
-        setDesignatedState(player, getState(player, PlayerStateTypes.PickUpMajorItem), majorItems);
+        setDesignatedState(player, getState(player, PlayerStateTypes.PickUpMajorItem), [majorItems[0]]);
     }
+}
+
+export function addKeys(amount:number):void{
+    player.keys += amount;
 }

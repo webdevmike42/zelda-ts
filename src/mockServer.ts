@@ -3,7 +3,7 @@ import { closeDoor, createDoor, Door, openDoor } from "./gameObjects/door.js";
 import { setFloorSwitchPressedCallback, setFloorSwitchReleasedCallback, createFloorSwitch, FloorSwitch } from "./gameObjects/floorSwitch.js";
 import { GameObject, GameObjectType } from "./gameObjects/gameObject.js";
 import { createSolidDummy, filterGameObjects } from "./gameObjects/gameObjectFactory.js";
-import { createSword } from "./gameObjects/item.js";
+import { createSmallKey, createSword } from "./gameObjects/item.js";
 import { createDestroyableStaticHazard, createStaticHazard } from "./gameObjects/staticHazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, Screen, WORLD_MAP_COLS } from "./screens.js";
@@ -2387,8 +2387,9 @@ export function loadScreenById(screenId: number) {
                 }),
                 createDoor(110, 120, 16, 16, false),
                 createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                //createSword(80,140)
-                createConveyor(80,140,16,16,normalizedVector(createVector(1,0)),90)
+                createSword(80,130),
+                createSmallKey(80,100),
+                createConveyor(80,140,16,16,normalizedVector(createVector(1,0)),10)
             ];
             break;
         case 120:

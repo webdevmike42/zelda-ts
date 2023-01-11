@@ -29,6 +29,7 @@ export function createPlayer(x, y) {
     setMaxHealth(player, 8);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     player.hasSword = false;
+    player.keys = 0;
     return player;
 }
 function addPlayerStates(player) {
@@ -39,7 +40,6 @@ function addPlayerStates(player) {
     addState(player, CommonStateTypes.HIT, createPlayerHitState(player));
     addState(player, PlayerStateTypes.PickUpMajorItem, createPlayerPickUpmajorItemState(player));
     setDefaultState(player, idleState);
-    //player.pickUpMajorItemState = 
 }
 function createPlayerIdleState(player) {
     const state = createEmptyState();
@@ -164,7 +164,7 @@ function createPlayerPickUpmajorItemState(player) {
         if (player.stateArgs.length > 0) {
             majorItem = player.stateArgs[0];
             if (majorItem) {
-                majorItem.isCollectable = false;
+                majorItem.isCollected = true;
                 disableHurtBox(player);
                 setMovementVector(player, Object.assign({}, NULL_VECTOR));
                 setCurrentAnimation(player, getAnimation(player, PlayerStateTypes.PickUpMajorItem));
@@ -245,6 +245,9 @@ export function playerPickUpItems(items) {
     });
     const majorItems = items.filter(item => item.isMajorItem);
     if (majorItems.length > 0) {
-        setDesignatedState(player, getState(player, PlayerStateTypes.PickUpMajorItem), majorItems);
+        setDesignatedState(player, getState(player, PlayerStateTypes.PickUpMajorItem), [majorItems[0]]);
     }
+}
+export function addKeys(amount) {
+    player.keys += amount;
 }

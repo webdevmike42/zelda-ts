@@ -53,14 +53,8 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
             switchToState(gameObject, gameObject.designatedState);
             gameObject.designatedState = null;
         }
-        //if (isMoving(getMovementVector(gameObject))) {
         let resolvedMovementVector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
         moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
-        //}
-        /*
-                if(getCollidingActiveConveyors(gameObject).length > 0)
-                    console.log("overlapping conveyor")
-                    */
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }

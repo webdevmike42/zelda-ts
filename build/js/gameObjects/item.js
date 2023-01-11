@@ -8,32 +8,46 @@ import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
 export var ItemType;
 (function (ItemType) {
     ItemType[ItemType["SWORD"] = 0] = "SWORD";
+    ItemType[ItemType["SMALL_KEY"] = 1] = "SMALL_KEY";
 })(ItemType || (ItemType = {}));
-function createItem(x, y, width, height, itemType, isMajorItem, isCollectable = true) {
+function createItem(x, y, width, height, itemType, isMajorItem, amount = 1, isCollected = false) {
     const item = createGameObject(GameObjectType.ITEM);
     setPosition(item, createVector(x, y));
     setBounds(item, width, height);
     setCollisionBoxFromBoundingBox(item);
     setItemType(item, itemType);
     item.isMajorItem = isMajorItem;
-    item.isCollectable = isCollectable;
+    item.isCollected = isCollected;
+    item.amount = amount;
     return item;
 }
+function createCollectableMinorItem(x, y, width, height, itemType, amount = 1) {
+    const minorItem = createItem(x, y, width, height, itemType, false, amount);
+    addItemStates(minorItem);
+    return minorItem;
+}
+function createCollectableMajorItem(x, y, width, height, itemType) {
+    const majorItem = createItem(x, y, width, height, itemType, true, 1);
+    addItemStates(majorItem);
+    return majorItem;
+}
+function addItemStates(item) {
+    const idleState = createItemIdleState(item);
+    addState(item, CommonStateTypes.IDLE, idleState);
+    setDefaultState(item, idleState);
+}
+export function createSmallKey(x, y) {
+    const smallKey = createCollectableMinorItem(x, y, 8, 16, ItemType.SMALL_KEY);
+    addAnimation(smallKey, createAnimation("idle", "./resources/pausescreen.png", getPosition(smallKey), smallKey.width, smallKey.height, [{ srcX: 555, srcY: 137 }], 1, false));
+    switchToState(smallKey, getState(smallKey, CommonStateTypes.IDLE));
+    console.log(smallKey);
+    return smallKey;
+}
 export function createSword(x, y) {
-    const sword = createItem(x, y, 8, 16, ItemType.SWORD, true);
-    addSwordAnimations(sword);
-    addSwordStates(sword);
+    const sword = createCollectableMajorItem(x, y, 8, 16, ItemType.SWORD);
+    addAnimation(sword, createAnimation("idle", "./resources/pausescreen.png", getPosition(sword), sword.width, sword.height, [{ srcX: 555, srcY: 137 }], 1, false));
     switchToState(sword, getState(sword, CommonStateTypes.IDLE));
     return sword;
-}
-function addSwordAnimations(sword) {
-    sword.animations = new Map();
-    addAnimation(sword, createAnimation("idle", "./resources/pausescreen.png", getPosition(sword), sword.width, sword.height, [{ srcX: 555, srcY: 137 }], 1, false));
-}
-function addSwordStates(sword) {
-    const idleState = createItemIdleState(sword);
-    addState(sword, CommonStateTypes.IDLE, idleState);
-    setDefaultState(sword, idleState);
 }
 function createItemIdleState(item) {
     const state = createEmptyState();
@@ -50,7 +64,7 @@ function createItemIdleState(item) {
     };
     return state;
 }
-function createItemPickedUpState(item) {
+function createItemCollectedState(item) {
     const state = createEmptyState();
     state.name = "item picked up state";
     state.enter = () => {
@@ -71,5 +85,5 @@ function getCollidingItems(gameObject) {
     return getCollidingGameObjects(gameObject, getCollisionBox(gameObject), filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects()));
 }
 export function getCollidingCollectableItems(gameObject) {
-    return getCollidingItems(gameObject).filter(item => item.isCollectable);
+    return getCollidingItems(gameObject).filter(item => !item.isCollected);
 }

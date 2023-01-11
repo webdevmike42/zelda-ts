@@ -60,20 +60,15 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
         if (gameObject.type === GameObjectType.PLAYER)
             playerPickUpItems(getCollidingCollectableItems(gameObject));
 
-        
+
         if (gameObject.designatedState !== null) {
             switchToState(gameObject, gameObject.designatedState);
             gameObject.designatedState = null;
         }
 
-        //if (isMoving(getMovementVector(gameObject))) {
-            let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
-            moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
-        //}
-/*
-        if(getCollidingActiveConveyors(gameObject).length > 0)
-            console.log("overlapping conveyor")
-            */
+        let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
+        moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
+
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
