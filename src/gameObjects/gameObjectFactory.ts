@@ -1,19 +1,17 @@
-import { Animation, addAnimation, createAnimation, drawAnimation, drawAnimationAt, getOffsetX, setCurrentAnimation, updateAnimation, getOffsetY } from "../animation.js";
+import { Animation, drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
-import { boxesOverlap, boxOverlapSome, getCollidingBoxes, getCollidingGameObjects, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { Player, playerPickUpItems } from "../gameActors/player.js";
-import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
+import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { playerPickUpItems } from "../gameActors/player.js";
+import { getCollidingHitBoxes, HitBox } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
-import { addToInventory } from "../inventory.js";
-import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
-import { currentScreen, getCurrentGameObjects, removeGameObject } from "../screens.js";
+import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
-import { compose, getVectorFrameFraction, pipe } from "../utils.js";
-import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
-import { getCollidingActiveConveyors } from "./conveyor.js";
-import { GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getOverallVector, getPosition, isMoving, moveGameObject, setBounds, setPosition } from "./gameObject.js";
-import { getCollidingCollectableItems, Item } from "./item.js";
+import { getVectorFrameFraction } from "../utils.js";
+import { createVector, NULL_VECTOR, Vector } from "../vector.js";
+
+import { GameObject, GameObjectType, getCurrentAnimation, getOverallVector, getPosition, moveGameObject, setBounds, setPosition } from "./gameObject.js";
+import { getCollidingCollectableItems } from "./item.js";
 
 const globalGameObjects: GameObject[] = [];
 let id: number = 0;
@@ -32,7 +30,8 @@ export function createGameObject(type: GameObjectType): GameObject {
         position: { ...NULL_VECTOR },
         width: 0,
         height: 0,
-        collisionBox: { ...NULL_BOX }
+        collisionBox: { ...NULL_BOX },
+        isVisible:true
     }
 }
 
@@ -78,7 +77,7 @@ function updateGameObjectCurrentState(gameObject: GameObject, currentGameTime: n
 }
 
 export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
-    getCurrentGameObjects().forEach(gameObject => {
+    getCurrentVisibleGameObjects().forEach(gameObject => {
         const curAnimation: Animation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
         /*
@@ -144,15 +143,6 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
 
 */
 
-/*
-function isRegistered(gameObjectId: number): boolean {
-    return currentGameObjects.some(go => go.id === gameObjectId);
-}
-
-export function removeAllGameObjects() {
-    currentGameObjects = [];
-}
-*/
 export function setSolid(gameObject: GameObject, isSolid: boolean = true): void {
     gameObject.isSolid = isSolid;
 }
@@ -161,60 +151,9 @@ export function isSolid(gameObject: GameObject): boolean {
     return gameObject.isSolid || false;
 }
 
-function getGameObjectCount(): number {
-    return currentScreen.gameObjects.length;
-    //return currentGameObjects.length;
-}
-
-export function getGameObjects(): GameObject[] {
-    return currentScreen.gameObjects;
-    //return currentGameObjects;
-}
-
-
-
-/*
-export function setCurrentGameObjects(gameObjects: GameObject[]): void {
-    currentGameObjects = gameObjects;
-}
-*/
-
 export function getGlobalGameObjects(): GameObject[] {
     return globalGameObjects;
 }
-/*
-
-export function addToCurrentGameObjects(newGameObjects: GameObject[]): void {
-    currentGameObjects.push(...newGameObjects);
-}
-
-export function removeNonGlobalGameObjects(): void {
-    currentScreen.gameObjects.filter(gameObject => !gameObject.global);
-}
-*/
 export function testGameObjectFactory() {
     addTestResult("gameObjectsFactory: ", true);
-    /*
-    removeAllGameObjects();
-
-    addGameObject(GameObjectType.ITEM);
-    addGameObject(GameObjectType.CONVEYOR);
-    addTestResult("addGameObject", getGameObjectCount() === 2);
-
-    removeAllGameObjects();
-    addTestResult("removeAllGameObjects", getGameObjectCount() === 0);
-
-    let go = createTestGameObject();
-    addTestResult("createTestGameObject", go.type === GameObjectType.DUMMY);
-
-    setSolid(go);
-    addTestResult("addSolidGameObject", go.isSolid === true);
-
-    removeAllGameObjects();
-    addGameObject(GameObjectType.DUMMY);
-    const goToBeRemoved = addGameObject(GameObjectType.CONVEYOR);
-    removeGameObject(goToBeRemoved);
-    addTestResult("removeGameObject", getGameObjectCount() === 1 && !isRegistered(goToBeRemoved.id));
-    removeAllGameObjects();
-    */
 }

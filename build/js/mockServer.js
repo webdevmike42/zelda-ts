@@ -2,7 +2,7 @@ import { createConveyor } from "./gameObjects/conveyor.js";
 import { closeDoor, createDoor, openDoor } from "./gameObjects/door.js";
 import { createFloorSwitch } from "./gameObjects/floorSwitch.js";
 import { GameObjectType } from "./gameObjects/gameObject.js";
-import { createSolidDummy, filterGameObjects } from "./gameObjects/gameObjectFactory.js";
+import { filterGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { createSmallKey, createSword } from "./gameObjects/item.js";
 import { createDestroyableStaticHazard } from "./gameObjects/staticHazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
@@ -14,6 +14,7 @@ export function loadScreenById(screenId) {
         music: "",
         tileMap: [],
         gameObjects: [],
+        persistedGameObjects: [],
         collisionCells: [1, 3, 4, 5, 7, 9, 10, 11, 13, 15, 16, 17, 19, 20, 21, 23, 25, 26, 27, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 65, 66, 67, 68, 69, 71, 72, 73, 74, 78, 79, 80, 84, 85, 86, 90, 91, 92, 96, 97, 98, 103, 104, 108, 109, 110, 114, 115, 116, 120, 121, 122, 130, 136, 142]
     };
     //screen.music = SOUND.OVERWORLD;
@@ -2301,7 +2302,6 @@ export function loadScreenById(screenId) {
                 [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]
             ];
             screen.gameObjects = [
-                createSolidDummy(120, 80, 16, 16),
                 //createStaticHazard(120,150,48,32,1),
                 createFloorSwitch(120, 100, 16, 16, false, () => {
                     openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
@@ -2312,8 +2312,13 @@ export function loadScreenById(screenId) {
                 createDoor(110, 120, 16, 16, false),
                 createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
                 createSword(80, 130),
-                createSmallKey(80, 100),
+                createSmallKey(70, 110),
                 createConveyor(80, 140, 16, 16, normalizedVector(createVector(1, 0)), 10)
+            ];
+            screen.persistedGameObjects = [
+                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                //createSword(80,130),
+                createSmallKey(80, 100),
             ];
             break;
         case 120:

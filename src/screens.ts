@@ -1,6 +1,6 @@
-import { GameObject } from "./gameObjects/gameObject.js";
-import { loadScreenById } from "./mockServer.js";
-import { createSolidDummy, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js"
+import { GameObject, GameObjectType, isVisible } from "./gameObjects/gameObject.js";
+import { getAllScreensAsArray, loadScreenById } from "./mockServer.js";
+import { createSolidDummy, filterGameObjects, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js"
 import { removeAllHitBoxes } from "./hitbox.js";
 
 export const CANVAS_WIDTH = 256;
@@ -19,18 +19,23 @@ export interface Screen {
     music: string,
     tileMap: number[][],
     gameObjects: GameObject[],
+    persistedGameObjects:GameObject[],
     collisionCells: number[]
 }
 
 let tileMapImage: HTMLImageElement;
 let ctx: CanvasRenderingContext2D;
-export let currentScreen: Screen;
-//let screens: Screen[];
+let currentScreen: Screen;
+let currentGameObjects:GameObject[] = [];
+let screens: Screen[];
 
 export function init(renderingContext: CanvasRenderingContext2D, imageUrl: string): void {
     tileMapImage = new Image();
     tileMapImage.src = imageUrl;
     ctx = renderingContext;
+    screens = getAllScreensAsArray();
+    console.clear();
+    console.log(screens[119])
 }
 
 export function renderTileMap(tileMapDataArray: number[][]) {
@@ -54,31 +59,41 @@ export function renderTileMap(tileMapDataArray: number[][]) {
 export function switchToScreen(screenId: number) {
     if (isValidScreenId(screenId)) {
         cleanupCurrentScreen();
-        //setCurrentScreen(screenId);
         loadCurrentScreen(screenId);
     }
 }
 
 function cleanupCurrentScreen(): void {
     removeAllHitBoxes();
+    currentGameObjects = [];
+}
+
+function loadCurrentScreen(screenId: number) {
+    currentScreen = screens[screenId];
+
+    //refresh non persistent game objects by loading from server
+    currentGameObjects.push(...loadScreenById(screenId).gameObjects);
+    currentGameObjects.push(...currentScreen.persistedGameObjects);
+    currentGameObjects.push(...getGlobalGameObjects());
+    currentGameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
+    console.clear();
+    console.log(currentScreen.persistedGameObjects)
 }
 
 export function getCurrentGameObjects(): GameObject[] {
-    return currentScreen?.gameObjects || [];
+    return currentGameObjects;
+}
+
+export function getCurrentVisibleGameObjects(): GameObject[] {
+    return currentGameObjects.filter(gameObject => isVisible(gameObject));
 }
 
 export function removeGameObject(gameObject: GameObject): void {
-    currentScreen.gameObjects = getCurrentGameObjects().filter(go => go.id !== gameObject.id);
+    currentGameObjects = currentGameObjects.filter(go => go.id !== gameObject.id);
 }
 
 export function drawCurrentScreen() {
     renderTileMap(getCurrentScreenTileMap());
-}
-
-function loadCurrentScreen(screenId: number) {
-    currentScreen = loadScreenById(screenId);
-    currentScreen.gameObjects.push(...getGlobalGameObjects());
-    currentScreen.gameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
 }
 
 function addCollisionObjectsFromTileMap(tileMapDataArray: number[][], collisionCells: number[]): GameObject[] {

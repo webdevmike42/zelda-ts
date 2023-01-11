@@ -1,4 +1,5 @@
-import { loadScreenById } from "./mockServer.js";
+import { isVisible } from "./gameObjects/gameObject.js";
+import { getAllScreensAsArray, loadScreenById } from "./mockServer.js";
 import { createSolidDummy, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { removeAllHitBoxes } from "./hitbox.js";
 export const CANVAS_WIDTH = 256;
@@ -13,12 +14,16 @@ export const EMPTY_SCREEN_ID = -1;
 export const START_SCREEN_ID = 119;
 let tileMapImage;
 let ctx;
-export let currentScreen;
-//let screens: Screen[];
+let currentScreen;
+let currentGameObjects = [];
+let screens;
 export function init(renderingContext, imageUrl) {
     tileMapImage = new Image();
     tileMapImage.src = imageUrl;
     ctx = renderingContext;
+    screens = getAllScreensAsArray();
+    console.clear();
+    console.log(screens[119]);
 }
 export function renderTileMap(tileMapDataArray) {
     for (let i = 0; i < tileMapDataArray.length; i++) {
@@ -30,26 +35,34 @@ export function renderTileMap(tileMapDataArray) {
 export function switchToScreen(screenId) {
     if (isValidScreenId(screenId)) {
         cleanupCurrentScreen();
-        //setCurrentScreen(screenId);
         loadCurrentScreen(screenId);
     }
 }
 function cleanupCurrentScreen() {
     removeAllHitBoxes();
+    currentGameObjects = [];
+}
+function loadCurrentScreen(screenId) {
+    currentScreen = screens[screenId];
+    //refresh non persistent game objects by loading from server
+    currentGameObjects.push(...loadScreenById(screenId).gameObjects);
+    currentGameObjects.push(...currentScreen.persistedGameObjects);
+    currentGameObjects.push(...getGlobalGameObjects());
+    currentGameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
+    console.clear();
+    console.log(currentScreen.persistedGameObjects);
 }
 export function getCurrentGameObjects() {
-    return (currentScreen === null || currentScreen === void 0 ? void 0 : currentScreen.gameObjects) || [];
+    return currentGameObjects;
+}
+export function getCurrentVisibleGameObjects() {
+    return currentGameObjects.filter(gameObject => isVisible(gameObject));
 }
 export function removeGameObject(gameObject) {
-    currentScreen.gameObjects = getCurrentGameObjects().filter(go => go.id !== gameObject.id);
+    currentGameObjects = currentGameObjects.filter(go => go.id !== gameObject.id);
 }
 export function drawCurrentScreen() {
     renderTileMap(getCurrentScreenTileMap());
-}
-function loadCurrentScreen(screenId) {
-    currentScreen = loadScreenById(screenId);
-    currentScreen.gameObjects.push(...getGlobalGameObjects());
-    currentScreen.gameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
 }
 function addCollisionObjectsFromTileMap(tileMapDataArray, collisionCells) {
     const solidDummies = [];

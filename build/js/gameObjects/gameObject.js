@@ -2,9 +2,9 @@ import { NULL_ANIMATION } from "../animation.js";
 import { createBox } from "../box.js";
 import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
+import { getCurrentGameObjects } from "../screens.js";
 import { createVector, NULL_VECTOR, vectorDiff, vectorSum } from "../vector.js";
 import { getCollidingActiveConveyors, getConveyingVectorSum } from "./conveyor.js";
-import { getGameObjects } from "./gameObjectFactory.js";
 export var GameObjectType;
 (function (GameObjectType) {
     GameObjectType[GameObjectType["PLAYER"] = 0] = "PLAYER";
@@ -81,7 +81,7 @@ export function moveGameObject(gameObject, moveBy) {
 }
 export function setGameObjectPosition(gameObject, newPosition) {
     const diffVector = vectorDiff(newPosition, getPosition(gameObject));
-    if (getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), getGameObjects()).length === 0) {
+    if (getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), getCurrentGameObjects()).length === 0) {
         moveGameObject(gameObject, diffVector);
     }
 }
@@ -96,4 +96,10 @@ export function isGameObjectDead(gameObject) {
 }
 export function getHealth(gameObject) {
     return gameObject.health || 0;
+}
+export function setVisible(gameObject, isVisible) {
+    gameObject.isVisible = isVisible;
+}
+export function isVisible(gameObject) {
+    return gameObject.isVisible || false;
 }

@@ -1,14 +1,14 @@
 import { ActionBox } from "../actionBox.js";
 import { Animation, NULL_ANIMATION } from "../animation.js";
 import { Box, createBox } from "../box.js";
-import { setCollisionBoxFromBoundingBox, setCollisionBox, getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
+import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { HitBox } from "../hitbox.js";
 import { HurtBox } from "../hurtbox.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
+import { getCurrentGameObjects } from "../screens.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
 import { getCollidingActiveConveyors, getConveyingVectorSum } from "./conveyor.js";
-import { getGameObjects } from "./gameObjectFactory.js";
 
 export interface GameObject {
     id: number;
@@ -25,6 +25,7 @@ export interface GameObject {
     animations?: Map<string, Animation>;
     currentAnimation?: Animation,
     defaultAnimation?: Animation,
+    isVisible: boolean,
     viewVector: Vector,
     movementVector: Vector,
     isSolid?: boolean;
@@ -33,7 +34,7 @@ export interface GameObject {
     hurtBox?: HurtBox;
     health?: number;
     maxHealth?: number;
-    actionBox?:ActionBox
+    actionBox?: ActionBox
 }
 
 export enum GameObjectType {
@@ -80,7 +81,7 @@ export function getMovementVector(gameObject: GameObject): Vector {
     return gameObject.movementVector;
 }
 
-export function getOverallVector(gameObject:GameObject):Vector{
+export function getOverallVector(gameObject: GameObject): Vector {
     return vectorSum(getMovementVector(gameObject), getConveyingVectorSum(getCollidingActiveConveyors(gameObject)));
 }
 
@@ -123,7 +124,7 @@ export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {
 
 export function setGameObjectPosition(gameObject: GameObject, newPosition: Vector): void {
     const diffVector = vectorDiff(newPosition, getPosition(gameObject));
-    if (getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), getGameObjects()).length === 0) {
+    if (getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), getCurrentGameObjects()).length === 0) {
         moveGameObject(gameObject, diffVector);
     }
 }
@@ -142,4 +143,12 @@ export function isGameObjectDead(gameObject: GameObject): boolean {
 
 export function getHealth(gameObject: GameObject): number {
     return gameObject.health || 0;
+}
+
+export function setVisible(gameObject: GameObject, isVisible: boolean): void {
+    gameObject.isVisible = isVisible;
+}
+
+export function isVisible(gameObject: GameObject): boolean {
+    return gameObject.isVisible || false;
 }
