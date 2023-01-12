@@ -13,21 +13,13 @@ const NULL_HURTBOX = Object.freeze({
 
 })
 
-export function createHurtBox(position: Vector, width: number, height: number, owner: GameObject, enabled: boolean = true) {
+function createHurtBox(position: Vector, width: number, height: number, owner: GameObject, enabled: boolean = true) {
     return {
         ...createBox(position.x, position.y, width, height),
         owner: owner,
         enabled: enabled
     }
 }
-/*
-export function spawnHitBoxInFrontOf(gameObject: GameObject, damage: number): HurtBox {
-    const box = createBoxInFront(gameObject, gameObject.width, gameObject.height);
-    const hitBox = createHurtBox(box.position, box.width, box.height, gameObject, damage);
-    hurtBoxes.push(hitBox);
-    return hitBox;
-}
-*/
 
 export function setHurtBoxFromBoundingBox(gameObject: GameObject, enabled: boolean = true): void {
     const hurtBox: HurtBox = createHurtBox(getPosition(gameObject), gameObject.width, gameObject.height, gameObject, enabled);
@@ -50,9 +42,3 @@ function setHurtBoxEnabled(hurtBox: HurtBox | undefined, isEnabled: boolean): vo
 export function isHurtBoxEnabled(gameObject: GameObject): boolean {
     return gameObject.hurtBox?.enabled || false;
 }
-
-/*
-export function getHurtBox(gameObject:GameObject):HurtBox{
-    //return gameObject.hurtBox ? ;
-}
-*/

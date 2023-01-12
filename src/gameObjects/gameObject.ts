@@ -56,8 +56,8 @@ export function setCurrentAnimation(gameObject: GameObject, animation: Animation
     gameObject.currentAnimation = animation;
 }
 
-export function setPosition(gameObject: GameObject, newPosition: Vector): void {
-    gameObject.position = { ...newPosition };
+export function setPosition(object: GameObject | Box | Animation, newPosition: Vector): void {
+    object.position = { ...newPosition };
 }
 
 export function setBounds(gameObject: GameObject, width: number, height: number): void {
@@ -69,8 +69,8 @@ export function getBoundingBox(gameObject: GameObject): Box {
     return createBox(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height);
 }
 
-export function getPosition(gameObject: GameObject): Vector {
-    return gameObject.position;
+export function getPosition(object: GameObject | Box | Animation): Vector {
+    return object.position;
 }
 
 export function setMovementVector(gameObject: GameObject, movementVector: Vector): void {
@@ -112,14 +112,15 @@ export function isMoving(movementVector: Vector): boolean {
 }
 
 export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {
-    setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
-    if (gameObject.currentAnimation)
-        gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
-    if (gameObject.hitBox)
-        gameObject.hitBox.position = vectorSum(gameObject.hitBox.position, moveBy);
-    if (gameObject.hurtBox)
-        gameObject.hurtBox.position = vectorSum(gameObject.hurtBox.position, moveBy);
-    gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
+    move(getPosition(gameObject), moveBy);
+    move(getPosition(getCurrentAnimation(gameObject)), moveBy);
+    move(getPosition(getCollisionBox(gameObject)), moveBy);
+    if (gameObject.hitBox) move(getPosition(gameObject.hitBox), moveBy)
+    if (gameObject.hurtBox) move(getPosition(gameObject.hurtBox), moveBy)
+}
+
+function move(position: Vector, moveBy: Vector): void {
+    position = vectorSum(position, moveBy);
 }
 
 export function setGameObjectPosition(gameObject: GameObject, newPosition: Vector): void {

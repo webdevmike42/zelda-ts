@@ -13,13 +13,14 @@ export interface HitBox extends Box {
     enabled: boolean
 }
 
-export function createHitBox(position: Vector, width: number, height: number, owner: GameObject, damage: number, enabled: boolean = true) {
-    return {
-        ... createBox(position.x, position.y, width, height),
+function createHitBox(position: Vector, width: number, height: number, owner: GameObject, damage: number, enabled: boolean = true) {
+    const hitBox = {
+        ...createBox(position.x, position.y, width, height),
         owner: owner,
         damage: (damage >= 0 ? damage : 0),
         enabled: enabled
     }
+    return hitBox;
 }
 
 export function spawnHitBoxInFrontOf(gameObject: GameObject, damage: number): HitBox {
@@ -51,13 +52,13 @@ export function enableHitBox(gameObject: GameObject): void {
         gameObject.hitBox.enabled = true;
 }
 
-export function isHitBoxEnabled(gameObject:GameObject):boolean{
+export function isHitBoxEnabled(gameObject: GameObject): boolean {
     return gameObject.hitBox?.enabled || false;
 }
 
 export function getCollidingHitBoxes(gameObject: GameObject): HitBox[] {
     return (gameObject.hurtBox && isHurtBoxEnabled(gameObject))
-    ? (getCollidingBoxes(gameObject.hurtBox || { ...NULL_BOX }, hitBoxes) as HitBox[]).filter(hb => hb.enabled && hb.owner.id !== gameObject.id)
-    : [];
+        ? (getCollidingBoxes(gameObject.hurtBox || { ...NULL_BOX }, hitBoxes) as HitBox[]).filter(hb => hb.enabled && hb.owner.id !== gameObject.id)
+        : [];
 }
 

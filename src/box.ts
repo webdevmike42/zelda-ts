@@ -1,4 +1,4 @@
-import { GameObject, getBoundingBox, getCenter, getPosition, getViewVector } from "./gameObjects/gameObject.js";
+import { GameObject, getBoundingBox, getCenter, getPosition, getViewVector, setPosition } from "./gameObjects/gameObject.js";
 import { NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "./vector.js";
 
 export interface Box {
