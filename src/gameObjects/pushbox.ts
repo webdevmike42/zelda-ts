@@ -1,9 +1,9 @@
 
-import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
+import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
 import { createVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObject, GameObjectType, getPosition, setBounds, setMovementVector, setPosition } from "./gameObject.js";
+import { createMovementVector, GameObject, GameObjectType, getOverallVector, getPosition, setBounds, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject, setSolid } from "./gameObjectFactory.js";
 
 enum PushBoxStates {
@@ -39,7 +39,7 @@ function createPushBoxIdleState(pushBox: GameObject): State {
     state.name = "push box idle state";
     state.type = CommonStateTypes.IDLE;
     state.enter = () => {
-        console.log("enter: " + state.name)
+        console.log("enter: " + state.name);
         setMovementVector(pushBox, { ...NULL_VECTOR });
         setCurrentAnimation(pushBox, getAnimation(pushBox, CommonStateTypes.IDLE));
     }
@@ -52,19 +52,25 @@ function createPushBoxIdleState(pushBox: GameObject): State {
 }
 
 function createPushBoxPushedState(pushBox: GameObject): State {
-    let movingSpeed: number = 50;
+    let pushingGameObject: GameObject | null = null;
     const state: State = createEmptyState();
     state.name = "push box pushed state";
     state.type = PushBoxStates.PUSHED;
     state.enter = () => {
+        pushBox.ignoreConveyor = true;
+        if (pushBox.stateArgs.length > 0) {
+            pushingGameObject = pushBox.stateArgs[0] as GameObject;
+        }
         console.log("enter: " + state.name)
         setCurrentAnimation(pushBox, getAnimation(pushBox, PushBoxStates.PUSHED));
     }
     state.update = () => {
-        const movementVector = createMovementVector();
-        setMovementVector(pushBox, vectorScalarProduct(movingSpeed, movementVector));
+        if (pushingGameObject !== null)
+            setMovementVector(pushBox, getOverallVector(pushingGameObject));
     }
     state.exit = () => {
+        pushingGameObject = null;
+        pushBox.ignoreConveyor = false;
         console.log("exit " + state.name)
     };
     return state;
