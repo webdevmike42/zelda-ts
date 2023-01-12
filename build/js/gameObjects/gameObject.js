@@ -22,8 +22,8 @@ export function getCurrentAnimation(gameObject) {
 export function setCurrentAnimation(gameObject, animation) {
     gameObject.currentAnimation = animation;
 }
-export function setPosition(gameObject, newPosition) {
-    gameObject.position = Object.assign({}, newPosition);
+export function setPosition(object, newPosition) {
+    object.position = Object.assign({}, newPosition);
 }
 export function setBounds(gameObject, width, height) {
     gameObject.width = width;
@@ -32,8 +32,8 @@ export function setBounds(gameObject, width, height) {
 export function getBoundingBox(gameObject) {
     return createBox(gameObject.position.x, gameObject.position.y, gameObject.width, gameObject.height);
 }
-export function getPosition(gameObject) {
-    return gameObject.position;
+export function getPosition(object) {
+    return object.position;
 }
 export function setMovementVector(gameObject, movementVector) {
     gameObject.movementVector = Object.assign({}, movementVector);
@@ -78,6 +78,9 @@ export function moveGameObject(gameObject, moveBy) {
     if (gameObject.hurtBox)
         gameObject.hurtBox.position = vectorSum(gameObject.hurtBox.position, moveBy);
     gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
+}
+function move(position, moveBy) {
+    position = vectorSum(position, moveBy);
 }
 export function setGameObjectPosition(gameObject, newPosition) {
     const diffVector = vectorDiff(newPosition, getPosition(gameObject));

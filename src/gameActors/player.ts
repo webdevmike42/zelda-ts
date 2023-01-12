@@ -39,6 +39,7 @@ export function createPlayer(x: number, y: number): Player {
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     player.hasSword = false;
     player.keys = 0;
+    player.ignoreConveyor = false;
     return player;
 }
 
@@ -193,6 +194,7 @@ function createPlayerPickUpmajorItemState(player: Player): State {
     state.enter = () => {
         console.log("enter" + state.name)
         if (player.stateArgs.length > 0) {
+            player.ignoreConveyor = true;
             majorItem = player.stateArgs[0];
 
             if (majorItem) {
@@ -219,6 +221,7 @@ function createPlayerPickUpmajorItemState(player: Player): State {
     state.exit = () => {
         enableHurtBox(player);
         startTime = -1;
+        player.ignoreConveyor = false;
         if (majorItem)
             removeGameObject(majorItem);
     }

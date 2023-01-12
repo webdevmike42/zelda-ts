@@ -31,7 +31,8 @@ export function createGameObject(type: GameObjectType): GameObject {
         width: 0,
         height: 0,
         collisionBox: { ...NULL_BOX },
-        isVisible:true
+        isVisible:true,
+        ignoreConveyor:false
     }
 }
 

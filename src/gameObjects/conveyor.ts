@@ -7,7 +7,7 @@ import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from 
 import { createGameObject } from "./gameObjectFactory.js";
 
 interface Conveyor extends GameObject {
-    isActive:boolean,
+    isActive: boolean,
     conveyingNormalizedDirection: Vector,
     conveyingSpeed: number,
     conveyingVector: Vector
@@ -80,14 +80,16 @@ function createConveyorInactiveState(conveyor: Conveyor): State {
     return state;
 }
 
-function getCollidingConveyors(gameObject:GameObject):Conveyor[]{
-    return getCollidingGameObjects(gameObject,getCollisionBox(gameObject),getCurrentGameObjects()) as Conveyor[];
+function getCollidingConveyors(gameObject: GameObject): Conveyor[] {
+    return gameObject.ignoreConveyor
+    ? []
+    : getCollidingGameObjects(gameObject, getCollisionBox(gameObject), getCurrentGameObjects()) as Conveyor[];
 }
 
-export function getCollidingActiveConveyors(gameObject:GameObject):Conveyor[]{
+export function getCollidingActiveConveyors(gameObject: GameObject): Conveyor[] {
     return getCollidingConveyors(gameObject).filter(conveyor => conveyor.isActive);
 }
 
-export function getConveyingVectorSum(conveyors:Conveyor[]):Vector{
-    return conveyors.reduce((resultVector, conveyor) => vectorSum(resultVector,conveyor.conveyingVector),{...NULL_VECTOR});
+export function getConveyingVectorSum(conveyors: Conveyor[]): Vector {
+    return conveyors.reduce((resultVector, conveyor) => vectorSum(resultVector, conveyor.conveyingVector), { ...NULL_VECTOR });
 }

@@ -34,7 +34,8 @@ export interface GameObject {
     hurtBox?: HurtBox;
     health?: number;
     maxHealth?: number;
-    actionBox?: ActionBox
+    actionBox?: ActionBox,
+    ignoreConveyor: boolean
 }
 
 export enum GameObjectType {
@@ -112,11 +113,14 @@ export function isMoving(movementVector: Vector): boolean {
 }
 
 export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {
-    move(getPosition(gameObject), moveBy);
-    move(getPosition(getCurrentAnimation(gameObject)), moveBy);
-    move(getPosition(getCollisionBox(gameObject)), moveBy);
-    if (gameObject.hitBox) move(getPosition(gameObject.hitBox), moveBy)
-    if (gameObject.hurtBox) move(getPosition(gameObject.hurtBox), moveBy)
+    setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
+    if (gameObject.currentAnimation)
+        gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
+    if (gameObject.hitBox)
+        gameObject.hitBox.position = vectorSum(gameObject.hitBox.position, moveBy);
+    if (gameObject.hurtBox)
+        gameObject.hurtBox.position = vectorSum(gameObject.hurtBox.position, moveBy);
+    gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
 }
 
 function move(position: Vector, moveBy: Vector): void {

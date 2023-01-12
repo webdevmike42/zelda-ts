@@ -66,7 +66,9 @@ function createConveyorInactiveState(conveyor) {
     return state;
 }
 function getCollidingConveyors(gameObject) {
-    return getCollidingGameObjects(gameObject, getCollisionBox(gameObject), getCurrentGameObjects());
+    return gameObject.ignoreConveyor
+        ? []
+        : getCollidingGameObjects(gameObject, getCollisionBox(gameObject), getCurrentGameObjects());
 }
 export function getCollidingActiveConveyors(gameObject) {
     return getCollidingConveyors(gameObject).filter(conveyor => conveyor.isActive);

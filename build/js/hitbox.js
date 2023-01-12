@@ -4,8 +4,9 @@ import { getPosition } from "./gameObjects/gameObject.js";
 import { isHurtBoxEnabled } from "./hurtbox.js";
 import { removeObjectFromArray } from "./utils.js";
 export let hitBoxes = [];
-export function createHitBox(position, width, height, owner, damage, enabled = true) {
-    return Object.assign(Object.assign({}, createBox(position.x, position.y, width, height)), { owner: owner, damage: (damage >= 0 ? damage : 0), enabled: enabled });
+function createHitBox(position, width, height, owner, damage, enabled = true) {
+    const hitBox = Object.assign(Object.assign({}, createBox(position.x, position.y, width, height)), { owner: owner, damage: (damage >= 0 ? damage : 0), enabled: enabled });
+    return hitBox;
 }
 export function spawnHitBoxInFrontOf(gameObject, damage) {
     const box = createBoxInFront(gameObject, gameObject.width, gameObject.height);

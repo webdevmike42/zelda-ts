@@ -28,7 +28,8 @@ export function createGameObject(type) {
         width: 0,
         height: 0,
         collisionBox: Object.assign({}, NULL_BOX),
-        isVisible: true
+        isVisible: true,
+        ignoreConveyor: false
     };
 }
 export function createGlobalGameObject(type) {

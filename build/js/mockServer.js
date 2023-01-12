@@ -2311,7 +2311,7 @@ export function loadScreenById(screenId) {
                 }),
                 createDoor(110, 120, 16, 16, false),
                 createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                createSword(80, 130),
+                createSword(70, 140),
                 createSmallKey(70, 110),
                 createConveyor(80, 140, 16, 16, normalizedVector(createVector(1, 0)), 10)
             ];
