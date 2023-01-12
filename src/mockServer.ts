@@ -1,3 +1,4 @@
+import { createChest } from "./gameObjects/chest.js";
 import { createConveyor } from "./gameObjects/conveyor.js";
 import { closeDoor, createDoor, Door, openDoor } from "./gameObjects/door.js";
 import { setFloorSwitchPressedCallback, setFloorSwitchReleasedCallback, createFloorSwitch, FloorSwitch } from "./gameObjects/floorSwitch.js";
@@ -2380,6 +2381,13 @@ export function loadScreenById(screenId: number) {
 
             screen.gameObjects = [
                 //createStaticHazard(120,150,48,32,1),
+               
+                
+                createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                //createPushBox(70,110),
+                createChest(70,110),
+                //createSword(70,140),
+                //createSmallKey(70,110),
                 createFloorSwitch(120, 100, 16, 16, false, () => {
                     openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }, () => {
@@ -2387,10 +2395,6 @@ export function loadScreenById(screenId: number) {
                         closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }),
                 createDoor(110, 120, 16, 16, false),
-                createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                createPushBox(70,110),
-                //createSword(70,140),
-                //createSmallKey(70,110),
                 createConveyor(80,140,16,16,normalizedVector(createVector(1,0)),10)
             ];
 

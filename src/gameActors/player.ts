@@ -12,6 +12,7 @@ import { Item } from "../gameObjects/item.js";
 import { addToInventory } from "../inventory.js";
 import { getCurrentGameObjects, removeGameObject } from "../screens.js";
 import { grabPushBox, releasePushBox } from "../gameObjects/pushbox.js";
+import { Chest, openChest } from "../gameObjects/chest.js";
 
 const PLAYER_WIDTH: number = 16, PLAYER_HEIGHT: number = 16;
 let player: Player;
@@ -73,8 +74,15 @@ function createPlayerIdleState(player: Player): State {
             const pushBoxes: GameObject[] = filterGameObjects(GameObjectType.PUSH_BOX, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects()));
             if (pushBoxes.length > 0)
                 setDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), [pushBoxes[0]]);
-            else
+            else {
+                const closedChests: Chest[] = (filterGameObjects(GameObjectType.CHEST, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects())) as Chest[])
+                    .filter(chest => !chest.isOpen);
+                if (closedChests.length > 0)
+                    openChest(closedChests[0]);
+
                 setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+            }
+
             return;
         }
         if (isKeyPressed(KEYS.DASH)) {

@@ -11,6 +11,7 @@ import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hur
 import { addToInventory } from "../inventory.js";
 import { getCurrentGameObjects, removeGameObject } from "../screens.js";
 import { grabPushBox, releasePushBox } from "../gameObjects/pushbox.js";
+import { openChest } from "../gameObjects/chest.js";
 const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16;
 let player;
 var PlayerStateTypes;
@@ -62,8 +63,13 @@ function createPlayerIdleState(player) {
             const pushBoxes = filterGameObjects(GameObjectType.PUSH_BOX, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects()));
             if (pushBoxes.length > 0)
                 setDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), [pushBoxes[0]]);
-            else
+            else {
+                const closedChests = filterGameObjects(GameObjectType.CHEST, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects()))
+                    .filter(chest => !chest.isOpen);
+                if (closedChests.length > 0)
+                    openChest(closedChests[0]);
                 setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+            }
             return;
         }
         if (isKeyPressed(KEYS.DASH)) {

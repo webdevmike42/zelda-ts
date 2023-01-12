@@ -47,7 +47,8 @@ export enum GameObjectType {
     DUMMY,
     FLOOR_SWITCH,
     DOOR,
-    PUSH_BOX
+    PUSH_BOX,
+    CHEST
 }
 
 export function getCurrentAnimation(gameObject: GameObject): Animation {
