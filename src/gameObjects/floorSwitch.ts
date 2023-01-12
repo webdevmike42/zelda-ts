@@ -50,6 +50,7 @@ function addFloorSwitchAnimations(floorSwitch: FloorSwitch): void {
 function createFloorSwitchPressedState(floorSwitch: FloorSwitch): State {
     const state: State = createEmptyState();
     state.name = "floor switch pressed state";
+    state.type = FloorSwitchStates.PRESSED;
     state.enter = () => {
         console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.PRESSED));
@@ -68,6 +69,7 @@ function createFloorSwitchPressedState(floorSwitch: FloorSwitch): State {
 function createFloorSwitchReleasedState(floorSwitch: FloorSwitch): State {
     const state: State = createEmptyState();
     state.name = "floor switch released state";
+    state.type = FloorSwitchStates.RELEASED;
     state.enter = () => {
         console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.RELEASED));

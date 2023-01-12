@@ -1,20 +1,22 @@
 import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
-import { isAnyMovementKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
+import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, vectorScalarProduct, vectorSum } from "../vector.js";
-import { setCollisionBox } from "../collisions.js";
+import { getCollidingGameObjects, getCollisionBox, setCollisionBox } from "../collisions.js";
 import { createBox } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
 import { removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addToInventory } from "../inventory.js";
 import { getCurrentGameObjects, removeGameObject } from "../screens.js";
+import { grabPushBox, releasePushBox } from "../gameObjects/pushbox.js";
 const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16;
 let player;
 var PlayerStateTypes;
 (function (PlayerStateTypes) {
     PlayerStateTypes["PickUpMajorItem"] = "PickUpMajorItem";
+    PlayerStateTypes["PUSHING"] = "Pushing";
 })(PlayerStateTypes || (PlayerStateTypes = {}));
 export function createPlayer(x, y) {
     player = createGlobalGameObject(GameObjectType.PLAYER);
@@ -40,6 +42,7 @@ function addPlayerStates(player) {
     addState(player, CommonStateTypes.ACTION, createPlayerActionState(player));
     addState(player, CommonStateTypes.HIT, createPlayerHitState(player));
     addState(player, PlayerStateTypes.PickUpMajorItem, createPlayerPickUpmajorItemState(player));
+    addState(player, PlayerStateTypes.PUSHING, createPlayerPushingState(player));
     setDefaultState(player, idleState);
 }
 function createPlayerIdleState(player) {
@@ -56,12 +59,15 @@ function createPlayerIdleState(player) {
             return;
         }
         if (isKeyPressed(KEYS.ACTION)) {
-            setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+            const pushBoxes = filterGameObjects(GameObjectType.PUSH_BOX, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects()));
+            if (pushBoxes.length > 0)
+                setDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), [pushBoxes[0]]);
+            else
+                setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             return;
         }
         if (isKeyPressed(KEYS.DASH)) {
             const majorItem = filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects())[0];
-            //setGameObjectPosition(majorItem, vectorSum(getCurrentAnimation(player).position, createVector(player.width / 2 - majorItem.width / 4, -majorItem.height)));
             setGameObjectPosition(majorItem, createVector(majorItem.position.x, majorItem.position.y + 20));
             console.log(getPosition(majorItem));
         }
@@ -192,11 +198,83 @@ function createPlayerPickUpmajorItemState(player) {
     };
     return state;
 }
+function createPlayerPushingState(player) {
+    let pushingSpeed = 50;
+    let pushBox;
+    const state = createEmptyState();
+    state.name = "player pushing state";
+    state.type = PlayerStateTypes.PUSHING;
+    state.enter = () => {
+        console.log("enter " + state.name);
+        if (player.stateArgs.length > 0) {
+            pushBox = player.stateArgs[0];
+            grabPushBox(pushBox, player);
+        }
+    };
+    state.update = () => {
+        if (!isKeyDown(KEYS.ACTION)) {
+            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+        }
+        const movementVector = createMovementVector();
+        setMovementVector(player, vectorScalarProduct(pushingSpeed, movementVector));
+        setViewVector(player, get4DirectionVector(movementVector));
+        updateCurrentAnimationBasedOnViewVector(player);
+    };
+    state.exit = () => {
+        console.log("exit " + state.name);
+        if (pushBox)
+            releasePushBox(pushBox);
+    };
+    /*
+    const pushingState = {
+        name: "playerPushing",
+        type: PLAYER_STATES.PUSHING,
+        handleInput: function (input) {
+            if (!input[KEYS.ACTION].down) {
+                return player.getState(PLAYER_STATES.IDLE);
+            }
+
+            const movementVector = getMovementVector(player);
+
+            if (input[KEYS.UP].down) {
+                addVector(movementVector, { x: 0, y: -1 });
+            }
+            if (input[KEYS.LEFT].down) {
+                addVector(movementVector, { x: -1, y: 0 });
+            }
+            if (input[KEYS.DOWN].down) {
+                addVector(movementVector, { x: 0, y: 1 });
+            }
+            if (input[KEYS.RIGHT].down) {
+                addVector(movementVector, { x: 1, y: 0 });
+            }
+
+            setViewVector(player, { ...movementVector });
+            multiplyVector(movementVector, player.movement.speed);
+        },
+
+        enter: function () {
+            switchAnimation(player, "PlayerIdle", player.directionCode);
+            grabPushBox(pushBox, player);
+        },
+
+        update: function (currentGameTime, timeSinceLastTick) {
+
+        },
+
+        exit: function () {
+            releasePushBox(pushBox);
+        }
+    }
+    */
+    return state;
+}
 function addPlayerAnimations(player) {
     addPlayerIdleAnimations(player);
     addPlayerMovingAnimations(player);
     addPlayerAttackingAnimations(player);
     addPlayerPickUpItemAnimations(player);
+    addPlayerPushingAnimations(player);
 }
 function addPlayerIdleAnimations(player) {
     addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Up", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 62, srcY: 0 }], 1, false));
@@ -209,6 +287,21 @@ function addPlayerMovingAnimations(player) {
     addAnimation(player, createAnimation(CommonStateTypes.MOVING + "Left", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true));
     addAnimation(player, createAnimation(CommonStateTypes.MOVING + "Down", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 0, srcY: 0 }, { srcX: 0, srcY: 30 }], 6, true));
     addAnimation(player, createAnimation(CommonStateTypes.MOVING + "Right", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 91, srcY: 0 }, { srcX: 91, srcY: 30 }], 6, true));
+}
+function addPlayerPushingAnimations(player) {
+    /*
+    TODO: PUSHING animation while standing
+    
+        addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Up", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 62, srcY: 0 }], 1, false));
+        addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Left", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 30, srcY: 0 }], 1, false));
+        addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Down", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 0, srcY: 0 }], 1, false));
+        addAnimation(player, createAnimation(CommonStateTypes.IDLE + "Right", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 91, srcY: 0 }], 1, false));
+    
+        */
+    addAnimation(player, createAnimation(PlayerStateTypes.PUSHING + "Up", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 62, srcY: 0 }, { srcX: 62, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation(PlayerStateTypes.PUSHING + "Left", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 30, srcY: 0 }, { srcX: 30, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation(PlayerStateTypes.PUSHING + "Down", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 0, srcY: 0 }, { srcX: 0, srcY: 30 }], 6, true));
+    addAnimation(player, createAnimation(PlayerStateTypes.PUSHING + "Right", "./resources/link.png", getPosition(player), player.width, player.height, [{ srcX: 91, srcY: 0 }, { srcX: 91, srcY: 30 }], 6, true));
 }
 function addPlayerAttackingAnimations(player) {
     addAnimation(player, createAnimation(CommonStateTypes.ACTION + "Up", "./resources/link.png", getPosition(player), player.width, 27, [{ srcX: 60, srcY: 84 }], 1, false, createVector(0, -11)));
