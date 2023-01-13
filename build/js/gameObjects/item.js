@@ -3,7 +3,7 @@ import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBo
 import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
-import { GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
+import { GameObjectType, getPosition, setBounds, setPosition, setVisible } from "./gameObject.js";
 import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
 export var ItemType;
 (function (ItemType) {
@@ -69,6 +69,7 @@ function createItemCollectedState(item) {
     state.name = "item picked up state";
     state.enter = () => {
         console.log("enter: " + state.name);
+        setVisible(item, false);
         setCurrentAnimation(item, getAnimation(item, "idle"));
     };
     state.update = () => {

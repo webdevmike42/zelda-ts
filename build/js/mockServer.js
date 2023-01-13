@@ -1,9 +1,10 @@
 import { createConveyor } from "./gameObjects/conveyor.js";
-import { createOldMan } from "./gameObjects/decoObjects.js";
+import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObjects.js";
 import { closeDoor, createDoor, openDoor } from "./gameObjects/door.js";
 import { createFloorSwitch } from "./gameObjects/floorSwitch.js";
 import { GameObjectType } from "./gameObjects/gameObject.js";
 import { filterGameObjects } from "./gameObjects/gameObjectFactory.js";
+import { createSword } from "./gameObjects/item.js";
 import { createDestroyableStaticHazard } from "./gameObjects/staticHazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, WORLD_MAP_COLS } from "./screens.js";
@@ -2302,13 +2303,8 @@ export function loadScreenById(screenId) {
                 [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]
             ];
             screen.gameObjects = [
-                //createStaticHazard(120,150,48,32,1),
+                createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
                 createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                createOldMan(70, 110),
-                //createPushBox(70,110),
-                //createChest(70,110),
-                //createSword(70,140),
-                //createSmallKey(70,110),
                 createFloorSwitch(120, 100, 16, 16, false, () => {
                     openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
                 }, () => {
@@ -2494,17 +2490,16 @@ export function loadScreenById(screenId) {
                 [55, 55, 37, 37, 37, 37, 37, 28, 28, 37, 37, 37, 37, 37, 55, 55],
                 [55, 55, 55, 55, 55, 55, 55, 28, 28, 55, 55, 55, 55, 55, 55, 55]
             ];
-            /*
-                        screen.gameObjects = [
-            
-                            createFlame(72, 126),
-                            createOldMan(120, 126),
-                            createSword(125, 156),
-                            createFlame(168, 126),
-                            createText(40, 110),
-                            createTeleportTrigger(128, 220, 16, 16, createTeleporterDto(119, 65, 90))
-                        ];
-            */
+            screen.gameObjects = [
+                createFlame(72, 126),
+                createOldMan(120, 126),
+                createFlame(168, 126),
+                createTeleporterTrigger(128, 220, 16, 16, 119, 65, 90)
+            ];
+            screen.persistedGameObjects = [
+                createCaveText(40, 110),
+                createSword(125, 156)
+            ];
             break;
         case 129:
             screen.tileMap = [

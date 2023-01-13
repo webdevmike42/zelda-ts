@@ -1,5 +1,6 @@
-import { createPlayer, isPlayerDead } from "./gameActors/player.js"
+import { createPlayer, getPlayer, isPlayerDead } from "./gameActors/player.js"
 import { drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js"
+import { createHudDtoFromGameObject, drawHUD, loadHud } from "./hud.js"
 import { initKeyBoardInputHandler, isKeyPressed, KEYS } from "./KeyboardInputHandler.js"
 import { drawCurrentScreen, init, START_SCREEN_ID, switchToScreen } from "./screens.js"
 import { runAllTests } from "./tests.js"
@@ -19,12 +20,13 @@ let gameState: GameState | null = null;
 let startTime: number = -1;
 let fps: number = 60;
 let timeOfLastTick: number = 0;
-let quitGame:boolean = false;
+let quitGame: boolean = false;
 
 function startNewGame(): void {
     if ((canvas = document.getElementById("myCanvas") as HTMLCanvasElement) !== null && (ctx = canvas.getContext("2d")) !== null) {
         initKeyBoardInputHandler();
         init(ctx, "./resources/tiles-overworld.png");
+        loadHud(ctx, "./resources/pausescreen.png");
         createPlayer(100, 100);
         switchToScreen(START_SCREEN_ID);
         setGameState(GameState.RUNNING);
@@ -94,7 +96,7 @@ function drawGame(): void {
     drawCurrentScreen();
     if (ctx)
         drawGameObjects(ctx);
-
+    drawHUD(createHudDtoFromGameObject(getPlayer()));
     /*
     GameObjectModule.drawGameObjects(ctx);
     drawHUD(createHudDtoFromGameObject(player));
