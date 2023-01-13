@@ -63,10 +63,12 @@ function raiseAnimationFrame(animation) {
     if (animation.loop)
         animation.currentFrameIndex = 0;
 }
-export function addAnimation(gameObject, animation) {
+export function addAnimation(gameObject, animation, isCurrentAnimation = false) {
     if (!gameObject.animations)
         gameObject.animations = new Map();
     gameObject.animations.set(animation.name, animation);
+    if (isCurrentAnimation)
+        setCurrentAnimation(gameObject, animation);
 }
 export function getAnimation(gameObject, key) {
     var _a;

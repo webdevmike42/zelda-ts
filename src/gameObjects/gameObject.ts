@@ -1,7 +1,6 @@
 import { Animation, NULL_ANIMATION } from "../animation.js";
 import { Box, createBox } from "../box.js";
 import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
-import { Player } from "../gameActors/player.js";
 import { HitBox } from "../hitbox.js";
 import { HurtBox } from "../hurtbox.js";
 import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
@@ -47,7 +46,8 @@ export enum GameObjectType {
     FLOOR_SWITCH,
     DOOR,
     PUSH_BOX,
-    CHEST
+    CHEST,
+    MISC
 }
 
 export function getCurrentAnimation(gameObject: GameObject): Animation {

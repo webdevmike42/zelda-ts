@@ -96,10 +96,12 @@ function raiseAnimationFrame(animation: Animation) {
         animation.currentFrameIndex = 0;
 }
 
-export function addAnimation(gameObject: GameObject, animation: Animation): void {
+export function addAnimation(gameObject: GameObject, animation: Animation, isCurrentAnimation: boolean = false): void {
     if (!gameObject.animations)
         gameObject.animations = new Map<string, Animation>();
     gameObject.animations.set(animation.name, animation);
+    if (isCurrentAnimation)
+        setCurrentAnimation(gameObject, animation);
 }
 
 export function getAnimation(gameObject: GameObject, key: string): Animation {

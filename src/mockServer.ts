@@ -1,5 +1,6 @@
 import { createChest } from "./gameObjects/chest.js";
 import { createConveyor } from "./gameObjects/conveyor.js";
+import { createFlame, createOldMan } from "./gameObjects/decoObjects.js";
 import { closeDoor, createDoor, Door, openDoor } from "./gameObjects/door.js";
 import { setFloorSwitchPressedCallback, setFloorSwitchReleasedCallback, createFloorSwitch, FloorSwitch } from "./gameObjects/floorSwitch.js";
 import { GameObject, GameObjectType } from "./gameObjects/gameObject.js";
@@ -2384,7 +2385,8 @@ export function loadScreenById(screenId: number) {
                
                 
                 createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                createPushBox(70,110),
+                createOldMan(70,110),
+                //createPushBox(70,110),
                 //createChest(70,110),
                 //createSword(70,140),
                 //createSmallKey(70,110),
