@@ -3,8 +3,8 @@ import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObject
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, vectorScalarProduct, vectorSum } from "../vector.js";
-import { getCollidingGameObjects, getCollisionBox, setCollisionBox } from "../collisions.js";
-import { createBox } from "../box.js";
+import { getCollidingGameObjects, setCollisionBox } from "../collisions.js";
+import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
 import { removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
@@ -12,7 +12,7 @@ import { addToInventory } from "../inventory.js";
 import { getCurrentGameObjects, removeGameObject } from "../screens.js";
 import { grabPushBox, releasePushBox } from "../gameObjects/pushbox.js";
 import { openChest } from "../gameObjects/chest.js";
-const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16;
+const PLAYER_WIDTH = 16, PLAYER_HEIGHT = 16, PLAYER_DEFAULT_VIEW_VECTOR = createVector(1, 0);
 let player;
 var PlayerStateTypes;
 (function (PlayerStateTypes) {
@@ -30,6 +30,7 @@ export function createPlayer(x, y) {
     setHurtBoxFromBoundingBox(player);
     setHealth(player, 8);
     setMaxHealth(player, 8);
+    setViewVector(player, PLAYER_DEFAULT_VIEW_VECTOR);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     player.hasSword = false;
     player.keys = 0;
@@ -60,15 +61,17 @@ function createPlayerIdleState(player) {
             return;
         }
         if (isKeyPressed(KEYS.ACTION)) {
-            const pushBoxes = filterGameObjects(GameObjectType.PUSH_BOX, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects()));
+            const collidingObjects = getCollidingGameObjects(player, createBoxInFront(player, player.width, player.height), getCurrentGameObjects());
+            const pushBoxes = filterGameObjects(GameObjectType.PUSH_BOX, collidingObjects);
             if (pushBoxes.length > 0)
                 setDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), [pushBoxes[0]]);
             else {
-                const closedChests = filterGameObjects(GameObjectType.CHEST, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects()))
+                const closedChests = filterGameObjects(GameObjectType.CHEST, collidingObjects)
                     .filter(chest => !chest.isOpen);
                 if (closedChests.length > 0)
                     openChest(closedChests[0]);
-                setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+                else
+                    setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             }
             return;
         }

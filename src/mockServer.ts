@@ -2384,8 +2384,8 @@ export function loadScreenById(screenId: number) {
                
                 
                 createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                //createPushBox(70,110),
-                createChest(70,110),
+                createPushBox(70,110),
+                //createChest(70,110),
                 //createSword(70,140),
                 //createSmallKey(70,110),
                 createFloorSwitch(120, 100, 16, 16, false, () => {

@@ -4,7 +4,7 @@ import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBox } from "../collisions.js";
-import { createBox } from "../box.js";
+import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
 import { HitBox, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
@@ -14,7 +14,8 @@ import { getCurrentGameObjects, removeGameObject } from "../screens.js";
 import { grabPushBox, releasePushBox } from "../gameObjects/pushbox.js";
 import { Chest, openChest } from "../gameObjects/chest.js";
 
-const PLAYER_WIDTH: number = 16, PLAYER_HEIGHT: number = 16;
+
+const PLAYER_WIDTH: number = 16, PLAYER_HEIGHT: number = 16, PLAYER_DEFAULT_VIEW_VECTOR: Vector = createVector(1, 0);
 let player: Player;
 
 enum PlayerStateTypes {
@@ -39,6 +40,7 @@ export function createPlayer(x: number, y: number): Player {
     setHurtBoxFromBoundingBox(player);
     setHealth(player, 8);
     setMaxHealth(player, 8);
+    setViewVector(player, PLAYER_DEFAULT_VIEW_VECTOR);
     switchToState(player, getState(player, CommonStateTypes.IDLE));
     player.hasSword = false;
     player.keys = 0;
@@ -71,18 +73,18 @@ function createPlayerIdleState(player: Player): State {
             return;
         }
         if (isKeyPressed(KEYS.ACTION)) {
-            const pushBoxes: GameObject[] = filterGameObjects(GameObjectType.PUSH_BOX, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects()));
+            const collidingObjects: GameObject[] = getCollidingGameObjects(player, createBoxInFront(player, player.width, player.height), getCurrentGameObjects())
+            const pushBoxes: GameObject[] = filterGameObjects(GameObjectType.PUSH_BOX, collidingObjects);
             if (pushBoxes.length > 0)
                 setDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), [pushBoxes[0]]);
             else {
-                const closedChests: Chest[] = (filterGameObjects(GameObjectType.CHEST, getCollidingGameObjects(player, getCollisionBox(player), getCurrentGameObjects())) as Chest[])
+                const closedChests: Chest[] = (filterGameObjects(GameObjectType.CHEST, collidingObjects) as Chest[])
                     .filter(chest => !chest.isOpen);
                 if (closedChests.length > 0)
                     openChest(closedChests[0]);
-
-                setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+                else
+                    setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             }
-
             return;
         }
         if (isKeyPressed(KEYS.DASH)) {
@@ -90,7 +92,6 @@ function createPlayerIdleState(player: Player): State {
             setGameObjectPosition(majorItem, createVector(majorItem.position.x, majorItem.position.y + 20))
             console.log(getPosition(majorItem));
         }
-
     }
     state.exit = () => {/*console.log("exit " + state.name)*/ };
     return state;

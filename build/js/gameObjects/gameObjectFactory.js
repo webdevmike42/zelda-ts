@@ -1,5 +1,6 @@
+//import { createActionbox, isActionboxEnabled } from "../actionBox.js";
 import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
-import { NULL_BOX } from "../box.js";
+import { createBoxInFront, NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { playerPickUpItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes } from "../hitbox.js";
@@ -67,6 +68,12 @@ export function drawGameObjects(ctx) {
     getCurrentVisibleGameObjects().forEach(gameObject => {
         const curAnimation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
+        if (gameObject.type === GameObjectType.PLAYER) {
+            const player = gameObject;
+            ctx.fillStyle = "rgba(0, 0, 100, 0.5)";
+            const box = createBoxInFront(player, player.width, player.height);
+            ctx.fillRect(box.position.x, box.position.y, box.width, box.height);
+        }
         /*
                 if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
                     //draw hurtbox

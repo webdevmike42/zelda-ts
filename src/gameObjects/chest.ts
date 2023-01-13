@@ -21,7 +21,7 @@ export function createChest(x: number, y: number, isLocked:boolean = false, isOp
     const chest:Chest = createGameObject(GameObjectType.CHEST) as Chest;
     setPosition(chest, createVector(x, y));
     setBounds(chest, 16, 16);
-    //setSolid(chest,false);
+    setSolid(chest);
     addChestStates(chest);
     addChestAnimations(chest);
     setCollisionBoxFromBoundingBox(chest);

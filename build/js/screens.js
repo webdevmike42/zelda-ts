@@ -49,8 +49,6 @@ function loadCurrentScreen(screenId) {
     currentGameObjects.push(...currentScreen.persistedGameObjects);
     currentGameObjects.push(...getGlobalGameObjects());
     currentGameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
-    console.clear();
-    console.log(currentScreen.persistedGameObjects);
 }
 export function getCurrentGameObjects() {
     return currentGameObjects;

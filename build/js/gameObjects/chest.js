@@ -3,7 +3,7 @@ import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { addState, createEmptyState, getState, setDefaultState, setDesignatedState, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
-import { createGameObject } from "./gameObjectFactory.js";
+import { createGameObject, setSolid } from "./gameObjectFactory.js";
 var ChestStates;
 (function (ChestStates) {
     ChestStates["OPEN"] = "Open";
@@ -13,7 +13,7 @@ export function createChest(x, y, isLocked = false, isOpen = false) {
     const chest = createGameObject(GameObjectType.CHEST);
     setPosition(chest, createVector(x, y));
     setBounds(chest, 16, 16);
-    //setSolid(chest,false);
+    setSolid(chest);
     addChestStates(chest);
     addChestAnimations(chest);
     setCollisionBoxFromBoundingBox(chest);

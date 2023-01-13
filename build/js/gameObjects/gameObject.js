@@ -79,6 +79,12 @@ export function moveGameObject(gameObject, moveBy) {
         gameObject.hitBox.position = vectorSum(gameObject.hitBox.position, moveBy);
     if (gameObject.hurtBox)
         gameObject.hurtBox.position = vectorSum(gameObject.hurtBox.position, moveBy);
+    /*
+if (gameObject.type === GameObjectType.PLAYER) {
+    const player: Player = gameObject as Player;
+    player.actionBox.position = vectorSum(player.actionBox.position, moveBy);
+}
+*/
     gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
 }
 function move(position, moveBy) {
