@@ -2393,7 +2393,7 @@ export function loadScreenById(screenId: number) {
             ];
 
             screen.persistedGameObjects = [
-                createDynamicHazard(80,140,16,16,1)
+                createDynamicHazard(120,140,16,16,1)
                 //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
                 //createSword(80,130),
                 //createSmallKey(80,100),

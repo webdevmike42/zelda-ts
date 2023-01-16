@@ -1,7 +1,8 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
-import { setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getCollidingSolidGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { disableHitBox, HitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
+import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
 import { createVector, reverseVector, vectorScalarProduct } from "../vector.js";
 import { createMovementVector, GameObject, GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
@@ -94,7 +95,8 @@ function createDynamicHazardMovingState(hazard: GameObject): State {
             startTime = currentGameTime;
         }
 
-        if ((currentGameTime - startTime) >= durationInMs) {
+        //if ((currentGameTime - startTime) >= durationInMs) {
+        if(hazard.hitSolid){
             movementVector = reverseVector(movementVector);
             startTime = currentGameTime;
         }

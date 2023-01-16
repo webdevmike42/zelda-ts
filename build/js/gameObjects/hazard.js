@@ -79,7 +79,8 @@ function createDynamicHazardMovingState(hazard) {
         if (startTime === -1) {
             startTime = currentGameTime;
         }
-        if ((currentGameTime - startTime) >= durationInMs) {
+        //if ((currentGameTime - startTime) >= durationInMs) {
+        if (hazard.hitSolid) {
             movementVector = reverseVector(movementVector);
             startTime = currentGameTime;
         }

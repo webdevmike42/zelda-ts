@@ -1,5 +1,5 @@
 import { Box, createBox } from "./box.js";
-import { GameObject, getBoundingBox } from "./gameObjects/gameObject.js";
+import { GameObject, GameObjectType, getBoundingBox } from "./gameObjects/gameObject.js";
 import { isSolid } from "./gameObjects/gameObjectFactory.js";
 import { getCurrentGameObjects } from "./screens.js";
 import { addTestResult } from "./tests.js";
@@ -56,6 +56,8 @@ export function getCollisionBox(gameObject: GameObject): Box {
 
 export function getResolvedSolidCollisionVector(gameObject: GameObject, diffVector: Vector): Vector {
     let collidedSolidObjects = getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(gameObject, diffVector), getCurrentGameObjects());
+    gameObject.hitSolid = (collidedSolidObjects.length > 0);
+   
     if (collidedSolidObjects.length === 0)
         return diffVector;
 

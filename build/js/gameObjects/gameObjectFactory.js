@@ -1,6 +1,6 @@
 //import { createActionbox, isActionboxEnabled } from "../actionBox.js";
 import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
-import { createBoxInFront, NULL_BOX } from "../box.js";
+import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { playerPickUpItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes } from "../hitbox.js";
@@ -30,7 +30,8 @@ export function createGameObject(type) {
         height: 0,
         collisionBox: Object.assign({}, NULL_BOX),
         isVisible: true,
-        ignoreConveyor: false
+        ignoreConveyor: false,
+        hitSolid: false
     };
 }
 export function createGlobalGameObject(type) {
@@ -68,25 +69,24 @@ export function drawGameObjects(ctx) {
     getCurrentVisibleGameObjects().forEach(gameObject => {
         const curAnimation = getCurrentAnimation(gameObject);
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
-        if (gameObject.type === GameObjectType.PLAYER) {
-            const player = gameObject;
-            ctx.fillStyle = "rgba(0, 0, 100, 0.5)";
-            const box = createBoxInFront(player, player.width, player.height);
-            ctx.fillRect(box.position.x, box.position.y, box.width, box.height);
-        }
         /*
-                if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
-                    //draw hurtbox
-                    ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
-                    ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
-                }
-        
-                if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
-                    //draw hitbox
-                    ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-                    ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-                }
-                */
+        if(gameObject.type === GameObjectType.PLAYER){
+            const player:Player = gameObject as Player;
+            ctx.fillStyle = "rgba(0, 0, 100, 0.5)";
+            const box : Box = createBoxInFront(player,player.width, player.height);
+            ctx.fillRect(box.position.x, box.position.y, box.width, box.height)
+        }
+        */
+        if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
+            //draw hurtbox
+            ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
+            ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height);
+        }
+        if (gameObject.hitBox /*&& isHitBoxEnabled(gameObject)*/) {
+            //draw hitbox
+            ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height);
+        }
     });
 }
 export function createSolidDummy(x, y, width, height) {

@@ -34,6 +34,7 @@ export interface GameObject {
     health?: number;
     maxHealth?: number;
     ignoreConveyor: boolean;
+    hitSolid:boolean;
 }
 
 export enum GameObjectType {

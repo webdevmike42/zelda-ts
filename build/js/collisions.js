@@ -38,6 +38,7 @@ export function getCollisionBox(gameObject) {
 }
 export function getResolvedSolidCollisionVector(gameObject, diffVector) {
     let collidedSolidObjects = getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(gameObject, diffVector), getCurrentGameObjects());
+    gameObject.hitSolid = (collidedSolidObjects.length > 0);
     if (collidedSolidObjects.length === 0)
         return diffVector;
     diffVector = getResolved8DirectionVector(getCornerCollisions(getProspectedCollisionBox(getCollisionBox(gameObject), diffVector), collidedSolidObjects), diffVector);
