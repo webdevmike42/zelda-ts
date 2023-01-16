@@ -49,3 +49,7 @@ export function get4DirectionVector(vector: Vector): Vector {
     //8 directions get resolved to x axis
     return createVector(vector.x, (vector.x !== 0) ? 0 : vector.y)
 }
+
+export function reverseVector(vector: Vector): Vector {
+    return vectorScalarProduct(-1, vector);
+}

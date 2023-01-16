@@ -2,9 +2,9 @@ import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { disableHitBox, HitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, State } from "../state.js";
-import { createVector } from "../vector.js";
-import { GameObject, GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setPosition } from "./gameObject.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
+import { createVector, reverseVector, vectorScalarProduct } from "../vector.js";
+import { createMovementVector, GameObject, GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
 
 
@@ -70,4 +70,40 @@ function createDestroyableStaticHazardDeathState(hazard: GameObject): State {
 
     };
     return state;
+}
+
+export function createDynamicHazard(x: number, y: number, width: number, height: number, damage: number): GameObject {
+    const hazard = createStaticHazard(x, y, width, height, damage);
+    addDynamicHazardStates(hazard);
+    addDynamicHazardAnimations(hazard);
+    switchToState(hazard, getState(hazard,CommonStateTypes.MOVING));
+    return hazard;
+}
+
+function addDynamicHazardStates(hazard: GameObject): void {
+    addState(hazard, CommonStateTypes.MOVING, createDynamicHazardMovingState(hazard));
+}
+
+function createDynamicHazardMovingState(hazard: GameObject): State {
+    let startTime: number = -1, durationInMs: number = 500;//, movingSpeed: number = 200;
+    let movementVector = createVector(100, 0);
+    const state = createEmptyState();
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+
+        if (startTime === -1) {
+            startTime = currentGameTime;
+        }
+
+        if ((currentGameTime - startTime) >= durationInMs) {
+            movementVector = reverseVector(movementVector);
+            startTime = currentGameTime;
+        }
+
+        setMovementVector(hazard, movementVector);
+    }
+    return state;
+}
+
+function addDynamicHazardAnimations(hazard:GameObject):void{
+    addAnimation(hazard, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(hazard), hazard.width, hazard.height, [{ srcX: 62, srcY: 0 }], 1, false),true);
 }

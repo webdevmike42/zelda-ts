@@ -1,48 +1,92 @@
+import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { createVector } from "../vector.js";
-import { GameObjectType, setBounds, setPosition } from "./gameObject.js";
+import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
+import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, switchToState } from "../state.js";
+import { createVector, reverseVector } from "../vector.js";
+import { GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
 export function createStaticHazard(x, y, width, height, damage) {
     const staticHazard = createGameObject(GameObjectType.HAZARD);
     setPosition(staticHazard, createVector(x, y));
     setBounds(staticHazard, width, height);
     setCollisionBoxFromBoundingBox(staticHazard);
+    setHitBoxFromBoundingBox(staticHazard, damage);
+    addAnimation(staticHazard, createAnimation("StaticHazardActive", "./resources/link.png", getPosition(staticHazard), staticHazard.width, staticHazard.height, [{ srcX: 180, srcY: 151 }], 1, false));
+    setCurrentAnimation(staticHazard, getAnimation(staticHazard, "StaticHazardActive"));
     return staticHazard;
 }
-/*
-function addTeleporterStates(teleporter: Hazard): void {
-    const activeState: State = createTeleporterActiveState(teleporter);
-    addState(teleporter, TeleporterStates.ACTIVE, activeState);
-    setDefaultState(teleporter, activeState);
+export function createDestroyableStaticHazard(x, y, width, height, damage, health) {
+    const hazard = createStaticHazard(x, y, width, height, damage);
+    setHurtBoxFromBoundingBox(hazard);
+    setHealth(hazard, health);
+    setMaxHealth(hazard, health);
+    addDestroyableHazardStates(hazard);
+    return hazard;
 }
-
-function addTeleporterAnimations(teleporter: Hazard): void {
-    teleporter.animations = new Map<string, Animation>();
-    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 30 }], 1, false));
-    setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
+function addDestroyableHazardStates(hazard) {
+    const hitState = createDestroyableStaticHazardHitState(hazard);
+    addState(hazard, CommonStateTypes.HIT, hitState);
+    addState(hazard, CommonStateTypes.DEATH, createDestroyableStaticHazardDeathState(hazard));
+    setDefaultState(hazard, hitState);
 }
-
-function createTeleporterActiveState(teleporter: Hazard): State {
-    const state: State = createEmptyState();
-    state.name = "teleporter active state";
+function createDestroyableStaticHazardHitState(hazard) {
+    const state = createEmptyState();
+    state.type = CommonStateTypes.HIT;
+    state.name = "hazard hit state";
     state.enter = () => {
-        console.log("enter: " + state.name)
-        setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
-    }
+        console.log("enter hazard hit state");
+        console.log(hazard.health);
+        const hitBox = hazard.stateArgs[0];
+        if (hazard.health) {
+            hazard.health -= hitBox.damage;
+        }
+    };
     state.update = () => {
-        getCollidingGameObjects(teleporter, getCollisionBox(teleporter), filterGameObjects(GameObjectType.PLAYER, getGameObjects()))
-            .forEach(gameObject => {
-                teleport(gameObject, teleporter.targetScreenId, teleporter.targetX, teleporter.targetY);
-            });
-    }
-    state.exit = () => {
-        console.log("exit " + state.name)
+        if (isGameObjectDead(hazard)) {
+            console.log("MUH");
+            setDesignatedState(hazard, getState(hazard, CommonStateTypes.DEATH));
+        }
     };
     return state;
 }
-
-export function teleport(gameObject: GameObject, targetScreenId: number, targetX: number | undefined, targetY: number | undefined) {
-    switchToScreen(targetScreenId);
-    setGameObjectPosition(gameObject, createVector(targetX || getPosition(gameObject).x, targetY || getPosition(gameObject).y));
+function createDestroyableStaticHazardDeathState(hazard) {
+    const state = createEmptyState();
+    state.type = CommonStateTypes.DEATH;
+    state.name = "hazard death state";
+    state.enter = () => {
+        console.log("enter hazard death state");
+        disableHurtBox(hazard);
+        disableHitBox(hazard);
+    };
+    return state;
 }
-*/ 
+export function createDynamicHazard(x, y, width, height, damage) {
+    const hazard = createStaticHazard(x, y, width, height, damage);
+    addDynamicHazardStates(hazard);
+    addDynamicHazardAnimations(hazard);
+    switchToState(hazard, getState(hazard, CommonStateTypes.MOVING));
+    return hazard;
+}
+function addDynamicHazardStates(hazard) {
+    addState(hazard, CommonStateTypes.MOVING, createDynamicHazardMovingState(hazard));
+}
+function createDynamicHazardMovingState(hazard) {
+    let startTime = -1, durationInMs = 500; //, movingSpeed: number = 200;
+    let movementVector = createVector(100, 0);
+    const state = createEmptyState();
+    state.update = (currentGameTime, timeSinceLastTick) => {
+        if (startTime === -1) {
+            startTime = currentGameTime;
+        }
+        if ((currentGameTime - startTime) >= durationInMs) {
+            movementVector = reverseVector(movementVector);
+            startTime = currentGameTime;
+        }
+        setMovementVector(hazard, movementVector);
+    };
+    return state;
+}
+function addDynamicHazardAnimations(hazard) {
+    addAnimation(hazard, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(hazard), hazard.width, hazard.height, [{ srcX: 62, srcY: 0 }], 1, false), true);
+}

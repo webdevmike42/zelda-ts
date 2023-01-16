@@ -26,6 +26,7 @@ function startNewGame(): void {
     if ((canvas = document.getElementById("myCanvas") as HTMLCanvasElement) !== null && (ctx = canvas.getContext("2d")) !== null) {
         initKeyBoardInputHandler();
         init(ctx, "./resources/tiles-overworld.png");
+        //init(ctx, "./resources/gfx/Overworld.png");
         loadHud(ctx, "./resources/pausescreen.png");
         createPlayer(100, 100);
         switchToScreen(START_SCREEN_ID);

@@ -1,14 +1,12 @@
-import { createConveyor } from "./gameObjects/conveyor.js";
 import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObjects.js";
 import { closeDoor, createDoor, openDoor } from "./gameObjects/door.js";
 import { createFloorSwitch } from "./gameObjects/floorSwitch.js";
 import { GameObjectType } from "./gameObjects/gameObject.js";
 import { filterGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { createSword } from "./gameObjects/item.js";
-import { createDestroyableStaticHazard } from "./gameObjects/staticHazard.js";
+import { createDestroyableStaticHazard, createDynamicHazard } from "./gameObjects/hazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, WORLD_MAP_COLS } from "./screens.js";
-import { createVector, normalizedVector } from "./vector.js";
 export function loadScreenById(screenId) {
     const screen = {
         id: screenId,
@@ -2312,12 +2310,13 @@ export function loadScreenById(screenId) {
                         closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
                 }),
                 createDoor(110, 120, 16, 16, false),
-                createConveyor(80, 140, 16, 16, normalizedVector(createVector(1, 0)), 10)
+                //createConveyor(80, 140, 16, 16, normalizedVector(createVector(1, 0)), 10)
             ];
             screen.persistedGameObjects = [
-            //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-            //createSword(80,130),
-            //createSmallKey(80,100),
+                createDynamicHazard(80, 140, 16, 16, 1)
+                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                //createSword(80,130),
+                //createSmallKey(80,100),
             ];
             break;
         case 120:
