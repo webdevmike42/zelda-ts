@@ -10,6 +10,10 @@ export var ItemType;
     ItemType[ItemType["SWORD"] = 0] = "SWORD";
     ItemType[ItemType["SMALL_KEY"] = 1] = "SMALL_KEY";
 })(ItemType || (ItemType = {}));
+var ItemState;
+(function (ItemState) {
+    ItemState["COLLECTED"] = "Collected";
+})(ItemState || (ItemState = {}));
 function createItem(x, y, width, height, itemType, isMajorItem, amount = 1, isCollected = false) {
     const item = createGameObject(GameObjectType.ITEM);
     setPosition(item, createVector(x, y));
@@ -50,32 +54,27 @@ export function createSword(x, y) {
     return sword;
 }
 function createItemIdleState(item) {
-    const state = createEmptyState();
+    const state = createEmptyState(CommonStateTypes.IDLE);
     state.name = "item idle state";
-    state.type = CommonStateTypes.IDLE;
     state.enter = () => {
-        console.log("enter: " + state.name);
         setCurrentAnimation(item, getAnimation(item, "idle"));
     };
     state.update = () => {
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }
 function createItemCollectedState(item) {
-    const state = createEmptyState();
+    const state = createEmptyState(ItemState.COLLECTED);
     state.name = "item picked up state";
     state.enter = () => {
-        console.log("enter: " + state.name);
         setVisible(item, false);
         setCurrentAnimation(item, getAnimation(item, "idle"));
     };
     state.update = () => {
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }

@@ -30,32 +30,27 @@ function addPushBoxAnimations(pushBox) {
     addAnimation(pushBox, createAnimation(PushBoxStates.PUSHED, "./resources/link.png", getPosition(pushBox), pushBox.width, pushBox.height, [{ srcX: 91, srcY: 0 }], 1, false));
 }
 function createPushBoxIdleState(pushBox) {
-    const state = createEmptyState();
+    const state = createEmptyState(CommonStateTypes.IDLE);
     state.name = "push box idle state";
-    state.type = CommonStateTypes.IDLE;
     state.enter = () => {
-        console.log("enter: " + state.name);
         setMovementVector(pushBox, Object.assign({}, NULL_VECTOR));
         setCurrentAnimation(pushBox, getAnimation(pushBox, CommonStateTypes.IDLE));
     };
     state.update = () => {
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }
 function createPushBoxPushedState(pushBox) {
     let pushingGameObject = null;
-    const state = createEmptyState();
+    const state = createEmptyState(PushBoxStates.PUSHED);
     state.name = "push box pushed state";
-    state.type = PushBoxStates.PUSHED;
     state.enter = () => {
         pushBox.ignoreConveyor = true;
         if (pushBox.stateArgs.length > 0) {
             pushingGameObject = pushBox.stateArgs[0];
         }
-        console.log("enter: " + state.name);
         setCurrentAnimation(pushBox, getAnimation(pushBox, PushBoxStates.PUSHED));
     };
     state.update = () => {
@@ -65,7 +60,6 @@ function createPushBoxPushedState(pushBox) {
     state.exit = () => {
         pushingGameObject = null;
         pushBox.ignoreConveyor = false;
-        console.log("exit " + state.name);
     };
     return state;
 }

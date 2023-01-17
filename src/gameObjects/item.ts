@@ -18,6 +18,10 @@ export interface Item extends GameObject {
     amount:number
 }
 
+enum ItemState {
+    COLLECTED = "Collected"
+}
+
 function createItem(x: number, y: number, width: number, height: number, itemType: ItemType, isMajorItem: boolean, amount:number = 1, isCollected = false): Item {
     const item: Item = createGameObject(GameObjectType.ITEM) as Item;
     setPosition(item, createVector(x, y));
@@ -64,33 +68,28 @@ export function createSword(x: number, y: number): Item {
 }
 
 function createItemIdleState(item: Item): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(CommonStateTypes.IDLE);
     state.name = "item idle state";
-    state.type = CommonStateTypes.IDLE;
     state.enter = () => {
-        console.log("enter: " + state.name)
         setCurrentAnimation(item, getAnimation(item, "idle"));
     }
     state.update = () => {
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }
 
 function createItemCollectedState(item: Item): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(ItemState.COLLECTED);
     state.name = "item picked up state";
     state.enter = () => {
-        console.log("enter: " + state.name)
         setVisible(item,false);
         setCurrentAnimation(item, getAnimation(item, "idle"));
     }
     state.update = () => {
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }

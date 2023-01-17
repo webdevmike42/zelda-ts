@@ -46,10 +46,9 @@ function addTeleporterAnimations(teleporter: Teleporter): void {
 }
 
 function createTeleporterActiveState(teleporter: Teleporter): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(TeleporterStates.ACTIVE);
     state.name = "teleporter active state";
     state.enter = () => {
-        console.log("enter: " + state.name)
         setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
     }
     state.update = () => {
@@ -59,7 +58,6 @@ function createTeleporterActiveState(teleporter: Teleporter): State {
             });
     }
     state.exit = () => {
-       // console.log("exit " + state.name)
     };
     return state;
 }

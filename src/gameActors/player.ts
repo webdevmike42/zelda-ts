@@ -64,8 +64,7 @@ function addPlayerStates(player: Player): void {
 }
 
 function createPlayerIdleState(player: Player): State {
-    const state: State = createEmptyState();
-    state.type = CommonStateTypes.IDLE;
+    const state: State = createEmptyState(CommonStateTypes.IDLE);
     state.name = "player idle state";
     state.enter = () => {
         updateCurrentAnimationBasedOnViewVector(player);
@@ -103,8 +102,7 @@ function createPlayerIdleState(player: Player): State {
 
 function createPlayerMovingState(player: Player): State {
     let movingSpeed = 100;
-    const state: State = createEmptyState();
-    state.type = CommonStateTypes.MOVING;
+    const state: State = createEmptyState(CommonStateTypes.MOVING);
     state.name = "player moving state";
     state.enter = () => {/*console.log("enter " + state.name)*/ };
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
@@ -130,8 +128,7 @@ function createPlayerActionState(player: Player): State {
     let startTime: number, duration: number = 50;
     let hitBox: HitBox;
 
-    const state: State = createEmptyState();
-    state.type = CommonStateTypes.ACTION;
+    const state: State = createEmptyState(CommonStateTypes.ACTION);
     state.name = "player action state";
     state.enter = () => {
         startTime = -1;
@@ -159,8 +156,7 @@ function createPlayerHitState(player: Player): State {
     let startTime = -1;
     let knockBackAngle: number, knockBackDurationInMs: number, knockBackVector: Vector;
 
-    const state: State = createEmptyState();
-    state.type = CommonStateTypes.HIT;
+    const state: State = createEmptyState(CommonStateTypes.HIT);
     state.name = "player hit state";
 
     state.enter = () => {
@@ -203,11 +199,10 @@ function createPlayerHitState(player: Player): State {
 }
 
 function createPlayerCollectmajorItemState(player: Player): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(PlayerStateTypes.CollectMajorItem);
     let majorItem: Item | null = null;
     let startTime: number = -1;
     let durationInMS: number = 2000;
-    state.type = PlayerStateTypes.CollectMajorItem;
     state.name = "player pick up major item state";
 
     state.enter = () => {
@@ -250,9 +245,8 @@ function createPlayerCollectmajorItemState(player: Player): State {
 function createPlayerPushingState(player: Player): State {
     let pushingSpeed: number = 50;
     let pushBox: GameObject;
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(PlayerStateTypes.PUSHING);
     state.name = "player pushing state";
-    state.type = PlayerStateTypes.PUSHING;
 
     state.enter = () => {
         console.log("enter " + state.name);

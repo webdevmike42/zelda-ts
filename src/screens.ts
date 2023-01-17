@@ -34,8 +34,6 @@ export function init(renderingContext: CanvasRenderingContext2D, imageUrl: strin
     tileMapImage.src = imageUrl;
     ctx = renderingContext;
     screens = getAllScreensAsArray();
-    console.clear();
-    console.log(screens[119])
 }
 
 export function renderTileMap(tileMapDataArray: number[][]) {

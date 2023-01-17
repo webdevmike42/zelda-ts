@@ -34,32 +34,28 @@ function addDoorAnimations(door) {
     addAnimation(door, createAnimation(DoorStates.CLOSED, "./resources/link.png", getPosition(door), door.width, door.height, [{ srcX: 30, srcY: 0 }], 1, false));
 }
 function createDoorOpenState(door) {
-    const state = createEmptyState();
+    const state = createEmptyState(DoorStates.OPEN);
     state.name = "door open state";
     state.enter = () => {
-        console.log("enter: " + state.name);
         setCurrentAnimation(door, getAnimation(door, DoorStates.OPEN));
         setSolid(door, false);
     };
     state.update = () => {
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }
 function createDoorClosedState(door) {
-    const state = createEmptyState();
+    const state = createEmptyState(DoorStates.CLOSED);
     state.name = "door closed state";
     state.enter = () => {
-        console.log("enter: " + state.name);
         setCurrentAnimation(door, getAnimation(door, DoorStates.CLOSED));
         setSolid(door, true);
     };
     state.update = () => {
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }

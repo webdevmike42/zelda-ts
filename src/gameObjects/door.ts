@@ -42,10 +42,9 @@ function addDoorAnimations(door: Door): void {
 }
 
 function createDoorOpenState(door: Door): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(DoorStates.OPEN);
     state.name = "door open state";
     state.enter = () => {
-        console.log("enter: " + state.name)
         setCurrentAnimation(door, getAnimation(door, DoorStates.OPEN));
         setSolid(door,false);
     }
@@ -53,16 +52,14 @@ function createDoorOpenState(door: Door): State {
         
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }
 
 function createDoorClosedState(door: Door): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(DoorStates.CLOSED);
     state.name = "door closed state";
     state.enter = () => {
-        console.log("enter: " + state.name)
         setCurrentAnimation(door, getAnimation(door, DoorStates.CLOSED));
         setSolid(door,true);
     }
@@ -70,7 +67,6 @@ function createDoorClosedState(door: Door): State {
         
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }

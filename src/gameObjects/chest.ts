@@ -45,35 +45,31 @@ function addChestAnimations(chest: Chest): void {
 }
 
 function createChestOpenState(chest: Chest): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(ChestStates.OPEN);
     state.name = "chest open state";
     state.enter = () => {
         chest.isOpen = true;
-        console.log("enter: " + state.name)
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.OPEN));
     }
     state.update = () => {
         
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }
 
 function createChestClosedState(chest: Chest): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(ChestStates.CLOSED);
     state.name = "chest closed state";
     state.enter = () => {
         chest.isOpen = false;
-        console.log("enter: " + state.name)
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.CLOSED));
     }
     state.update = () => {
         
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }

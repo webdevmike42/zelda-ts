@@ -34,32 +34,28 @@ function addChestAnimations(chest) {
     addAnimation(chest, createAnimation(ChestStates.CLOSED, "./resources/link.png", getPosition(chest), chest.width, chest.height, [{ srcX: 30, srcY: 0 }], 1, false));
 }
 function createChestOpenState(chest) {
-    const state = createEmptyState();
+    const state = createEmptyState(ChestStates.OPEN);
     state.name = "chest open state";
     state.enter = () => {
         chest.isOpen = true;
-        console.log("enter: " + state.name);
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.OPEN));
     };
     state.update = () => {
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }
 function createChestClosedState(chest) {
-    const state = createEmptyState();
+    const state = createEmptyState(ChestStates.CLOSED);
     state.name = "chest closed state";
     state.enter = () => {
         chest.isOpen = false;
-        console.log("enter: " + state.name);
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.CLOSED));
     };
     state.update = () => {
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }

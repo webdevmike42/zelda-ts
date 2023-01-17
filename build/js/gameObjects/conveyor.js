@@ -36,9 +36,8 @@ function addConveyorStates(conveyor) {
     setDefaultState(conveyor, activeState);
 }
 function createConveyorActiveState(conveyor) {
-    const state = createEmptyState();
+    const state = createEmptyState(ConveyorStates.ACTIVE);
     state.name = "conveyor active state";
-    state.type = ConveyorStates.ACTIVE;
     state.enter = () => {
         console.log("enter: " + state.name);
         setCurrentAnimation(conveyor, getAnimation(conveyor, "active"));
@@ -51,9 +50,8 @@ function createConveyorActiveState(conveyor) {
     return state;
 }
 function createConveyorInactiveState(conveyor) {
-    const state = createEmptyState();
+    const state = createEmptyState(ConveyorStates.INACTIVE);
     state.name = "conveyor inactive state";
-    state.type = ConveyorStates.INACTIVE;
     state.enter = () => {
         console.log("enter: " + state.name);
         setCurrentAnimation(conveyor, getAnimation(conveyor, "inactive"));

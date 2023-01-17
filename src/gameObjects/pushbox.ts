@@ -35,33 +35,28 @@ function addPushBoxAnimations(pushBox: GameObject): void {
 }
 
 function createPushBoxIdleState(pushBox: GameObject): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(CommonStateTypes.IDLE);
     state.name = "push box idle state";
-    state.type = CommonStateTypes.IDLE;
     state.enter = () => {
-        console.log("enter: " + state.name);
         setMovementVector(pushBox, { ...NULL_VECTOR });
         setCurrentAnimation(pushBox, getAnimation(pushBox, CommonStateTypes.IDLE));
     }
     state.update = () => {
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }
 
 function createPushBoxPushedState(pushBox: GameObject): State {
     let pushingGameObject: GameObject | null = null;
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(PushBoxStates.PUSHED);
     state.name = "push box pushed state";
-    state.type = PushBoxStates.PUSHED;
     state.enter = () => {
         pushBox.ignoreConveyor = true;
         if (pushBox.stateArgs.length > 0) {
             pushingGameObject = pushBox.stateArgs[0] as GameObject;
         }
-        console.log("enter: " + state.name)
         setCurrentAnimation(pushBox, getAnimation(pushBox, PushBoxStates.PUSHED));
     }
     state.update = () => {
@@ -71,7 +66,7 @@ function createPushBoxPushedState(pushBox: GameObject): State {
     state.exit = () => {
         pushingGameObject = null;
         pushBox.ignoreConveyor = false;
-        console.log("exit " + state.name)
+
     };
     return state;
 }

@@ -25,8 +25,8 @@ export const NULL_STATE: State = Object.freeze({
     exit: () => { console.log("exit null state") }
 });
 
-export function createEmptyState(): State {
-    return { ...NULL_STATE };
+export function createEmptyState(type?: string): State {
+    return { ...NULL_STATE, type: type || CommonStateTypes.NULL };
 }
 
 export function switchToState(gameObject: GameObject, newState: State) {

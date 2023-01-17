@@ -22,8 +22,6 @@ export function init(renderingContext, imageUrl) {
     tileMapImage.src = imageUrl;
     ctx = renderingContext;
     screens = getAllScreensAsArray();
-    console.clear();
-    console.log(screens[119]);
 }
 export function renderTileMap(tileMapDataArray) {
     for (let i = 0; i < tileMapDataArray.length; i++) {

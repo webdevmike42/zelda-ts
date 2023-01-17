@@ -31,12 +31,9 @@ function addDestroyableHazardStates(hazard) {
     setDefaultState(hazard, hitState);
 }
 function createDestroyableStaticHazardHitState(hazard) {
-    const state = createEmptyState();
-    state.type = CommonStateTypes.HIT;
+    const state = createEmptyState(CommonStateTypes.HIT);
     state.name = "hazard hit state";
     state.enter = () => {
-        console.log("enter hazard hit state");
-        console.log(hazard.health);
         const hitBox = hazard.stateArgs[0];
         if (hazard.health) {
             hazard.health -= hitBox.damage;
@@ -44,18 +41,15 @@ function createDestroyableStaticHazardHitState(hazard) {
     };
     state.update = () => {
         if (isGameObjectDead(hazard)) {
-            console.log("MUH");
             setDesignatedState(hazard, getState(hazard, CommonStateTypes.DEATH));
         }
     };
     return state;
 }
 function createDestroyableStaticHazardDeathState(hazard) {
-    const state = createEmptyState();
-    state.type = CommonStateTypes.DEATH;
+    const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "hazard death state";
     state.enter = () => {
-        console.log("enter hazard death state");
         disableHurtBox(hazard);
         disableHitBox(hazard);
     };
@@ -74,7 +68,7 @@ function addDynamicHazardStates(hazard) {
 function createDynamicHazardMovingState(hazard) {
     let startTime = -1, durationInMs = 500; //, movingSpeed: number = 200;
     let movementVector = createVector(100, 0);
-    const state = createEmptyState();
+    const state = createEmptyState(CommonStateTypes.MOVING);
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (startTime === -1) {
             startTime = currentGameTime;

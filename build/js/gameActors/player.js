@@ -50,8 +50,7 @@ function addPlayerStates(player) {
     setDefaultState(player, idleState);
 }
 function createPlayerIdleState(player) {
-    const state = createEmptyState();
-    state.type = CommonStateTypes.IDLE;
+    const state = createEmptyState(CommonStateTypes.IDLE);
     state.name = "player idle state";
     state.enter = () => {
         updateCurrentAnimationBasedOnViewVector(player);
@@ -88,8 +87,7 @@ function createPlayerIdleState(player) {
 }
 function createPlayerMovingState(player) {
     let movingSpeed = 100;
-    const state = createEmptyState();
-    state.type = CommonStateTypes.MOVING;
+    const state = createEmptyState(CommonStateTypes.MOVING);
     state.name = "player moving state";
     state.enter = () => { };
     state.update = (currentGameTime, timeSinceLastTick) => {
@@ -112,8 +110,7 @@ function createPlayerMovingState(player) {
 function createPlayerActionState(player) {
     let startTime, duration = 50;
     let hitBox;
-    const state = createEmptyState();
-    state.type = CommonStateTypes.ACTION;
+    const state = createEmptyState(CommonStateTypes.ACTION);
     state.name = "player action state";
     state.enter = () => {
         startTime = -1;
@@ -139,8 +136,7 @@ function createPlayerHitState(player) {
     let hitBox;
     let startTime = -1;
     let knockBackAngle, knockBackDurationInMs, knockBackVector;
-    const state = createEmptyState();
-    state.type = CommonStateTypes.HIT;
+    const state = createEmptyState(CommonStateTypes.HIT);
     state.name = "player hit state";
     state.enter = () => {
         console.log("enter player hit state");
@@ -171,11 +167,10 @@ function createPlayerHitState(player) {
     return state;
 }
 function createPlayerCollectmajorItemState(player) {
-    const state = createEmptyState();
+    const state = createEmptyState(PlayerStateTypes.CollectMajorItem);
     let majorItem = null;
     let startTime = -1;
     let durationInMS = 2000;
-    state.type = PlayerStateTypes.CollectMajorItem;
     state.name = "player pick up major item state";
     state.enter = () => {
         console.log("enter" + state.name);
@@ -212,9 +207,8 @@ function createPlayerCollectmajorItemState(player) {
 function createPlayerPushingState(player) {
     let pushingSpeed = 50;
     let pushBox;
-    const state = createEmptyState();
+    const state = createEmptyState(PlayerStateTypes.PUSHING);
     state.name = "player pushing state";
-    state.type = PlayerStateTypes.PUSHING;
     state.enter = () => {
         console.log("enter " + state.name);
         if (player.stateArgs.length > 0) {

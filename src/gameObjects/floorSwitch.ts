@@ -48,11 +48,9 @@ function addFloorSwitchAnimations(floorSwitch: FloorSwitch): void {
 }
 
 function createFloorSwitchPressedState(floorSwitch: FloorSwitch): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(FloorSwitchStates.PRESSED);
     state.name = "floor switch pressed state";
-    state.type = FloorSwitchStates.PRESSED;
     state.enter = () => {
-        console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.PRESSED));
         floorSwitch.onPressed(floorSwitch);
     }
@@ -61,17 +59,14 @@ function createFloorSwitchPressedState(floorSwitch: FloorSwitch): State {
             setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }
 
 function createFloorSwitchReleasedState(floorSwitch: FloorSwitch): State {
-    const state: State = createEmptyState();
+    const state: State = createEmptyState(FloorSwitchStates.RELEASED);
     state.name = "floor switch released state";
-    state.type = FloorSwitchStates.RELEASED;
     state.enter = () => {
-        console.log("enter: " + state.name)
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.RELEASED));
         floorSwitch.onReleased(floorSwitch);
     }
@@ -80,7 +75,6 @@ function createFloorSwitchReleasedState(floorSwitch: FloorSwitch): State {
             setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.PRESSED));
     }
     state.exit = () => {
-        console.log("exit " + state.name)
     };
     return state;
 }

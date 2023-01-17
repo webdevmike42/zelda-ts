@@ -36,11 +36,9 @@ function addFloorSwitchAnimations(floorSwitch) {
     addAnimation(floorSwitch, createAnimation(FloorSwitchStates.RELEASED, "./resources/tiles-overworld.png", getPosition(floorSwitch), floorSwitch.width, floorSwitch.height, [{ srcX: 1, srcY: 18 }], 1, false));
 }
 function createFloorSwitchPressedState(floorSwitch) {
-    const state = createEmptyState();
+    const state = createEmptyState(FloorSwitchStates.PRESSED);
     state.name = "floor switch pressed state";
-    state.type = FloorSwitchStates.PRESSED;
     state.enter = () => {
-        console.log("enter: " + state.name);
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.PRESSED));
         floorSwitch.onPressed(floorSwitch);
     };
@@ -49,16 +47,13 @@ function createFloorSwitchPressedState(floorSwitch) {
             setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }
 function createFloorSwitchReleasedState(floorSwitch) {
-    const state = createEmptyState();
+    const state = createEmptyState(FloorSwitchStates.RELEASED);
     state.name = "floor switch released state";
-    state.type = FloorSwitchStates.RELEASED;
     state.enter = () => {
-        console.log("enter: " + state.name);
         setCurrentAnimation(floorSwitch, getAnimation(floorSwitch, FloorSwitchStates.RELEASED));
         floorSwitch.onReleased(floorSwitch);
     };
@@ -67,7 +62,6 @@ function createFloorSwitchReleasedState(floorSwitch) {
             setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.PRESSED));
     };
     state.exit = () => {
-        console.log("exit " + state.name);
     };
     return state;
 }
