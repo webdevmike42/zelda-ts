@@ -1,12 +1,8 @@
 import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObjects.js";
-import { closeDoor, createDoor, openDoor } from "./gameObjects/door.js";
-import { createFloorSwitch } from "./gameObjects/floorSwitch.js";
-import { GameObjectType } from "./gameObjects/gameObject.js";
-import { filterGameObjects } from "./gameObjects/gameObjectFactory.js";
 import { createSword } from "./gameObjects/item.js";
-import { createDestroyableStaticHazard, createDynamicHazard } from "./gameObjects/hazard.js";
+import { createDynamicHazard } from "./gameObjects/hazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, WORLD_MAP_COLS } from "./screens.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
 export function loadScreenById(screenId) {
     const screen = {
         id: screenId,
@@ -2302,21 +2298,20 @@ export function loadScreenById(screenId) {
             ];
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
-                createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                /*
                 createFloorSwitch(120, 100, 16, 16, false, () => {
-                    openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
+                    openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }, () => {
                     if (filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects()).length > 0)
-                        closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0]);
+                        closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }),
-                createDoor(110, 120, 16, 16, false),
-                //createConveyor(80, 140, 16, 16, normalizedVector(createVector(1, 0)), 10)
+                */
+                //createDoor(70, 130, 16, 16, false)
+                //createStaticHazard(120,140,16,16,1)
             ];
             screen.persistedGameObjects = [
                 createDynamicHazard(120, 140, 16, 16, 1)
-                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                //createSword(80,130),
-                //createSmallKey(80,100),
             ];
             break;
         case 120:

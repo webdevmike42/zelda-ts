@@ -3,7 +3,7 @@ import { Animation, drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } f
 import { Box, createBoxInFront, NULL_BOX } from "../box.js";
 import { getCollidingSolidGameObjects, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { Player, playerPickUpItems } from "../gameActors/player.js";
-import { getCollidingHitBoxes, HitBox, isHitBoxEnabled } from "../hitbox.js";
+import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
@@ -20,6 +20,7 @@ let id: number = 0;
 export function createGameObject(type: GameObjectType): GameObject {
     return {
         id: id++,
+        name:"",
         type: type,
         states: new Map<string, State>(),
         currentState: { ...NULL_STATE },
@@ -72,6 +73,9 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
         moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
 
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
+
+        if(gameObject.type === GameObjectType.HAZARD)
+        console.log(gameObject.hitBox?.id);
     });
 }
 
@@ -100,7 +104,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
                     ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
                 }
         
-                if (gameObject.hitBox /*&& isHitBoxEnabled(gameObject)*/) {
+                if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
                     //draw hitbox
                     ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
                     ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)

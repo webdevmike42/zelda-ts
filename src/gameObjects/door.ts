@@ -17,6 +17,7 @@ enum DoorStates {
 
 export function createDoor(x: number, y: number, width: number, height: number, isOpen: boolean): Door {
     const door:Door = createGameObject(GameObjectType.DOOR) as Door;
+    console.log("createDoor")
     setPosition(door, createVector(x, y));
     setBounds(door, width, height);
     setSolid(door,!isOpen);

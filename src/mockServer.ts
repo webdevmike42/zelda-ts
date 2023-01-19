@@ -2381,22 +2381,22 @@ export function loadScreenById(screenId: number) {
 
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
-                createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                /*
                 createFloorSwitch(120, 100, 16, 16, false, () => {
                     openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }, () => {
                     if (filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects()).length > 0)
                         closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
                 }),
-                createDoor(110, 120, 16, 16, false),
-                //createConveyor(80, 140, 16, 16, normalizedVector(createVector(1, 0)), 10)
+                */
+                //createDoor(70, 130, 16, 16, false)
+                //createStaticHazard(120,140,16,16,1)
+                
             ];
 
             screen.persistedGameObjects = [
-                createDynamicHazard(120,140,16,16,1)
-                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-                //createSword(80,130),
-                //createSmallKey(80,100),
+                createDynamicHazard(120,140,16,16,1)  
             ];
 
             break;

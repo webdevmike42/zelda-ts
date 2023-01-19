@@ -20,9 +20,9 @@ export enum CommonStateTypes {
 export const NULL_STATE: State = Object.freeze({
     type: CommonStateTypes.NULL,
     name: "NULL_STATE",
-    enter: () => { console.log("enter null state") },
+    enter: () => { /*console.log("enter null state") */},
     update: () => { },
-    exit: () => { console.log("exit null state") }
+exit: () => { /*console.log("exit null state") */}
 });
 
 export function createEmptyState(type?: string): State {

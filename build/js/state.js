@@ -10,9 +10,9 @@ export var CommonStateTypes;
 export const NULL_STATE = Object.freeze({
     type: CommonStateTypes.NULL,
     name: "NULL_STATE",
-    enter: () => { console.log("enter null state"); },
+    enter: () => { },
     update: () => { },
-    exit: () => { console.log("exit null state"); }
+    exit: () => { }
 });
 export function createEmptyState(type) {
     return Object.assign(Object.assign({}, NULL_STATE), { type: type || CommonStateTypes.NULL });

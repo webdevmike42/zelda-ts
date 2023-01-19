@@ -1,6 +1,6 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
+import { disableHitBox, enableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, switchToState } from "../state.js";
 import { createVector, reverseVector } from "../vector.js";
@@ -14,6 +14,7 @@ export function createStaticHazard(x, y, width, height, damage) {
     setHitBoxFromBoundingBox(staticHazard, damage);
     addAnimation(staticHazard, createAnimation("StaticHazardActive", "./resources/link.png", getPosition(staticHazard), staticHazard.width, staticHazard.height, [{ srcX: 180, srcY: 151 }], 1, false));
     setCurrentAnimation(staticHazard, getAnimation(staticHazard, "StaticHazardActive"));
+    console.dir("createStaticHazard");
     return staticHazard;
 }
 export function createDestroyableStaticHazard(x, y, width, height, damage, health) {
@@ -56,10 +57,19 @@ function createDestroyableStaticHazardDeathState(hazard) {
     return state;
 }
 export function createDynamicHazard(x, y, width, height, damage) {
-    const hazard = createStaticHazard(x, y, width, height, damage);
+    const hazard = createGameObject(GameObjectType.HAZARD); //createStaticHazard(x, y, width, height, damage);
+    hazard.name = "hazard";
+    console.dir("createDynamicHazard");
+    //const staticHazard: GameObject = createGameObject(GameObjectType.HAZARD);
+    setPosition(hazard, createVector(x, y));
+    setBounds(hazard, width, height);
+    setCollisionBoxFromBoundingBox(hazard);
+    setHitBoxFromBoundingBox(hazard, damage);
+    addAnimation(hazard, createAnimation("hazardActive", "./resources/link.png", getPosition(hazard), hazard.width, hazard.height, [{ srcX: 195, srcY: 160 }], 1, false), true);
     addDynamicHazardStates(hazard);
-    addDynamicHazardAnimations(hazard);
+    //addDynamicHazardAnimations(hazard);
     switchToState(hazard, getState(hazard, CommonStateTypes.MOVING));
+    //disableHitBox(hazard);
     return hazard;
 }
 function addDynamicHazardStates(hazard) {
@@ -67,7 +77,7 @@ function addDynamicHazardStates(hazard) {
 }
 function createDynamicHazardMovingState(hazard) {
     let startTime = -1, durationInMs = 500; //, movingSpeed: number = 200;
-    let movementVector = createVector(100, 0);
+    let movementVector = createVector(-50, 0);
     const state = createEmptyState(CommonStateTypes.MOVING);
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (startTime === -1) {
@@ -75,6 +85,7 @@ function createDynamicHazardMovingState(hazard) {
         }
         //if ((currentGameTime - startTime) >= durationInMs) {
         if (hazard.hitSolid) {
+            enableHitBox(hazard);
             movementVector = reverseVector(movementVector);
             startTime = currentGameTime;
         }

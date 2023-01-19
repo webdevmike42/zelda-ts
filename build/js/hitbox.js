@@ -25,6 +25,10 @@ export function removeHitBox(hitBoxId) {
 export function removeAllHitBoxes() {
     hitBoxes = [];
 }
+export function setHitBoxesFromGameObjects(gameObjects) {
+    hitBoxes = (gameObjects.map((gameObject) => gameObject.hitBox)).filter(hitBox => hitBox !== undefined);
+    console.log(hitBoxes);
+}
 export function disableHitBox(gameObject) {
     if (gameObject.hitBox)
         gameObject.hitBox.enabled = false;

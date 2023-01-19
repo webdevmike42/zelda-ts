@@ -6,7 +6,7 @@ import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, Vecto
 import { getCollidingGameObjects, getCollisionBox, setCollisionBox } from "../collisions.js";
 import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { HitBox, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
+import { HitBox, hitBoxes, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { Item } from "../gameObjects/item.js";
 import { addToInventory } from "../inventory.js";
@@ -33,6 +33,7 @@ export interface Player extends GameObject {
 
 export function createPlayer(x: number, y: number): Player {
     player = createGlobalGameObject(GameObjectType.PLAYER) as Player;
+    player.name = "player";
     setPosition(player, createVector(x, y));
     setBounds(player, PLAYER_WIDTH, PLAYER_HEIGHT);
     addPlayerStates(player);
@@ -162,8 +163,11 @@ function createPlayerHitState(player: Player): State {
     state.enter = () => {
         console.log("enter player hit state")
         hitBox = player.stateArgs[0] as HitBox;
+        console.log(hitBox.owner)
+        
         if (player.health)
             player.health -= hitBox.damage;
+            console.log(hitBoxes.length)
         disableHurtBox(player);
 
         knockBackAngle = 90;

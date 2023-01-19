@@ -12,6 +12,7 @@ var DoorStates;
 ;
 export function createDoor(x, y, width, height, isOpen) {
     const door = createGameObject(GameObjectType.DOOR);
+    console.log("createDoor");
     setPosition(door, createVector(x, y));
     setBounds(door, width, height);
     setSolid(door, !isOpen);

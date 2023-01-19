@@ -76,8 +76,10 @@ export function moveGameObject(gameObject, moveBy) {
     setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
     if (gameObject.currentAnimation)
         gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
-    if (gameObject.hitBox)
+    if (gameObject.hitBox) {
+        //if(gameObject.type === GameObjectType.HAZARD) //console.log(gameObject.hitBox);
         gameObject.hitBox.position = vectorSum(gameObject.hitBox.position, moveBy);
+    }
     if (gameObject.hurtBox)
         gameObject.hurtBox.position = vectorSum(gameObject.hurtBox.position, moveBy);
     /*

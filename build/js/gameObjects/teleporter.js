@@ -11,6 +11,7 @@ var TeleporterStates;
 })(TeleporterStates || (TeleporterStates = {}));
 export function createTeleporterTrigger(x, y, width, height, targetScreenId, targetX, targetY) {
     const teleporter = createGameObject(GameObjectType.TELEPORTER); //addGameObject(GameObjectType.TELEPORTER) as Teleporter;
+    teleporter.name = "teleporterTrigger";
     setPosition(teleporter, createVector(x, y));
     setBounds(teleporter, width, height);
     addTeleporterStates(teleporter);

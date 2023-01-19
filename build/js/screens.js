@@ -1,7 +1,7 @@
 import { isVisible } from "./gameObjects/gameObject.js";
 import { getAllScreensAsArray, loadScreenById } from "./mockServer.js";
 import { createSolidDummy, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js";
-import { removeAllHitBoxes } from "./hitbox.js";
+import { removeAllHitBoxes, setHitBoxesFromGameObjects } from "./hitbox.js";
 export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
 export const WORLD_MAP_ROWS = 8;
@@ -47,6 +47,7 @@ function loadCurrentScreen(screenId) {
     currentGameObjects.push(...currentScreen.persistedGameObjects);
     currentGameObjects.push(...getGlobalGameObjects());
     currentGameObjects.push(...addCollisionObjectsFromTileMap(currentScreen.tileMap, currentScreen.collisionCells));
+    setHitBoxesFromGameObjects(currentGameObjects);
 }
 export function getCurrentGameObjects() {
     return currentGameObjects;

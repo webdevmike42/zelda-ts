@@ -18,6 +18,7 @@ enum TeleporterStates {
 
 export function createTeleporterTrigger(x: number, y: number, width: number, height: number, targetScreenId?: number, targetX?: number, targetY?: number): Teleporter {
     const teleporter: Teleporter = createGameObject(GameObjectType.TELEPORTER) as Teleporter;//addGameObject(GameObjectType.TELEPORTER) as Teleporter;
+    teleporter.name = "teleporterTrigger"
     setPosition(teleporter, createVector(x, y));
     setBounds(teleporter, width, height);
     addTeleporterStates(teleporter);

@@ -3,7 +3,7 @@ import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../ani
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { playerPickUpItems } from "../gameActors/player.js";
-import { getCollidingHitBoxes } from "../hitbox.js";
+import { getCollidingHitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, switchToState } from "../state.js";
@@ -17,6 +17,7 @@ let id = 0;
 export function createGameObject(type) {
     return {
         id: id++,
+        name: "",
         type: type,
         states: new Map(),
         currentState: Object.assign({}, NULL_STATE),
@@ -44,6 +45,7 @@ function addToGlobalList(gameObject) {
 }
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
+        var _a;
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
         if (isHurtBoxEnabled(gameObject)) {
             const chb = getCollidingHitBoxes(gameObject);
@@ -60,6 +62,8 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
         let resolvedMovementVector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
         moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
+        if (gameObject.type === GameObjectType.HAZARD)
+            console.log((_a = gameObject.hitBox) === null || _a === void 0 ? void 0 : _a.id);
     });
 }
 function updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick) {
@@ -82,7 +86,7 @@ export function drawGameObjects(ctx) {
             ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
             ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height);
         }
-        if (gameObject.hitBox /*&& isHitBoxEnabled(gameObject)*/) {
+        if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height);
