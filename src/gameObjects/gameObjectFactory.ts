@@ -73,9 +73,6 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
         moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
 
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
-
-        if(gameObject.type === GameObjectType.HAZARD)
-        console.log(gameObject.hitBox?.id);
     });
 }
 

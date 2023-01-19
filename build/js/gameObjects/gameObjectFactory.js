@@ -45,7 +45,6 @@ function addToGlobalList(gameObject) {
 }
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
-        var _a;
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
         if (isHurtBoxEnabled(gameObject)) {
             const chb = getCollidingHitBoxes(gameObject);
@@ -62,8 +61,6 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
         let resolvedMovementVector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
         moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
-        if (gameObject.type === GameObjectType.HAZARD)
-            console.log((_a = gameObject.hitBox) === null || _a === void 0 ? void 0 : _a.id);
     });
 }
 function updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick) {
