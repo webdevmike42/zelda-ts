@@ -40,7 +40,6 @@ function gameLoop(currentTime) {
         startTime = currentTime;
         timeOfLastTick = 0;
     }
-    //handlePlayerInput();
     if (readyForNextFrame(currentTime, timeOfLastTick, fps)) {
         updateGame(currentTime - startTime, currentTime - timeOfLastTick);
         drawGame();

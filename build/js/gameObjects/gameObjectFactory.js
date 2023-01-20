@@ -30,6 +30,8 @@ export function createGameObject(type) {
         width: 0,
         height: 0,
         collisionBox: Object.assign({}, NULL_BOX),
+        //collidingGameObjects: [],
+        //overallVector: { ...NULL_VECTOR },
         isVisible: true,
         ignoreConveyor: false,
         hitSolid: false
@@ -44,6 +46,20 @@ function addToGlobalList(gameObject) {
     globalGameObjects.push(gameObject);
 }
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
+    /*
+    getCurrentGameObjects().forEach(gameObject => {
+        gameObject.collidingGameObjects =
+            getCollidingGameObjects(
+                gameObject,
+                getProspectedCollisionBox(
+                    gameObject,
+                    getVectorFrameFraction(
+                        getOverallVector(gameObject),
+                        timeSinceLastTick)
+                ), getCurrentGameObjects()
+            );
+    })
+    */
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
         if (isHurtBoxEnabled(gameObject)) {
@@ -52,8 +68,9 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
                 setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
             }
         }
-        if (gameObject.type === GameObjectType.PLAYER)
+        if (gameObject.type === GameObjectType.PLAYER) {
             playerPickUpItems(getCollidingCollectableItems(gameObject));
+        }
         if (gameObject.designatedState !== null) {
             switchToState(gameObject, gameObject.designatedState);
             gameObject.designatedState = null;
@@ -63,6 +80,33 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
 }
+/*
+export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
+    getCurrentGameObjects().forEach(gameObject => {
+        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+
+        if (isHurtBoxEnabled(gameObject)) {
+            const chb: HitBox[] = getCollidingHitBoxes(gameObject);
+            if (chb.length > 0) {
+                setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
+            }
+        }
+
+        if (gameObject.type === GameObjectType.PLAYER)
+            playerPickUpItems(getCollidingCollectableItems(gameObject));
+
+
+        if (gameObject.designatedState !== null) {
+            switchToState(gameObject, gameObject.designatedState);
+            gameObject.designatedState = null;
+        }
+
+        let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
+        moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
+
+        updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
+    });
+}*/
 function updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick) {
     getCurrentState(gameObject).update(currentGameTime, timeSinceLastTick);
 }

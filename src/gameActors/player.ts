@@ -3,10 +3,10 @@ import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObject
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, switchToState, setDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
-import { getCollidingGameObjects, getCollisionBox, setCollisionBox } from "../collisions.js";
+import { getCollidingGameObjects, setCollisionBox } from "../collisions.js";
 import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { HitBox, hitBoxes, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
+import { HitBox, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { Item } from "../gameObjects/item.js";
 import { addToInventory } from "../inventory.js";
@@ -28,7 +28,9 @@ export interface Player extends GameObject {
     pickUpMajorItemState: State,
     keys: number,
     rupees: number,
-    bombs: number
+    bombs: number,
+    coolDownDurationInMS: number,
+    isCoolingDown: boolean
 }
 
 export function createPlayer(x: number, y: number): Player {
@@ -50,6 +52,8 @@ export function createPlayer(x: number, y: number): Player {
     player.rupees = 106;
     player.bombs = 17;
     player.ignoreConveyor = false;
+    player.coolDownDurationInMS = 500;
+    player.isCoolingDown = false;
     return player;
 }
 
@@ -71,7 +75,7 @@ function createPlayerIdleState(player: Player): State {
         updateCurrentAnimationBasedOnViewVector(player);
         setMovementVector(player, { ...NULL_VECTOR });
     }
-    state.update = () => {
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
         if (isAnyMovementKeyDown()) {
             setDesignatedState(player, getState(player, CommonStateTypes.MOVING));
             return;
@@ -94,7 +98,7 @@ function createPlayerIdleState(player: Player): State {
         if (isKeyPressed(KEYS.DASH)) {
             const majorItem: Item = filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects())[0] as Item;
             setGameObjectPosition(majorItem, createVector(majorItem.position.x, majorItem.position.y + 20))
-            console.log(getPosition(majorItem));
+            //console.log(getPosition(majorItem));
         }
     }
     state.exit = () => {/*console.log("exit " + state.name)*/ };
@@ -164,11 +168,9 @@ function createPlayerHitState(player: Player): State {
         console.log("enter player hit state")
         hitBox = player.stateArgs[0] as HitBox;
         console.log(hitBox.owner)
-        
+
         if (player.health)
             player.health -= hitBox.damage;
-            console.log(hitBoxes.length)
-        disableHurtBox(player);
 
         knockBackAngle = 90;
         knockBackDurationInMs = 50;
@@ -179,6 +181,8 @@ function createPlayerHitState(player: Player): State {
                     createVector(player.position.x - hitBox.position.x, player.position.y - hitBox.position.y)
                 )
             );
+        
+        startCoolDown(player, player.coolDownDurationInMS);
     };
 
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
@@ -196,7 +200,7 @@ function createPlayerHitState(player: Player): State {
     };
     state.exit = () => {
         startTime = -1;
-        enableHurtBox(player);
+        //enableHurtBox(player);
         console.log("exit hit state")
     };
     return state;
@@ -412,6 +416,17 @@ export function addKeys(amount: number): void {
     player.keys += amount;
 }
 
-export function getPlayer():Player{
+export function getPlayer(): Player {
     return player;
+}
+
+function startCoolDown(player: Player, coolDownDurationInMS:number): void {
+    player.isCoolingDown = true;
+    disableHurtBox(player);
+    setTimeout(stopCoolDown,coolDownDurationInMS,player);
+}
+
+function stopCoolDown(player: Player): void {
+    player.isCoolingDown = false;
+    enableHurtBox(player);
 }

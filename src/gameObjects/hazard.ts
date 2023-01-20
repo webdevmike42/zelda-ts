@@ -89,7 +89,7 @@ function addDynamicHazardStates(hazard: GameObject): void {
 }
 
 function createDynamicHazardMovingState(hazard: GameObject): State {
-    let movementVector = createVector(-50, 0);
+    let movementVector = createVector(-100, 0);
 
     const state = createEmptyState(CommonStateTypes.MOVING);
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
@@ -97,18 +97,7 @@ function createDynamicHazardMovingState(hazard: GameObject): State {
         
         if (hazard.hitSolid) {
             movementVector = reverseVector(movementVector);
-            console.log("hazard hit solid")
-        } 
-        /*else {
-            if (filterGameObjects(GameObjectType.PLAYER,
-                getCollidingGameObjects(hazard, getCollisionBox(hazard), getCurrentGameObjects())).length > 0 && isHurtBoxEnabled(getPlayer())) {
-                console.log("collided with player")
-                movementVector = reverseVector(movementVector);
-                disableHitBox(hazard);
-                disableHurtBox(getPlayer());
-            }
-        }
-        */
+        }        
 
         setMovementVector(hazard, movementVector);
     }

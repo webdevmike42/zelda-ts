@@ -1,7 +1,7 @@
 //import { createActionbox, isActionboxEnabled } from "../actionBox.js";
 import { Animation, drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { Box, createBoxInFront, NULL_BOX } from "../box.js";
-import { getCollidingSolidGameObjects, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox, getProspectedCollisionBox, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { Player, playerPickUpItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
@@ -20,7 +20,7 @@ let id: number = 0;
 export function createGameObject(type: GameObjectType): GameObject {
     return {
         id: id++,
-        name:"",
+        name: "",
         type: type,
         states: new Map<string, State>(),
         currentState: { ...NULL_STATE },
@@ -33,9 +33,11 @@ export function createGameObject(type: GameObjectType): GameObject {
         width: 0,
         height: 0,
         collisionBox: { ...NULL_BOX },
-        isVisible:true,
-        ignoreConveyor:false,
-        hitSolid:false
+        //collidingGameObjects: [],
+        //overallVector: { ...NULL_VECTOR },
+        isVisible: true,
+        ignoreConveyor: false,
+        hitSolid: false
     }
 }
 
@@ -49,6 +51,53 @@ function addToGlobalList(gameObject: GameObject): void {
     globalGameObjects.push(gameObject);
 }
 
+export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
+    /*
+    getCurrentGameObjects().forEach(gameObject => {
+        gameObject.collidingGameObjects =
+            getCollidingGameObjects(
+                gameObject,
+                getProspectedCollisionBox(
+                    gameObject,
+                    getVectorFrameFraction(
+                        getOverallVector(gameObject),
+                        timeSinceLastTick)
+                ), getCurrentGameObjects()
+            );
+    })
+    */
+
+    getCurrentGameObjects().forEach(gameObject => {
+
+        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+
+        if (isHurtBoxEnabled(gameObject)) {
+            const chb: HitBox[] = getCollidingHitBoxes(gameObject);
+            if (chb.length > 0) {
+                setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
+            }
+        }
+
+        if (gameObject.type === GameObjectType.PLAYER){
+            playerPickUpItems(getCollidingCollectableItems(gameObject));
+        }
+            
+
+
+        if (gameObject.designatedState !== null) {
+            switchToState(gameObject, gameObject.designatedState);
+            gameObject.designatedState = null;
+        }
+
+        let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
+        moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
+
+        updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
+    });
+}
+
+
+/*
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
@@ -74,7 +123,7 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
 
         updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
     });
-}
+}*/
 
 function updateGameObjectCurrentState(gameObject: GameObject, currentGameTime: number, timeSinceLastTick: number): void {
     getCurrentState(gameObject).update(currentGameTime, timeSinceLastTick);
@@ -94,19 +143,19 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
         }
         */
 
-        
-                if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
-                    //draw hurtbox
-                    ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
-                    ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
-                }
-        
-                if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
-                    //draw hitbox
-                    ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-                    ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-                }
-                
+
+        if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
+            //draw hurtbox
+            ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
+            ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
+        }
+
+        if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
+            //draw hitbox
+            ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
+        }
+
     });
 }
 

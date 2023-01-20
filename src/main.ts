@@ -45,8 +45,6 @@ function gameLoop(currentTime: number): void {
         timeOfLastTick = 0;
     }
 
-    //handlePlayerInput();
-
     if (readyForNextFrame(currentTime, timeOfLastTick, fps)) {
         updateGame(currentTime - startTime, currentTime - timeOfLastTick);
         drawGame();

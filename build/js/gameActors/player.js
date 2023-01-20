@@ -6,7 +6,7 @@ import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, vecto
 import { getCollidingGameObjects, setCollisionBox } from "../collisions.js";
 import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { hitBoxes, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
+import { removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addToInventory } from "../inventory.js";
 import { getCurrentGameObjects, removeGameObject } from "../screens.js";
@@ -38,6 +38,8 @@ export function createPlayer(x, y) {
     player.rupees = 106;
     player.bombs = 17;
     player.ignoreConveyor = false;
+    player.coolDownDurationInMS = 500;
+    player.isCoolingDown = false;
     return player;
 }
 function addPlayerStates(player) {
@@ -57,7 +59,7 @@ function createPlayerIdleState(player) {
         updateCurrentAnimationBasedOnViewVector(player);
         setMovementVector(player, Object.assign({}, NULL_VECTOR));
     };
-    state.update = () => {
+    state.update = (currentGameTime, timeSinceLastTick) => {
         if (isAnyMovementKeyDown()) {
             setDesignatedState(player, getState(player, CommonStateTypes.MOVING));
             return;
@@ -80,7 +82,7 @@ function createPlayerIdleState(player) {
         if (isKeyPressed(KEYS.DASH)) {
             const majorItem = filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects())[0];
             setGameObjectPosition(majorItem, createVector(majorItem.position.x, majorItem.position.y + 20));
-            console.log(getPosition(majorItem));
+            //console.log(getPosition(majorItem));
         }
     };
     state.exit = () => { };
@@ -145,12 +147,11 @@ function createPlayerHitState(player) {
         console.log(hitBox.owner);
         if (player.health)
             player.health -= hitBox.damage;
-        console.log(hitBoxes.length);
-        disableHurtBox(player);
         knockBackAngle = 90;
         knockBackDurationInMs = 50;
         knockBackVector =
             vectorScalarProduct(200, normalizedVector(createVector(player.position.x - hitBox.position.x, player.position.y - hitBox.position.y)));
+        startCoolDown(player, player.coolDownDurationInMS);
     };
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (startTime === -1) {
@@ -164,7 +165,7 @@ function createPlayerHitState(player) {
     };
     state.exit = () => {
         startTime = -1;
-        enableHurtBox(player);
+        //enableHurtBox(player);
         console.log("exit hit state");
     };
     return state;
@@ -357,4 +358,13 @@ export function addKeys(amount) {
 }
 export function getPlayer() {
     return player;
+}
+function startCoolDown(player, coolDownDurationInMS) {
+    player.isCoolingDown = true;
+    disableHurtBox(player);
+    setTimeout(stopCoolDown, coolDownDurationInMS, player);
+}
+function stopCoolDown(player) {
+    player.isCoolingDown = false;
+    enableHurtBox(player);
 }
