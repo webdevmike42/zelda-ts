@@ -2,7 +2,7 @@ import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, switchToState } from "../state.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, switchToState } from "../state.js";
 import { createVector, reverseVector } from "../vector.js";
 import { GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
@@ -34,16 +34,19 @@ function addDestroyableHazardStates(hazard) {
 }
 function createDestroyableStaticHazardHitState(hazard) {
     const state = createEmptyState(CommonStateTypes.HIT);
+    let hitBox;
     state.name = "hazard hit state";
+    state.init = (hitBoxArg) => {
+        hitBox = hitBoxArg;
+    };
     state.enter = () => {
-        const hitBox = hazard.stateArgs[0];
         if (hazard.health) {
             hazard.health -= hitBox.damage;
         }
     };
     state.update = () => {
         if (isGameObjectDead(hazard)) {
-            setDesignatedState(hazard, getState(hazard, CommonStateTypes.DEATH));
+            proposeDesignatedState(hazard, getState(hazard, CommonStateTypes.DEATH));
         }
     };
     return state;

@@ -1,5 +1,6 @@
 import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObjects.js";
 import { createSword } from "./gameObjects/item.js";
+import { createPushBox } from "./gameObjects/pushbox.js";
 import { createDynamicHazard } from "./gameObjects/hazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
@@ -2298,6 +2299,7 @@ export function loadScreenById(screenId) {
             ];
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
+                createPushBox(120, 80)
                 //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
                 /*
                 createFloorSwitch(120, 100, 16, 16, false, () => {

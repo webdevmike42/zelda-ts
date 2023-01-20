@@ -16,14 +16,11 @@ export interface GameObject {
     states: Map<string, State>;
     currentState: State;
     defaultState: State;
-    designatedState: State | null;
-    stateArgs: any[]
+    designatedState: State;
     position: Vector;
     width: number,
     height: number,
     collisionBox: Box;
-    //overallVector:Vector;
-    //collidingGameObjects:GameObject[];
     animations?: Map<string, Animation>;
     currentAnimation?: Animation,
     defaultAnimation?: Animation,

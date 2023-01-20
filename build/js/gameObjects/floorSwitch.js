@@ -1,7 +1,7 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCurrentGameObjects } from "../screens.js";
-import { addState, createEmptyState, getState, setDefaultState, setDesignatedState, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
@@ -44,7 +44,7 @@ function createFloorSwitchPressedState(floorSwitch) {
     };
     state.update = () => {
         if (!floorSwitch.staysPressed && getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length === 0)
-            setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
+            proposeDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
     };
     state.exit = () => {
     };
@@ -59,7 +59,7 @@ function createFloorSwitchReleasedState(floorSwitch) {
     };
     state.update = () => {
         if (getCollidingGameObjects(floorSwitch, getCollisionBox(floorSwitch), getCurrentGameObjects()).length > 0)
-            setDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.PRESSED));
+            proposeDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.PRESSED));
     };
     state.exit = () => {
     };

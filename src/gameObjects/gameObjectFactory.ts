@@ -1,12 +1,11 @@
-//import { createActionbox, isActionboxEnabled } from "../actionBox.js";
 import { Animation, drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { Box, createBoxInFront, NULL_BOX } from "../box.js";
 import { getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox, getProspectedCollisionBox, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { Player, playerPickUpItems } from "../gameActors/player.js";
+import { Player, playerCollectItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
-import { CommonStateTypes, getCurrentState, getState, NULL_STATE, setDesignatedState, State, switchToState } from "../state.js";
+import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_STATE, proposeDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector } from "../vector.js";
@@ -25,16 +24,13 @@ export function createGameObject(type: GameObjectType): GameObject {
         states: new Map<string, State>(),
         currentState: { ...NULL_STATE },
         defaultState: { ...NULL_STATE },
-        designatedState: null,
-        stateArgs: [],
+        designatedState: { ...NULL_STATE },
         viewVector: { ...NULL_VECTOR },
         movementVector: { ...NULL_VECTOR },
         position: { ...NULL_VECTOR },
         width: 0,
         height: 0,
         collisionBox: { ...NULL_BOX },
-        //collidingGameObjects: [],
-        //overallVector: { ...NULL_VECTOR },
         isVisible: true,
         ignoreConveyor: false,
         hitSolid: false
@@ -52,21 +48,6 @@ function addToGlobalList(gameObject: GameObject): void {
 }
 
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
-    /*
-    getCurrentGameObjects().forEach(gameObject => {
-        gameObject.collidingGameObjects =
-            getCollidingGameObjects(
-                gameObject,
-                getProspectedCollisionBox(
-                    gameObject,
-                    getVectorFrameFraction(
-                        getOverallVector(gameObject),
-                        timeSinceLastTick)
-                ), getCurrentGameObjects()
-            );
-    })
-    */
-
     getCurrentGameObjects().forEach(gameObject => {
 
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
@@ -74,19 +55,16 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
         if (isHurtBoxEnabled(gameObject)) {
             const chb: HitBox[] = getCollidingHitBoxes(gameObject);
             if (chb.length > 0) {
-                setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
+                proposeDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb[0]);
             }
         }
 
         if (gameObject.type === GameObjectType.PLAYER){
-            playerPickUpItems(getCollidingCollectableItems(gameObject));
+            playerCollectItems(getCollidingCollectableItems(gameObject));
         }
-            
 
-
-        if (gameObject.designatedState !== null) {
+        if(hasDesignatedState(gameObject)){
             switchToState(gameObject, gameObject.designatedState);
-            gameObject.designatedState = null;
         }
 
         let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);

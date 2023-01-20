@@ -1,6 +1,6 @@
 import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
-import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, switchToState, setDesignatedState, getCurrentState } from "../state.js";
+import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, switchToState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { getCollidingGameObjects, setCollisionBox } from "../collisions.js";
@@ -46,7 +46,7 @@ export function createPlayer(x: number, y: number): Player {
     setHealth(player, 8);
     setMaxHealth(player, 8);
     setViewVector(player, PLAYER_DEFAULT_VIEW_VECTOR);
-    switchToState(player, getState(player, CommonStateTypes.IDLE));
+    proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE), ["bliblablub"]);
     player.hasSword = false;
     player.keys = 2;
     player.rupees = 106;
@@ -77,21 +77,21 @@ function createPlayerIdleState(player: Player): State {
     }
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
         if (isAnyMovementKeyDown()) {
-            setDesignatedState(player, getState(player, CommonStateTypes.MOVING));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.MOVING));
             return;
         }
         if (isKeyPressed(KEYS.ACTION)) {
             const collidingObjects: GameObject[] = getCollidingGameObjects(player, createBoxInFront(player, player.width, player.height), getCurrentGameObjects())
             const pushBoxes: GameObject[] = filterGameObjects(GameObjectType.PUSH_BOX, collidingObjects);
             if (pushBoxes.length > 0)
-                setDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), [pushBoxes[0]]);
+                proposeDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), pushBoxes[0]);
             else {
                 const closedChests: Chest[] = (filterGameObjects(GameObjectType.CHEST, collidingObjects) as Chest[])
                     .filter(chest => !chest.isOpen);
                 if (closedChests.length > 0)
                     openChest(closedChests[0]);
                 else
-                    setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+                    proposeDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             }
             return;
         }
@@ -112,11 +112,11 @@ function createPlayerMovingState(player: Player): State {
     state.enter = () => {/*console.log("enter " + state.name)*/ };
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
         if (isKeyPressed(KEYS.ACTION)) {
-            setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             return;
         }
         if (!isAnyMovementKeyDown()) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
             return;
         }
         const movementVector = createMovementVector();
@@ -146,7 +146,7 @@ function createPlayerActionState(player: Player): State {
             startTime = currentGameTime;
         }
         if ((currentGameTime - startTime) >= duration) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
             return;
         }
     }
@@ -159,21 +159,18 @@ function createPlayerActionState(player: Player): State {
 function createPlayerHitState(player: Player): State {
     let hitBox: HitBox;
     let startTime = -1;
-    let knockBackAngle: number, knockBackDurationInMs: number, knockBackVector: Vector;
+    let knockBackDurationInMs: number = 50, knockBackVector: Vector;
 
     const state: State = createEmptyState(CommonStateTypes.HIT);
     state.name = "player hit state";
 
-    state.enter = () => {
-        console.log("enter player hit state")
-        hitBox = player.stateArgs[0] as HitBox;
-        console.log(hitBox.owner)
+    state.init = (hb: HitBox) => {
+        hitBox = hb;
+    }
 
+    state.enter = () => {
         if (player.health)
             player.health -= hitBox.damage;
-
-        knockBackAngle = 90;
-        knockBackDurationInMs = 50;
 
         knockBackVector =
             vectorScalarProduct(200,
@@ -181,7 +178,7 @@ function createPlayerHitState(player: Player): State {
                     createVector(player.position.x - hitBox.position.x, player.position.y - hitBox.position.y)
                 )
             );
-        
+
         startCoolDown(player, player.coolDownDurationInMS);
     };
 
@@ -192,15 +189,13 @@ function createPlayerHitState(player: Player): State {
         }
 
         if ((currentGameTime - startTime) >= knockBackDurationInMs) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE))
-            //return GameObjectModule.isDead(player) ? player.getState(PLAYER_STATES.DEATH) : player.getState(PLAYER_STATES.IDLE);
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE), "return from hit state")
         }
 
         setMovementVector(player, knockBackVector);
     };
     state.exit = () => {
         startTime = -1;
-        //enableHurtBox(player);
         console.log("exit hit state")
     };
     return state;
@@ -208,44 +203,31 @@ function createPlayerHitState(player: Player): State {
 
 function createPlayerCollectmajorItemState(player: Player): State {
     const state: State = createEmptyState(PlayerStateTypes.CollectMajorItem);
-    let majorItem: Item | null = null;
-    let startTime: number = -1;
+    let majorItem: Item;
     let durationInMS: number = 2000;
-    state.name = "player pick up major item state";
+    state.name = "player collect major item state";
+
+    state.init = (majorItemArg: Item) => {
+        majorItem = majorItemArg;
+    }
 
     state.enter = () => {
-        console.log("enter" + state.name)
-        if (player.stateArgs.length > 0) {
-            player.ignoreConveyor = true;
-            majorItem = player.stateArgs[0];
-
-            if (majorItem) {
-                majorItem.isCollected = true;
-                disableHurtBox(player);
-                setMovementVector(player, { ...NULL_VECTOR });
-                setCurrentAnimation(player, getAnimation(player, PlayerStateTypes.CollectMajorItem));
-                setGameObjectPosition(majorItem, vectorSum(getPosition(player), createVector(player.width / 2 - majorItem.width / 4, -majorItem.height)));
-            }
-        }
+        player.ignoreConveyor = true;
+        majorItem.isCollected = true;
+        disableHurtBox(player);
+        setMovementVector(player, { ...NULL_VECTOR });
+        setCurrentAnimation(player, getAnimation(player, PlayerStateTypes.CollectMajorItem));
+        setGameObjectPosition(majorItem, vectorSum(getPosition(player), createVector(player.width / 2 - majorItem.width / 4, -majorItem.height)));
+        setTimeout(proposeDesignatedState, durationInMS, player, getState(player, CommonStateTypes.IDLE));
     }
 
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-        if (startTime === -1) {
-            startTime = currentGameTime;
-        }
-
-        if (majorItem === null || (currentGameTime - startTime) >= durationInMS) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
-            return;
-        }
     };
 
     state.exit = () => {
         enableHurtBox(player);
-        startTime = -1;
         player.ignoreConveyor = false;
-        if (majorItem)
-            setVisible(majorItem, false);
+        setVisible(majorItem, false);
     }
     return state;
 }
@@ -256,16 +238,16 @@ function createPlayerPushingState(player: Player): State {
     const state: State = createEmptyState(PlayerStateTypes.PUSHING);
     state.name = "player pushing state";
 
+    state.init = (pushBoxArg: GameObject) => {
+        pushBox = pushBoxArg;
+    }
+
     state.enter = () => {
-        console.log("enter " + state.name);
-        if (player.stateArgs.length > 0) {
-            pushBox = player.stateArgs[0];
-            grabPushBox(pushBox, player);
-        }
+        grabPushBox(pushBox, player);
     }
     state.update = () => {
         if (!isKeyDown(KEYS.ACTION)) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
         }
 
         const movementVector = createMovementVector();
@@ -275,53 +257,9 @@ function createPlayerPushingState(player: Player): State {
     }
 
     state.exit = () => {
-        console.log("exit " + state.name);
-        if (pushBox)
-            releasePushBox(pushBox);
+        releasePushBox(pushBox);
     }
-    /*
-    const pushingState = {
-        name: "playerPushing",
-        type: PLAYER_STATES.PUSHING,
-        handleInput: function (input) {
-            if (!input[KEYS.ACTION].down) {
-                return player.getState(PLAYER_STATES.IDLE);
-            }
-
-            const movementVector = getMovementVector(player);
-
-            if (input[KEYS.UP].down) {
-                addVector(movementVector, { x: 0, y: -1 });
-            }
-            if (input[KEYS.LEFT].down) {
-                addVector(movementVector, { x: -1, y: 0 });
-            }
-            if (input[KEYS.DOWN].down) {
-                addVector(movementVector, { x: 0, y: 1 });
-            }
-            if (input[KEYS.RIGHT].down) {
-                addVector(movementVector, { x: 1, y: 0 });
-            }
-
-            setViewVector(player, { ...movementVector });
-            multiplyVector(movementVector, player.movement.speed);
-        },
-
-        enter: function () {
-            switchAnimation(player, "PlayerIdle", player.directionCode);
-            grabPushBox(pushBox, player);
-        },
-
-        update: function (currentGameTime, timeSinceLastTick) {
-
-        },
-
-        exit: function () {
-            releasePushBox(pushBox);
-        }
-    }
-    */
-
+   
     return state;
 }
 
@@ -399,7 +337,7 @@ export function isPlayerDead(): boolean {
     return isGameObjectDead(player);
 }
 
-export function playerPickUpItems(items: Item[]): void {
+export function playerCollectItems(items: Item[]): void {
     items.filter(item => !item.isMajorItem).forEach(minorItem => {
         addToInventory(player, minorItem);
         removeGameObject(minorItem);
@@ -408,7 +346,7 @@ export function playerPickUpItems(items: Item[]): void {
     const majorItems: Item[] = items.filter(item => item.isMajorItem);
 
     if (majorItems.length > 0) {
-        setDesignatedState(player, getState(player, PlayerStateTypes.CollectMajorItem), [majorItems[0]]);
+        proposeDesignatedState(player, getState(player, PlayerStateTypes.CollectMajorItem), majorItems[0]);
     }
 }
 
@@ -420,10 +358,10 @@ export function getPlayer(): Player {
     return player;
 }
 
-function startCoolDown(player: Player, coolDownDurationInMS:number): void {
+function startCoolDown(player: Player, coolDownDurationInMS: number): void {
     player.isCoolingDown = true;
     disableHurtBox(player);
-    setTimeout(stopCoolDown,coolDownDurationInMS,player);
+    setTimeout(stopCoolDown, coolDownDurationInMS, player);
 }
 
 function stopCoolDown(player: Player): void {

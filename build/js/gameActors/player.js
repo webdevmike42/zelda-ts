@@ -1,6 +1,6 @@
 import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
-import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, switchToState, setDesignatedState, getCurrentState } from "../state.js";
+import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, vectorScalarProduct, vectorSum } from "../vector.js";
 import { getCollidingGameObjects, setCollisionBox } from "../collisions.js";
@@ -32,7 +32,7 @@ export function createPlayer(x, y) {
     setHealth(player, 8);
     setMaxHealth(player, 8);
     setViewVector(player, PLAYER_DEFAULT_VIEW_VECTOR);
-    switchToState(player, getState(player, CommonStateTypes.IDLE));
+    proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE), ["bliblablub"]);
     player.hasSword = false;
     player.keys = 2;
     player.rupees = 106;
@@ -61,21 +61,21 @@ function createPlayerIdleState(player) {
     };
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (isAnyMovementKeyDown()) {
-            setDesignatedState(player, getState(player, CommonStateTypes.MOVING));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.MOVING));
             return;
         }
         if (isKeyPressed(KEYS.ACTION)) {
             const collidingObjects = getCollidingGameObjects(player, createBoxInFront(player, player.width, player.height), getCurrentGameObjects());
             const pushBoxes = filterGameObjects(GameObjectType.PUSH_BOX, collidingObjects);
             if (pushBoxes.length > 0)
-                setDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), [pushBoxes[0]]);
+                proposeDesignatedState(player, getState(player, PlayerStateTypes.PUSHING), pushBoxes[0]);
             else {
                 const closedChests = filterGameObjects(GameObjectType.CHEST, collidingObjects)
                     .filter(chest => !chest.isOpen);
                 if (closedChests.length > 0)
                     openChest(closedChests[0]);
                 else
-                    setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+                    proposeDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             }
             return;
         }
@@ -95,11 +95,11 @@ function createPlayerMovingState(player) {
     state.enter = () => { };
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (isKeyPressed(KEYS.ACTION)) {
-            setDesignatedState(player, getState(player, CommonStateTypes.ACTION));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             return;
         }
         if (!isAnyMovementKeyDown()) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
             return;
         }
         const movementVector = createMovementVector();
@@ -126,7 +126,7 @@ function createPlayerActionState(player) {
             startTime = currentGameTime;
         }
         if ((currentGameTime - startTime) >= duration) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
             return;
         }
     };
@@ -138,17 +138,15 @@ function createPlayerActionState(player) {
 function createPlayerHitState(player) {
     let hitBox;
     let startTime = -1;
-    let knockBackAngle, knockBackDurationInMs, knockBackVector;
+    let knockBackDurationInMs = 50, knockBackVector;
     const state = createEmptyState(CommonStateTypes.HIT);
     state.name = "player hit state";
+    state.init = (hb) => {
+        hitBox = hb;
+    };
     state.enter = () => {
-        console.log("enter player hit state");
-        hitBox = player.stateArgs[0];
-        console.log(hitBox.owner);
         if (player.health)
             player.health -= hitBox.damage;
-        knockBackAngle = 90;
-        knockBackDurationInMs = 50;
         knockBackVector =
             vectorScalarProduct(200, normalizedVector(createVector(player.position.x - hitBox.position.x, player.position.y - hitBox.position.y)));
         startCoolDown(player, player.coolDownDurationInMS);
@@ -158,53 +156,39 @@ function createPlayerHitState(player) {
             startTime = currentGameTime;
         }
         if ((currentGameTime - startTime) >= knockBackDurationInMs) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
-            //return GameObjectModule.isDead(player) ? player.getState(PLAYER_STATES.DEATH) : player.getState(PLAYER_STATES.IDLE);
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE), "return from hit state");
         }
         setMovementVector(player, knockBackVector);
     };
     state.exit = () => {
         startTime = -1;
-        //enableHurtBox(player);
         console.log("exit hit state");
     };
     return state;
 }
 function createPlayerCollectmajorItemState(player) {
     const state = createEmptyState(PlayerStateTypes.CollectMajorItem);
-    let majorItem = null;
-    let startTime = -1;
+    let majorItem;
     let durationInMS = 2000;
-    state.name = "player pick up major item state";
+    state.name = "player collect major item state";
+    state.init = (majorItemArg) => {
+        majorItem = majorItemArg;
+    };
     state.enter = () => {
-        console.log("enter" + state.name);
-        if (player.stateArgs.length > 0) {
-            player.ignoreConveyor = true;
-            majorItem = player.stateArgs[0];
-            if (majorItem) {
-                majorItem.isCollected = true;
-                disableHurtBox(player);
-                setMovementVector(player, Object.assign({}, NULL_VECTOR));
-                setCurrentAnimation(player, getAnimation(player, PlayerStateTypes.CollectMajorItem));
-                setGameObjectPosition(majorItem, vectorSum(getPosition(player), createVector(player.width / 2 - majorItem.width / 4, -majorItem.height)));
-            }
-        }
+        player.ignoreConveyor = true;
+        majorItem.isCollected = true;
+        disableHurtBox(player);
+        setMovementVector(player, Object.assign({}, NULL_VECTOR));
+        setCurrentAnimation(player, getAnimation(player, PlayerStateTypes.CollectMajorItem));
+        setGameObjectPosition(majorItem, vectorSum(getPosition(player), createVector(player.width / 2 - majorItem.width / 4, -majorItem.height)));
+        setTimeout(proposeDesignatedState, durationInMS, player, getState(player, CommonStateTypes.IDLE));
     };
     state.update = (currentGameTime, timeSinceLastTick) => {
-        if (startTime === -1) {
-            startTime = currentGameTime;
-        }
-        if (majorItem === null || (currentGameTime - startTime) >= durationInMS) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
-            return;
-        }
     };
     state.exit = () => {
         enableHurtBox(player);
-        startTime = -1;
         player.ignoreConveyor = false;
-        if (majorItem)
-            setVisible(majorItem, false);
+        setVisible(majorItem, false);
     };
     return state;
 }
@@ -213,16 +197,15 @@ function createPlayerPushingState(player) {
     let pushBox;
     const state = createEmptyState(PlayerStateTypes.PUSHING);
     state.name = "player pushing state";
+    state.init = (pushBoxArg) => {
+        pushBox = pushBoxArg;
+    };
     state.enter = () => {
-        console.log("enter " + state.name);
-        if (player.stateArgs.length > 0) {
-            pushBox = player.stateArgs[0];
-            grabPushBox(pushBox, player);
-        }
+        grabPushBox(pushBox, player);
     };
     state.update = () => {
         if (!isKeyDown(KEYS.ACTION)) {
-            setDesignatedState(player, getState(player, CommonStateTypes.IDLE));
+            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
         }
         const movementVector = createMovementVector();
         setMovementVector(player, vectorScalarProduct(pushingSpeed, movementVector));
@@ -230,52 +213,8 @@ function createPlayerPushingState(player) {
         updateCurrentAnimationBasedOnViewVector(player);
     };
     state.exit = () => {
-        console.log("exit " + state.name);
-        if (pushBox)
-            releasePushBox(pushBox);
+        releasePushBox(pushBox);
     };
-    /*
-    const pushingState = {
-        name: "playerPushing",
-        type: PLAYER_STATES.PUSHING,
-        handleInput: function (input) {
-            if (!input[KEYS.ACTION].down) {
-                return player.getState(PLAYER_STATES.IDLE);
-            }
-
-            const movementVector = getMovementVector(player);
-
-            if (input[KEYS.UP].down) {
-                addVector(movementVector, { x: 0, y: -1 });
-            }
-            if (input[KEYS.LEFT].down) {
-                addVector(movementVector, { x: -1, y: 0 });
-            }
-            if (input[KEYS.DOWN].down) {
-                addVector(movementVector, { x: 0, y: 1 });
-            }
-            if (input[KEYS.RIGHT].down) {
-                addVector(movementVector, { x: 1, y: 0 });
-            }
-
-            setViewVector(player, { ...movementVector });
-            multiplyVector(movementVector, player.movement.speed);
-        },
-
-        enter: function () {
-            switchAnimation(player, "PlayerIdle", player.directionCode);
-            grabPushBox(pushBox, player);
-        },
-
-        update: function (currentGameTime, timeSinceLastTick) {
-
-        },
-
-        exit: function () {
-            releasePushBox(pushBox);
-        }
-    }
-    */
     return state;
 }
 function addPlayerAnimations(player) {
@@ -343,14 +282,14 @@ function getDirectionNameFromViewVector(viewVector) {
 export function isPlayerDead() {
     return isGameObjectDead(player);
 }
-export function playerPickUpItems(items) {
+export function playerCollectItems(items) {
     items.filter(item => !item.isMajorItem).forEach(minorItem => {
         addToInventory(player, minorItem);
         removeGameObject(minorItem);
     });
     const majorItems = items.filter(item => item.isMajorItem);
     if (majorItems.length > 0) {
-        setDesignatedState(player, getState(player, PlayerStateTypes.CollectMajorItem), [majorItems[0]]);
+        proposeDesignatedState(player, getState(player, PlayerStateTypes.CollectMajorItem), majorItems[0]);
     }
 }
 export function addKeys(amount) {

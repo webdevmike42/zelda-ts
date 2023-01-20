@@ -10,6 +10,7 @@ export var CommonStateTypes;
 export const NULL_STATE = Object.freeze({
     type: CommonStateTypes.NULL,
     name: "NULL_STATE",
+    init: () => { },
     enter: () => { },
     update: () => { },
     exit: () => { }
@@ -21,7 +22,7 @@ export function switchToState(gameObject, newState) {
     exitCurrentState(gameObject);
     setCurrentState(gameObject, newState);
     enterCurrentState(gameObject);
-    //handleGameObjectInput(gameObject);//otherwise, on transition from idle to moving state, very short input will be ignored
+    clearDesignatedState(gameObject);
 }
 export function addState(gameObject, key, newState) {
     gameObject.states.set(key, newState);
@@ -44,11 +45,21 @@ function enterCurrentState(gameObject) {
 function exitCurrentState(gameObject) {
     gameObject.currentState.exit();
 }
-export function setDesignatedState(gameObject, designatedState, designatedStateArgs) {
-    if (gameObject.designatedState === null) {
-        gameObject.designatedState = designatedState;
-        gameObject.stateArgs = designatedStateArgs || [];
-    }
+export function proposeDesignatedState(gameObject, designatedState, ...designatedStateArgs) {
+    setDesignatedState(gameObject, designatedState);
+    initState(designatedState, ...designatedStateArgs);
+}
+function setDesignatedState(gameObject, designatedState) {
+    gameObject.designatedState = designatedState;
+}
+function clearDesignatedState(gameObject) {
+    setDesignatedState(gameObject, Object.assign({}, NULL_STATE));
+}
+export function hasDesignatedState(gameObject) {
+    return gameObject.designatedState.type !== CommonStateTypes.NULL;
+}
+export function initState(state, ...stateArgs) {
+    state.init(...stateArgs);
 }
 export function testState() {
     /*

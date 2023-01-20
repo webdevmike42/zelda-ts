@@ -1,7 +1,7 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { EMPTY_SCREEN_ID, getCurrentGameObjects, switchToScreen } from "../screens.js";
-import { addState, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
 import { createGameObject, setSolid } from "./gameObjectFactory.js";
@@ -74,9 +74,9 @@ function createDoorClosedState(door: Door): State {
 
 
 export function openDoor(door:Door):void{
-    setDesignatedState(door,getState(door, DoorStates.OPEN));
+    proposeDesignatedState(door,getState(door, DoorStates.OPEN));
 }
 
 export function closeDoor(door:Door):void{
-    setDesignatedState(door,getState(door, DoorStates.CLOSED));
+    proposeDesignatedState(door,getState(door, DoorStates.CLOSED));
 }

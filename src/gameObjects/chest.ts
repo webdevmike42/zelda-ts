@@ -1,6 +1,6 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { addState, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
 import { createGameObject, setSolid } from "./gameObjectFactory.js";
@@ -76,9 +76,9 @@ function createChestClosedState(chest: Chest): State {
 
 
 export function openChest(chest:Chest):void{
-    setDesignatedState(chest,getState(chest, ChestStates.OPEN));
+    proposeDesignatedState(chest,getState(chest, ChestStates.OPEN));
 }
 
 export function closeChest(chest:Chest):void{
-    setDesignatedState(chest,getState(chest, ChestStates.CLOSED));
+    proposeDesignatedState(chest,getState(chest, ChestStates.CLOSED));
 }

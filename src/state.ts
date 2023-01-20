@@ -3,6 +3,7 @@ import { GameObject } from "./gameObjects/gameObject.js";
 export interface State {
     type: string,
     name: string,
+    init: Function,
     enter: Function,
     update: Function,
     exit: Function
@@ -20,9 +21,10 @@ export enum CommonStateTypes {
 export const NULL_STATE: State = Object.freeze({
     type: CommonStateTypes.NULL,
     name: "NULL_STATE",
-    enter: () => { /*console.log("enter null state") */},
+    init: () => { },
+    enter: () => { /*console.log("enter null state") */ },
     update: () => { },
-exit: () => { /*console.log("exit null state") */}
+    exit: () => { /*console.log("exit null state") */ }
 });
 
 export function createEmptyState(type?: string): State {
@@ -33,7 +35,7 @@ export function switchToState(gameObject: GameObject, newState: State) {
     exitCurrentState(gameObject);
     setCurrentState(gameObject, newState);
     enterCurrentState(gameObject);
-    //handleGameObjectInput(gameObject);//otherwise, on transition from idle to moving state, very short input will be ignored
+    clearDesignatedState(gameObject);
 }
 
 export function addState(gameObject: GameObject, key: string, newState: State): void {
@@ -64,11 +66,25 @@ function exitCurrentState(gameObject: GameObject): void {
     gameObject.currentState.exit();
 }
 
-export function setDesignatedState(gameObject: GameObject, designatedState: State | null, designatedStateArgs?: any[]): void {
-    if (gameObject.designatedState === null) {
-        gameObject.designatedState = designatedState;
-        gameObject.stateArgs = designatedStateArgs || [];
-    }
+export function proposeDesignatedState(gameObject: GameObject, designatedState: State, ...designatedStateArgs: any): void {
+    setDesignatedState(gameObject, designatedState);
+    initState(designatedState, ...designatedStateArgs);
+}
+
+function setDesignatedState(gameObject: GameObject, designatedState: State): void {
+    gameObject.designatedState = designatedState;
+}
+
+function clearDesignatedState(gameObject: GameObject): void {
+    setDesignatedState(gameObject, { ...NULL_STATE });
+}
+
+export function hasDesignatedState(gameObject: GameObject): boolean {
+    return gameObject.designatedState.type !== CommonStateTypes.NULL;
+}
+
+export function initState(state: State, ...stateArgs:any): void {
+    state.init(...stateArgs);
 }
 
 export function testState() {

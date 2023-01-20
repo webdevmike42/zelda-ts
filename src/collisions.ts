@@ -57,9 +57,7 @@ export function getCollisionBox(gameObject: GameObject): Box {
 export function getResolvedSolidCollisionVector(gameObject: GameObject, diffVector: Vector): Vector {
     let collidedSolidObjects = getCollidingSolidGameObjects(gameObject, getProspectedCollisionBox(gameObject, diffVector), getCurrentGameObjects());
     gameObject.hitSolid = (collidedSolidObjects.length > 0);
-    if(gameObject.type === GameObjectType.HAZARD&& collidedSolidObjects.length > 0)
-    console.log(collidedSolidObjects)
-   
+    
     if (collidedSolidObjects.length === 0)
         return diffVector;
 

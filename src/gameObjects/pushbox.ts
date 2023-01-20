@@ -1,10 +1,10 @@
 
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
-import { createVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObject, GameObjectType, getOverallVector, getPosition, setBounds, setMovementVector, setPosition } from "./gameObject.js";
-import { createGameObject, setSolid } from "./gameObjectFactory.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
+import { createVector, NULL_VECTOR } from "../vector.js";
+import { GameObject, GameObjectType, getOverallVector, getPosition, setBounds, setMovementVector, setPosition } from "./gameObject.js";
+import { createGameObject } from "./gameObjectFactory.js";
 
 enum PushBoxStates {
     PUSHED = "Pushed"
@@ -17,7 +17,6 @@ export function createPushBox(x: number, y: number): GameObject {
     addPushBoxStates(pushBox);
     addPushBoxAnimations(pushBox);
     setCollisionBoxFromBoundingBox(pushBox);
-    //setSolid(pushBox);
     switchToState(pushBox, getState(pushBox, CommonStateTypes.IDLE));
     return pushBox;
 }
@@ -49,32 +48,30 @@ function createPushBoxIdleState(pushBox: GameObject): State {
 }
 
 function createPushBoxPushedState(pushBox: GameObject): State {
-    let pushingGameObject: GameObject | null = null;
+    let pushingGameObject: GameObject;
     const state: State = createEmptyState(PushBoxStates.PUSHED);
     state.name = "push box pushed state";
+
+    state.init = (pushingGameObjectArg: GameObject) => {
+        pushingGameObject = pushingGameObjectArg;
+    }
     state.enter = () => {
         pushBox.ignoreConveyor = true;
-        if (pushBox.stateArgs.length > 0) {
-            pushingGameObject = pushBox.stateArgs[0] as GameObject;
-        }
         setCurrentAnimation(pushBox, getAnimation(pushBox, PushBoxStates.PUSHED));
     }
     state.update = () => {
-        if (pushingGameObject !== null)
-            setMovementVector(pushBox, getOverallVector(pushingGameObject));
+        setMovementVector(pushBox, getOverallVector(pushingGameObject));
     }
     state.exit = () => {
-        pushingGameObject = null;
         pushBox.ignoreConveyor = false;
-
     };
     return state;
 }
 
 export function grabPushBox(pushBox: GameObject, pushingGameObject: GameObject): void {
-    setDesignatedState(pushBox, getState(pushBox, PushBoxStates.PUSHED), [pushingGameObject]);
+    proposeDesignatedState(pushBox, getState(pushBox, PushBoxStates.PUSHED), pushingGameObject);
 }
 
 export function releasePushBox(pushBox: GameObject): void {
-    setDesignatedState(pushBox, getState(pushBox, CommonStateTypes.IDLE));
+    proposeDesignatedState(pushBox, getState(pushBox, CommonStateTypes.IDLE));
 }

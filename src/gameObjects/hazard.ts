@@ -4,7 +4,7 @@ import { getPlayer } from "../gameActors/player.js";
 import { disableHitBox, enableHitBox, HitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { getCurrentGameObjects } from "../screens.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, setDesignatedState, State, switchToState } from "../state.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
 import { createVector, reverseVector, vectorScalarProduct } from "../vector.js";
 import { createMovementVector, GameObject, GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
@@ -42,17 +42,21 @@ function addDestroyableHazardStates(hazard: GameObject): void {
 
 function createDestroyableStaticHazardHitState(hazard: GameObject): State {
     const state: State = createEmptyState(CommonStateTypes.HIT);
+    let hitBox: HitBox;
     state.name = "hazard hit state";
 
+    state.init = (hitBoxArg: HitBox) => {
+        hitBox = hitBoxArg;
+    }
+
     state.enter = () => {
-        const hitBox: HitBox = hazard.stateArgs[0] as HitBox;
         if (hazard.health) {
             hazard.health -= hitBox.damage;
         }
     };
     state.update = () => {
         if (isGameObjectDead(hazard)) {
-            setDesignatedState(hazard, getState(hazard, CommonStateTypes.DEATH));
+            proposeDesignatedState(hazard, getState(hazard, CommonStateTypes.DEATH));
         }
     }
     return state;
@@ -94,10 +98,10 @@ function createDynamicHazardMovingState(hazard: GameObject): State {
     const state = createEmptyState(CommonStateTypes.MOVING);
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
 
-        
+
         if (hazard.hitSolid) {
             movementVector = reverseVector(movementVector);
-        }        
+        }
 
         setMovementVector(hazard, movementVector);
     }
