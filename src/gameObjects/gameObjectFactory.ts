@@ -132,8 +132,8 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-        }
-*/
+        }*/
+
     });
 }
 

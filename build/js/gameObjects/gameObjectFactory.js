@@ -115,8 +115,7 @@ export function drawGameObjects(ctx) {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-        }
-*/
+        }*/
     });
 }
 export function createSolidDummy(x, y, width, height) {

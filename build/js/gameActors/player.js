@@ -111,24 +111,17 @@ function createPlayerMovingState(player) {
     return state;
 }
 function createPlayerActionState(player) {
-    let startTime, duration = 50;
+    let durationInMS = 50;
     let hitBox;
     const state = createEmptyState(CommonStateTypes.ACTION);
     state.name = "player action state";
     state.enter = () => {
-        startTime = -1;
         updateCurrentAnimationBasedOnViewVector(player);
         setMovementVector(player, Object.assign({}, NULL_VECTOR));
         hitBox = spawnHitBoxInFrontOf(player, 1);
+        setTimeout(proposeDesignatedState, durationInMS, player, getState(player, CommonStateTypes.IDLE));
     };
     state.update = (currentGameTime, timeSinceLastTick) => {
-        if (startTime === -1) {
-            startTime = currentGameTime;
-        }
-        if ((currentGameTime - startTime) >= duration) {
-            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
-            return;
-        }
     };
     state.exit = () => {
         removeHitBox(hitBox.id);

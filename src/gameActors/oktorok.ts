@@ -1,14 +1,14 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getPlayer } from "../gameActors/player.js";
-import { disableHitBox, enableHitBox, HitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
+import { disableHitBox, enableHitBox, HitBox, removeHitBox, setHitBoxFromBoundingBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState, getCurrentState } from "../state.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, reverseVector, Vector, vectorScalarProduct } from "../vector.js";
 import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
 import { createGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { isAnyMovementKeyDown, isKeyPressed, KEYS } from "../KeyboardInputHandler.js";
+import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS } from "../KeyboardInputHandler.js";
 import { Item } from "../gameObjects/item.js";
 
 const OKTOROK_WIDTH = 16, OKTOROK_HEIGHT = 16, OKTOROK_HEALTH = 1, OKTOROK_DAMAGE = 1;
@@ -35,6 +35,7 @@ function addOktorokStates(oktorok: GameObject): void {
     addState(oktorok, CommonStateTypes.MOVING, createOktorokMovingState(oktorok));
     addState(oktorok, CommonStateTypes.HIT, createOktorokHitState(oktorok));
     addState(oktorok, CommonStateTypes.DEATH, createOktorokDeathState(oktorok));
+    addState(oktorok,CommonStateTypes.ACTION, createOktorokActionState(oktorok));
     setDefaultState(oktorok, idleState);
 }
 
@@ -51,14 +52,35 @@ function createOktorokIdleState(oktorok: GameObject): State {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.MOVING));
             return;
         }
-        /*
-        if (isKeyPressed(KEYS.ACTION)) {
+        
+        if (isKeyDown(KEYS.ACTION)) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
             return;
         }
-        */
     }
     state.exit = () => { };
+    return state;
+}
+
+function createOktorokMovingState(oktorok: GameObject): State {
+    let movingSpeed:number = 100;
+    const state = createEmptyState(CommonStateTypes.MOVING);
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+        if (isKeyDown(KEYS.ACTION)) {
+            proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
+            return;
+        }
+        
+        if (!isAnyMovementKeyDown()) {
+            proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.IDLE));
+            return;
+        }
+
+        const movementVector = createMovementVector();
+        setMovementVector(oktorok, vectorScalarProduct(movingSpeed, movementVector));
+        setViewVector(oktorok, get4DirectionVector(movementVector));
+        updateCurrentAnimationBasedOnViewVector(oktorok);
+    }
     return state;
 }
 
@@ -98,36 +120,30 @@ function createOktorokDeathState(oktorok: GameObject): State {
     return state;
 }
 
-function createOktorokMovingState(oktorok: GameObject): State {
-    let movingSpeed:number = 100;
-    const state = createEmptyState(CommonStateTypes.MOVING);
-    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-        /*
-        if (oktorok.hitSolid) {
-            movementVector = reverseVector(movementVector);
-        }*/
-/*
-        if (isKeyPressed(KEYS.ACTION)) {
-            proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
-            return;
-        }
-        */
-        if (!isAnyMovementKeyDown()) {
-            proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.IDLE));
-            return;
-        }
+function createOktorokActionState(oktorok: GameObject): State {
+    let durationInMS: number = 50;
+    let hitBox: HitBox;
 
-        const movementVector = createMovementVector();
-        setMovementVector(oktorok, vectorScalarProduct(movingSpeed, movementVector));
-        setViewVector(oktorok, get4DirectionVector(movementVector));
+    const state: State = createEmptyState(CommonStateTypes.ACTION);
+    state.name = "oktorok action state";
+    state.enter = () => {
+        console.log("enter " + state.name)
         updateCurrentAnimationBasedOnViewVector(oktorok);
+        setMovementVector(oktorok, { ...NULL_VECTOR });
+        hitBox = spawnHitBoxInFrontOf(oktorok, 1);
+        setTimeout(proposeDesignatedState, durationInMS, oktorok, getState(oktorok, CommonStateTypes.IDLE));
     }
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+    }
+    state.exit = () => {
+        removeHitBox(hitBox.id)
+    };
     return state;
 }
-
 function addRedOktorokAnimations(oktorok: GameObject): void {
     addOktorokIdleAnimations(oktorok);
     addOktorokMovingAnimations(oktorok);
+    addOktorokActionAnimations(oktorok);
 }
 
 function addOktorokIdleAnimations(oktorok: GameObject): void {
@@ -143,6 +159,14 @@ function addOktorokMovingAnimations(oktorok: GameObject): void {
     addAnimation(oktorok, createAnimation(CommonStateTypes.MOVING + "Down", "./resources/enemies.png", getPosition(oktorok), oktorok.width, oktorok.height, [{ srcX: 0, srcY: 0 },{ srcX: 0, srcY: 30 }], 6, true));
     addAnimation(oktorok, createAnimation(CommonStateTypes.MOVING + "Right", "./resources/enemies.png", getPosition(oktorok), oktorok.width, oktorok.height, [{ srcX: 90, srcY: 0 },{ srcX: 90, srcY: 30 }], 6, true));
 }
+
+function addOktorokActionAnimations(oktorok: GameObject): void {
+    addAnimation(oktorok, createAnimation(CommonStateTypes.ACTION + "Up", "./resources/enemies.png", getPosition(oktorok), oktorok.width, oktorok.height, [{ srcX: 60, srcY: 30 }], 1, false));
+    addAnimation(oktorok, createAnimation(CommonStateTypes.ACTION + "Left", "./resources/enemies.png", getPosition(oktorok), oktorok.width, oktorok.height, [{ srcX: 30, srcY: 30 }], 1, false));
+    addAnimation(oktorok, createAnimation(CommonStateTypes.ACTION + "Down", "./resources/enemies.png", getPosition(oktorok), oktorok.width, oktorok.height, [{ srcX: 0, srcY: 30 }], 1, false));
+    addAnimation(oktorok, createAnimation(CommonStateTypes.ACTION + "Right", "./resources/enemies.png", getPosition(oktorok), oktorok.width, oktorok.height, [{ srcX: 90, srcY: 30 }], 1, false));
+}
+
 
 function updateCurrentAnimationBasedOnViewVector(oktorok: GameObject): void {
     let currentAnimation = getCurrentAnimation(oktorok);

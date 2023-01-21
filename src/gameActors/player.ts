@@ -130,25 +130,18 @@ function createPlayerMovingState(player: Player): State {
 }
 
 function createPlayerActionState(player: Player): State {
-    let startTime: number, duration: number = 50;
+    let durationInMS: number = 50;
     let hitBox: HitBox;
 
     const state: State = createEmptyState(CommonStateTypes.ACTION);
     state.name = "player action state";
     state.enter = () => {
-        startTime = -1;
         updateCurrentAnimationBasedOnViewVector(player);
         setMovementVector(player, { ...NULL_VECTOR });
         hitBox = spawnHitBoxInFrontOf(player, 1);
+        setTimeout(proposeDesignatedState, durationInMS, player, getState(player, CommonStateTypes.IDLE));
     }
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-        if (startTime === -1) {
-            startTime = currentGameTime;
-        }
-        if ((currentGameTime - startTime) >= duration) {
-            proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
-            return;
-        }
     }
     state.exit = () => {
         removeHitBox(hitBox.id)
