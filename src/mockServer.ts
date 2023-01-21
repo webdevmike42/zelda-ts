@@ -10,6 +10,7 @@ import { createPushBox } from "./gameObjects/pushbox.js";
 import { createDestroyableStaticHazard, createDynamicHazard, createStaticHazard } from "./gameObjects/hazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, Screen, WORLD_MAP_COLS } from "./screens.js";
+import { createRedOktorok } from "./gameActors/oktorok.js";
 
 export function loadScreenById(screenId: number) {
     const screen: Screen = {
@@ -2381,7 +2382,8 @@ export function loadScreenById(screenId: number) {
 
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
-                createPushBox(120,80)
+                createPushBox(120,80),
+                createRedOktorok(100,130)
                 //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
                 /*
                 createFloorSwitch(120, 100, 16, 16, false, () => {
@@ -2397,7 +2399,6 @@ export function loadScreenById(screenId: number) {
             ];
 
             screen.persistedGameObjects = [
-                createDynamicHazard(120,140,16,16,1)  
             ];
 
             break;

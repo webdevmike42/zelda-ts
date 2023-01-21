@@ -119,7 +119,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             const box : Box = createBoxInFront(player,player.width, player.height);
             ctx.fillRect(box.position.x, box.position.y, box.width, box.height)
         }
-        */
+        
 
 
         if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
@@ -133,7 +133,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
         }
-
+*/
     });
 }
 

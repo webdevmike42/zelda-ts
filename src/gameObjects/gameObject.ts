@@ -48,7 +48,8 @@ export enum GameObjectType {
     DOOR,
     PUSH_BOX,
     CHEST,
-    MISC
+    MISC,
+    OKTOROK
 }
 
 export function getCurrentAnimation(gameObject: GameObject): Animation {
