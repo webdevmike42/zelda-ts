@@ -38,7 +38,6 @@ function createOktorokIdleState(oktorok) {
     const state = createEmptyState(CommonStateTypes.IDLE);
     state.name = "oktorok idle state";
     state.enter = () => {
-        disableHurtBox(oktorok);
         updateCurrentAnimationBasedOnViewVector(oktorok);
         setMovementVector(oktorok, Object.assign({}, NULL_VECTOR));
     };
@@ -105,6 +104,7 @@ function createOktorokDeathState(oktorok) {
     state.name = "oktorok death state";
     state.enter = () => {
         console.log("enter redOktorok death");
+        setMovementVector(oktorok, Object.assign({}, NULL_VECTOR));
         disableHurtBox(oktorok);
         disableHitBox(oktorok);
     };

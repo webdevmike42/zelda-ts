@@ -126,7 +126,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
         }
         
 
-*/
+
         if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
             //draw hurtbox
             ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
@@ -138,7 +138,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
         }
-
+*/
     });
 }
 
