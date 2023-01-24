@@ -19,6 +19,7 @@ export var GameObjectType;
     GameObjectType[GameObjectType["CHEST"] = 9] = "CHEST";
     GameObjectType[GameObjectType["MISC"] = 10] = "MISC";
     GameObjectType[GameObjectType["OKTOROK"] = 11] = "OKTOROK";
+    GameObjectType[GameObjectType["BULLET"] = 12] = "BULLET";
 })(GameObjectType || (GameObjectType = {}));
 export function getCurrentAnimation(gameObject) {
     return gameObject.currentAnimation || gameObject.defaultAnimation || Object.assign({}, NULL_ANIMATION);

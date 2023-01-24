@@ -6,6 +6,7 @@ import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../
 import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
 import { createVector, reverseVector, vectorScalarProduct } from "../vector.js";
+import { Bullet } from "./bullet.js";
 import { createMovementVector, GameObject, GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
 
@@ -84,7 +85,8 @@ export function createDynamicHazard(x: number, y: number, width: number, height:
     addAnimation(hazard, createAnimation("hazardActive", "./resources/link.png", getPosition(hazard), hazard.width, hazard.height, [{ srcX: 195, srcY: 160 }], 1, false), true);
     addDynamicHazardStates(hazard);
     //addDynamicHazardAnimations(hazard);
-    switchToState(hazard, getState(hazard, CommonStateTypes.MOVING));
+    //switchToState(hazard, getState(hazard, CommonStateTypes.MOVING));
+    proposeDesignatedState(hazard,getState(hazard, CommonStateTypes.MOVING))
     return hazard;
 }
 
@@ -97,7 +99,6 @@ function createDynamicHazardMovingState(hazard: GameObject): State {
 
     const state = createEmptyState(CommonStateTypes.MOVING);
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-
 
         if (hazard.hitSolid) {
             movementVector = reverseVector(movementVector);

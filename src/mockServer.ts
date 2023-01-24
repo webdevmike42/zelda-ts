@@ -1,16 +1,14 @@
-import { createChest } from "./gameObjects/chest.js";
-import { createConveyor } from "./gameObjects/conveyor.js";
 import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObjects.js";
-import { closeDoor, createDoor, Door, openDoor } from "./gameObjects/door.js";
-import { setFloorSwitchPressedCallback, setFloorSwitchReleasedCallback, createFloorSwitch, FloorSwitch } from "./gameObjects/floorSwitch.js";
-import { GameObject, GameObjectType } from "./gameObjects/gameObject.js";
-import { createSolidDummy, filterGameObjects } from "./gameObjects/gameObjectFactory.js";
-import { createSmallKey, createSword } from "./gameObjects/item.js";
+import { GameObject } from "./gameObjects/gameObject.js";
+import { createSword } from "./gameObjects/item.js";
 import { createPushBox } from "./gameObjects/pushbox.js";
-import { createDestroyableStaticHazard, createDynamicHazard, createStaticHazard } from "./gameObjects/hazard.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, getCurrentGameObjects, Screen, WORLD_MAP_COLS } from "./screens.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, Screen, WORLD_MAP_COLS } from "./screens.js";
 import { createRedOktorok } from "./gameActors/oktorok.js";
+import { createDynamicHazard } from "./gameObjects/hazard.js";
+import { createBullet } from "./gameObjects/bullet.js";
+import { getPlayer } from "./gameActors/player.js";
+import { createVector } from "./vector.js";
 
 export function loadScreenById(screenId: number) {
     const screen: Screen = {
@@ -2383,6 +2381,8 @@ export function loadScreenById(screenId: number) {
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
                 createPushBox(120,80),
+                //createDynamicHazard(100,130,16,16,1),
+                //createBullet(100,130,16,16,getPlayer(),1,50,createVector(0,1)),
                 createRedOktorok(100,130)
                 //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
                 /*

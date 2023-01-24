@@ -41,6 +41,9 @@ export function createGlobalGameObject(type) {
 function addToGlobalList(gameObject) {
     globalGameObjects.push(gameObject);
 }
+export function addToCurrentGameObjects(gameObject) {
+    getCurrentGameObjects().push(gameObject);
+}
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);

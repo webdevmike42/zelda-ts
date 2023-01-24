@@ -2,7 +2,7 @@ import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, switchToState } from "../state.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState } from "../state.js";
 import { createVector, reverseVector } from "../vector.js";
 import { GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
@@ -70,7 +70,8 @@ export function createDynamicHazard(x, y, width, height, damage) {
     addAnimation(hazard, createAnimation("hazardActive", "./resources/link.png", getPosition(hazard), hazard.width, hazard.height, [{ srcX: 195, srcY: 160 }], 1, false), true);
     addDynamicHazardStates(hazard);
     //addDynamicHazardAnimations(hazard);
-    switchToState(hazard, getState(hazard, CommonStateTypes.MOVING));
+    //switchToState(hazard, getState(hazard, CommonStateTypes.MOVING));
+    proposeDesignatedState(hazard, getState(hazard, CommonStateTypes.MOVING));
     return hazard;
 }
 function addDynamicHazardStates(hazard) {

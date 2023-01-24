@@ -2300,6 +2300,8 @@ export function loadScreenById(screenId) {
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
                 createPushBox(120, 80),
+                //createDynamicHazard(100,130,16,16,1),
+                //createBullet(100,130,16,16,getPlayer(),1,50,createVector(0,1)),
                 createRedOktorok(100, 130)
                 //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
                 /*

@@ -9,7 +9,6 @@ import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_S
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR, Vector } from "../vector.js";
-
 import { GameObject, GameObjectType, getCurrentAnimation, getOverallVector, getPosition, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 import { getCollidingCollectableItems } from "./item.js";
 
@@ -45,6 +44,10 @@ export function createGlobalGameObject(type: GameObjectType): GameObject {
 
 function addToGlobalList(gameObject: GameObject): void {
     globalGameObjects.push(gameObject);
+}
+
+export function addToCurrentGameObjects(gameObject:GameObject):void{
+    getCurrentGameObjects().push(gameObject);
 }
 
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
