@@ -1,12 +1,14 @@
 import { addAnimation, createAnimation } from "../animation.js";
 import { disableHitBox } from "../hitbox.js";
 import { disableHurtBox } from "../hurtbox.js";
+import { removeGameObject } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, proposeDesignatedState } from "../state.js";
-import { vectorScalarProduct } from "../vector.js";
-import { getPosition, setMovementVector, setViewVector, setVisible } from "./gameObject.js";
+import { NULL_VECTOR, vectorScalarProduct } from "../vector.js";
+import { GameObjectType, getPosition, setMovementVector, setViewVector, setVisible } from "./gameObject.js";
 import { createDynamicHazard } from "./hazard.js";
 export function createBullet(x, y, width, height, owner, damage, speed, viewVector) {
     const bullet = createDynamicHazard(x, y, width, height, 1);
+    bullet.type = GameObjectType.BULLET;
     setOwner(bullet, owner);
     setSpeed(bullet, speed);
     ignoreConveyor(bullet);
@@ -14,7 +16,6 @@ export function createBullet(x, y, width, height, owner, damage, speed, viewVect
     addState(bullet, CommonStateTypes.MOVING, createBulletMovingState(bullet));
     addState(bullet, CommonStateTypes.DEATH, createBulletDeathState(bullet));
     addAnimation(bullet, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(bullet), bullet.width, bullet.height, [{ srcX: 195, srcY: 160 }], 1, false), true);
-    console.log("hkjkjhlkjdsfljdkfslkjfdlkjsfd");
     proposeDesignatedState(bullet, getState(bullet, CommonStateTypes.MOVING));
     return bullet;
 }
@@ -38,7 +39,8 @@ function createBulletMovingState(bullet) {
         console.log("BULLET");
         if (bullet.hitSolid)
             proposeDesignatedState(bullet, getState(bullet, CommonStateTypes.DEATH));
-        setMovementVector(bullet, movementVector);
+        else
+            setMovementVector(bullet, movementVector);
     };
     return state;
 }
@@ -46,9 +48,11 @@ function createBulletDeathState(bullet) {
     const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "bullet death state";
     state.enter = () => {
+        setMovementVector(bullet, Object.assign({}, NULL_VECTOR));
         disableHurtBox(bullet);
         disableHitBox(bullet);
         setVisible(bullet, false);
+        removeGameObject(bullet);
     };
     return state;
 }

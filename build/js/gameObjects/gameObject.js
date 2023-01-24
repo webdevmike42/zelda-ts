@@ -119,3 +119,14 @@ export function setVisible(gameObject, isVisible) {
 export function isVisible(gameObject) {
     return gameObject.isVisible || false;
 }
+export function startCoolDown(gameObject, onCooldownStart, onCooldownEnd, coolDownDurationInMS) {
+    gameObject.isCoolingDown = true;
+    onCooldownStart(gameObject);
+    setTimeout(() => {
+        onCooldownEnd(gameObject);
+        gameObject.isCoolingDown = false;
+    }, coolDownDurationInMS || gameObject.coolDownDurationInMS, gameObject);
+}
+export function isCoolingDown(gameObject) {
+    return gameObject.isCoolingDown;
+}

@@ -81,7 +81,6 @@ export function createDynamicHazard(x: number, y: number, width: number, height:
     setPosition(hazard, createVector(x, y));
     setBounds(hazard, width, height);
     setCollisionBoxFromBoundingBox(hazard);
-    setHitBoxFromBoundingBox(hazard, damage);
     addAnimation(hazard, createAnimation("hazardActive", "./resources/link.png", getPosition(hazard), hazard.width, hazard.height, [{ srcX: 195, srcY: 160 }], 1, false), true);
     addDynamicHazardStates(hazard);
     //addDynamicHazardAnimations(hazard);

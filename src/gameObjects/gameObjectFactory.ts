@@ -32,7 +32,9 @@ export function createGameObject(type: GameObjectType): GameObject {
         collisionBox: { ...NULL_BOX },
         isVisible: true,
         ignoreConveyor: false,
-        hitSolid: false
+        hitSolid: false,
+        coolDownDurationInMS:0,
+        isCoolingDown:false
     }
 }
 
@@ -124,7 +126,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
         }
         
 
-
+*/
         if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
             //draw hurtbox
             ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
@@ -135,7 +137,7 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-        }*/
+        }
 
     });
 }
@@ -199,5 +201,5 @@ export function getGlobalGameObjects(): GameObject[] {
     return globalGameObjects;
 }
 export function testGameObjectFactory() {
-    addTestResult("gameObjectsFactory: ", true);
+    addTestResult("gameObjectFactory: ", true);
 }

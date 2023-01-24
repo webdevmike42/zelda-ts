@@ -1,4 +1,4 @@
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
@@ -39,7 +39,6 @@ export function createPlayer(x, y) {
     player.bombs = 17;
     player.ignoreConveyor = false;
     player.coolDownDurationInMS = 500;
-    player.isCoolingDown = false;
     return player;
 }
 function addPlayerStates(player) {
@@ -136,13 +135,14 @@ function createPlayerHitState(player) {
     state.name = "player hit state";
     state.init = (hb) => {
         hitBox = hb;
+        console.log(hitBox.owner.type);
     };
     state.enter = () => {
         if (player.health)
             player.health -= hitBox.damage;
         knockBackVector =
             vectorScalarProduct(200, normalizedVector(createVector(player.position.x - hitBox.position.x, player.position.y - hitBox.position.y)));
-        startCoolDown(player, player.coolDownDurationInMS);
+        startPlayerCoolDown(player);
     };
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (startTime === -1) {
@@ -291,12 +291,6 @@ export function addKeys(amount) {
 export function getPlayer() {
     return player;
 }
-function startCoolDown(player, coolDownDurationInMS) {
-    player.isCoolingDown = true;
-    disableHurtBox(player);
-    setTimeout(stopCoolDown, coolDownDurationInMS, player);
-}
-function stopCoolDown(player) {
-    player.isCoolingDown = false;
-    enableHurtBox(player);
+function startPlayerCoolDown(player) {
+    startCoolDown(player, disableHurtBox, enableHurtBox);
 }

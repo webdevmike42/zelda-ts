@@ -1,4 +1,4 @@
-import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, State, switchToState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
@@ -28,9 +28,7 @@ export interface Player extends GameObject {
     pickUpMajorItemState: State,
     keys: number,
     rupees: number,
-    bombs: number,
-    coolDownDurationInMS: number,
-    isCoolingDown: boolean
+    bombs: number
 }
 
 export function createPlayer(x: number, y: number): Player {
@@ -53,7 +51,6 @@ export function createPlayer(x: number, y: number): Player {
     player.bombs = 17;
     player.ignoreConveyor = false;
     player.coolDownDurationInMS = 500;
-    player.isCoolingDown = false;
     return player;
 }
 
@@ -159,6 +156,7 @@ function createPlayerHitState(player: Player): State {
 
     state.init = (hb: HitBox) => {
         hitBox = hb;
+        console.log(hitBox.owner.type)
     }
 
     state.enter = () => {
@@ -171,8 +169,7 @@ function createPlayerHitState(player: Player): State {
                     createVector(player.position.x - hitBox.position.x, player.position.y - hitBox.position.y)
                 )
             );
-
-        startCoolDown(player, player.coolDownDurationInMS);
+        startPlayerCoolDown(player);
     };
 
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
@@ -252,7 +249,7 @@ function createPlayerPushingState(player: Player): State {
     state.exit = () => {
         releasePushBox(pushBox);
     }
-   
+
     return state;
 }
 
@@ -351,13 +348,6 @@ export function getPlayer(): Player {
     return player;
 }
 
-function startCoolDown(player: Player, coolDownDurationInMS: number): void {
-    player.isCoolingDown = true;
-    disableHurtBox(player);
-    setTimeout(stopCoolDown, coolDownDurationInMS, player);
-}
-
-function stopCoolDown(player: Player): void {
-    player.isCoolingDown = false;
-    enableHurtBox(player);
+function startPlayerCoolDown(player: Player): void {
+    startCoolDown(player, disableHurtBox, enableHurtBox);
 }

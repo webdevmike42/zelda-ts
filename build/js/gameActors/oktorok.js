@@ -4,7 +4,7 @@ import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject } from "../gameObjects/gameObjectFactory.js";
 import { isAnyMovementKeyDown, isKeyDown, KEYS } from "../KeyboardInputHandler.js";
 import { createBoxInFront } from "../box.js";
@@ -38,6 +38,7 @@ function createOktorokIdleState(oktorok) {
     const state = createEmptyState(CommonStateTypes.IDLE);
     state.name = "oktorok idle state";
     state.enter = () => {
+        disableHurtBox(oktorok);
         updateCurrentAnimationBasedOnViewVector(oktorok);
         setMovementVector(oktorok, Object.assign({}, NULL_VECTOR));
     };
@@ -46,7 +47,7 @@ function createOktorokIdleState(oktorok) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.MOVING));
             return;
         }
-        if (isKeyDown(KEYS.ACTION)) {
+        if (!isCoolingDown(oktorok) && isKeyDown(KEYS.ACTION)) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
             return;
         }
@@ -57,7 +58,7 @@ function createOktorokMovingState(oktorok) {
     let movingSpeed = 100;
     const state = createEmptyState(CommonStateTypes.MOVING);
     state.update = (currentGameTime, timeSinceLastTick) => {
-        if (isKeyDown(KEYS.ACTION)) {
+        if (!isCoolingDown(oktorok) && isKeyDown(KEYS.ACTION)) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
             return;
         }
@@ -118,8 +119,12 @@ function createOktorokActionState(oktorok) {
         setMovementVector(oktorok, Object.assign({}, NULL_VECTOR));
         setTimeout(proposeDesignatedState, durationInMS, oktorok, getState(oktorok, CommonStateTypes.IDLE));
         spawnOktorokBullet(oktorok);
+        startOktorokActionCoolDown(oktorok);
     };
     return state;
+}
+function startOktorokActionCoolDown(oktorok) {
+    startCoolDown(oktorok, () => console.log("oktorok cannot attack"), () => console.log("oktorok ready to go"), 1000);
 }
 function addRedOktorokAnimations(oktorok) {
     addOktorokIdleAnimations(oktorok);
@@ -162,11 +167,7 @@ function getDirectionNameFromViewVector(viewVector) {
 }
 function spawnOktorokBullet(oktorok) {
     const box = createBoxInFront(oktorok, OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT);
-    const oktorokBullet = createBullet(getPosition(box).x, getPosition(box).y, OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, oktorok, OKTOROK_DAMAGE, OKTOROK_BULLET_SPEED, getViewVector(oktorok));
-    addToCurrentGameObjects(oktorokBullet);
-    // addOktorokBulletStates(oktorokBullet);
-    //addOktorokBulletAnimations(oktorokBullet);
-    //proposeDesignatedState(oktorokBullet, getState(oktorokBullet,CommonStateTypes.ACTION));
+    addToCurrentGameObjects(createBullet(getPosition(box).x, getPosition(box).y, OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, oktorok, OKTOROK_DAMAGE, OKTOROK_BULLET_SPEED, getViewVector(oktorok)));
 }
 function addOktorokBulletStates(oktorokBullet) {
     const actionState = createOktorokBulletActionState(oktorokBullet);

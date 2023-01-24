@@ -11,7 +11,7 @@ import { getCollidingActiveConveyors, getConveyingVectorSum } from "./conveyor.j
 
 export interface GameObject {
     id: number;
-    name:string;
+    name: string;
     type: GameObjectType;
     states: Map<string, State>;
     currentState: State;
@@ -34,7 +34,9 @@ export interface GameObject {
     health?: number;
     maxHealth?: number;
     ignoreConveyor: boolean;
-    hitSolid:boolean;
+    hitSolid: boolean;
+    coolDownDurationInMS: number;
+    isCoolingDown: boolean
 }
 
 export enum GameObjectType {
@@ -120,19 +122,19 @@ export function moveGameObject(gameObject: GameObject, moveBy: Vector): void {
     setPosition(gameObject, vectorSum(getPosition(gameObject), moveBy));
     if (gameObject.currentAnimation)
         gameObject.currentAnimation.position = vectorSum(gameObject.currentAnimation.position, moveBy);
-    if (gameObject.hitBox){
+    if (gameObject.hitBox) {
         //if(gameObject.type === GameObjectType.HAZARD) //console.log(gameObject.hitBox);
         gameObject.hitBox.position = vectorSum(gameObject.hitBox.position, moveBy);
     }
     if (gameObject.hurtBox)
         gameObject.hurtBox.position = vectorSum(gameObject.hurtBox.position, moveBy);
 
-        /*
-    if (gameObject.type === GameObjectType.PLAYER) {
-        const player: Player = gameObject as Player;
-        player.actionBox.position = vectorSum(player.actionBox.position, moveBy);
-    }
-    */
+    /*
+if (gameObject.type === GameObjectType.PLAYER) {
+    const player: Player = gameObject as Player;
+    player.actionBox.position = vectorSum(player.actionBox.position, moveBy);
+}
+*/
 
     gameObject.collisionBox.position = vectorSum(gameObject.collisionBox.position, moveBy);
 }
@@ -170,4 +172,17 @@ export function setVisible(gameObject: GameObject, isVisible: boolean): void {
 
 export function isVisible(gameObject: GameObject): boolean {
     return gameObject.isVisible || false;
+}
+
+export function startCoolDown(gameObject: GameObject, onCooldownStart: Function, onCooldownEnd: Function, coolDownDurationInMS?: number): void {
+    gameObject.isCoolingDown = true;
+    onCooldownStart(gameObject);
+    setTimeout(() => {
+        onCooldownEnd(gameObject);
+        gameObject.isCoolingDown = false;
+    }, coolDownDurationInMS || gameObject.coolDownDurationInMS, gameObject);
+}
+
+export function isCoolingDown(gameObject: GameObject): boolean {
+    return gameObject.isCoolingDown;
 }
