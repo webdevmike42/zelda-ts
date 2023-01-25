@@ -7,8 +7,8 @@ import { isHurtBoxEnabled } from "../hurtbox.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_STATE, proposeDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
-import { getVectorFrameFraction } from "../utils.js";
-import { createVector, NULL_VECTOR, Vector } from "../vector.js";
+import { getRandomInt, getVectorFrameFraction, toRadians } from "../utils.js";
+import { createRandom4DirectionViewVector, createVector, NULL_VECTOR, Vector } from "../vector.js";
 import { GameObject, GameObjectType, getCurrentAnimation, getOverallVector, getPosition, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 import { getCollidingCollectableItems } from "./item.js";
 

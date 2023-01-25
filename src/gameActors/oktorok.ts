@@ -5,8 +5,8 @@ import { disableHitBox, enableHitBox, HitBox, removeHitBox, setHitBoxFromBoundin
 import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, getCurrentState } from "../state.js";
-import { createVector, get4DirectionVector, NULL_VECTOR, reverseVector, Vector, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, startCoolDown } from "../gameObjects/gameObject.js";
+import { createRandom4DirectionViewVector, createVector, get4DirectionVector, NULL_VECTOR, reverseVector, Vector, vectorScalarProduct } from "../vector.js";
+import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
 import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS } from "../KeyboardInputHandler.js";
 import { Item } from "../gameObjects/item.js";
@@ -17,7 +17,7 @@ const OKTOROK_WIDTH = 16, OKTOROK_HEIGHT = 16, OKTOROK_HEALTH = 1, OKTOROK_DAMAG
 
 export function createRedOktorok(x: number, y: number): GameObject {
     const oktorok: GameObject = createGameObject(GameObjectType.OKTOROK);
-    oktorok.name = "oktorok"
+    oktorok.name = "red oktorok"
     setPosition(oktorok, createVector(x, y));
     setBounds(oktorok, OKTOROK_WIDTH, OKTOROK_HEIGHT);
     setCollisionBoxFromBoundingBox(oktorok);
@@ -76,7 +76,8 @@ function createOktorokMovingState(oktorok: GameObject): State {
             return;
         }
 
-        const movementVector = createMovementVector();
+        //const movementVector = createMovementVector();
+        const movementVector = createRandom4DirectionViewVector();
         setMovementVector(oktorok, vectorScalarProduct(movingSpeed, movementVector));
         setViewVector(oktorok, get4DirectionVector(movementVector));
         updateCurrentAnimationBasedOnViewVector(oktorok);
@@ -125,6 +126,7 @@ function createOktorokDeathState(oktorok: GameObject): State {
         setMovementVector(oktorok,{...NULL_VECTOR});
         disableHurtBox(oktorok);
         disableHitBox(oktorok);
+        setTimeout(setVisible,2000,oktorok,false);
     };
     return state;
 }

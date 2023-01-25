@@ -1,3 +1,5 @@
+import { getRandomInt, toRadians } from "./utils.js";
+
 export interface Vector {
     x: number,
     y: number
@@ -52,4 +54,10 @@ export function get4DirectionVector(vector: Vector): Vector {
 
 export function reverseVector(vector: Vector): Vector {
     return vectorScalarProduct(-1, vector);
+}
+
+export function createRandom4DirectionViewVector(): Vector {
+    const directions:number[] = [0,90,180,270];
+    const dir:number = directions[getRandomInt(0,directions.length-1)];
+    return createVector(Math.round(Math.cos(toRadians(dir))), Math.round(Math.sin(toRadians(dir))));
 }
