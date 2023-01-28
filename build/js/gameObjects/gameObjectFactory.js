@@ -10,7 +10,7 @@ import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_S
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
-import { GameObjectType, getCurrentAnimation, getOverallVector, getPosition, moveGameObject, setBounds, setPosition } from "./gameObject.js";
+import { Controller, GameObjectType, getCurrentAnimation, getOverallVector, getPosition, isControlledByAI, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 import { getCollidingCollectableItems } from "./item.js";
 const globalGameObjects = [];
 let id = 0;
@@ -36,7 +36,9 @@ export function createGameObject(type) {
         isCoolingDown: false,
         ai_NextAction: () => { },
         ai_TimeRangeToNextAction: [0, 0],
-        mappedInput: createMappedInput()
+        ai_update: () => { },
+        mappedInput: createMappedInput(),
+        controller: Controller.SCRIPT
     };
 }
 export function createGlobalGameObject(type) {
@@ -50,8 +52,14 @@ function addToGlobalList(gameObject) {
 export function addToCurrentGameObjects(gameObject) {
     getCurrentGameObjects().push(gameObject);
 }
+function updateAI(gameObject) {
+    gameObject.ai_update(gameObject);
+}
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     getCurrentGameObjects().forEach(gameObject => {
+        if (isControlledByAI(gameObject)) {
+            updateAI(gameObject);
+        }
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
         if (isHurtBoxEnabled(gameObject)) {
             const chb = getCollidingHitBoxes(gameObject);

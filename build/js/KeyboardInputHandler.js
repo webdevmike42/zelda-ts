@@ -120,3 +120,25 @@ export function releaseAllKeys(mappedInput) {
         releaseKey(mappedInput, keyType);
     }
 }
+export function reverseMovementInput(mappedInput) {
+    if (isKeyDown(mappedInput, KEYS.UP)) {
+        releaseKey(mappedInput, KEYS.UP);
+        pressAndHoldKey(mappedInput, KEYS.DOWN);
+    }
+    else {
+        if (isKeyDown(mappedInput, KEYS.DOWN)) {
+            releaseKey(mappedInput, KEYS.DOWN);
+            pressAndHoldKey(mappedInput, KEYS.UP);
+        }
+    }
+    if (isKeyDown(mappedInput, KEYS.LEFT)) {
+        releaseKey(mappedInput, KEYS.LEFT);
+        pressAndHoldKey(mappedInput, KEYS.RIGHT);
+    }
+    else {
+        if (isKeyDown(mappedInput, KEYS.RIGHT)) {
+            releaseKey(mappedInput, KEYS.RIGHT);
+            pressAndHoldKey(mappedInput, KEYS.LEFT);
+        }
+    }
+}

@@ -10,7 +10,7 @@ import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_S
 import { addTestResult } from "../tests.js";
 import { getRandomInt, getVectorFrameFraction, toRadians } from "../utils.js";
 import { createRandom4DirectionViewVector, createVector, NULL_VECTOR, Vector } from "../vector.js";
-import { GameObject, GameObjectType, getCurrentAnimation, getOverallVector, getPosition, moveGameObject, setBounds, setPosition } from "./gameObject.js";
+import { Controller, GameObject, GameObjectType, getCurrentAnimation, getOverallVector, getPosition, isControlledByAI, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 import { getCollidingCollectableItems } from "./item.js";
 
 const globalGameObjects: GameObject[] = [];
@@ -38,7 +38,9 @@ export function createGameObject(type: GameObjectType): GameObject {
         isCoolingDown: false,
         ai_NextAction: () => { },
         ai_TimeRangeToNextAction: [0, 0],
-        mappedInput: createMappedInput()
+        ai_update: () => { },
+        mappedInput: createMappedInput(),
+        controller: Controller.SCRIPT
     }
 }
 
@@ -56,8 +58,16 @@ export function addToCurrentGameObjects(gameObject: GameObject): void {
     getCurrentGameObjects().push(gameObject);
 }
 
+function updateAI(gameObject: GameObject): void {
+    gameObject.ai_update(gameObject);
+}
+
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
     getCurrentGameObjects().forEach(gameObject => {
+
+        if (isControlledByAI(gameObject)) {
+            updateAI(gameObject);
+        }
 
         updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
 

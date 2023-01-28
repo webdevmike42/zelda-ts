@@ -3,7 +3,7 @@ import { Box, createBox } from "../box.js";
 import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { HitBox } from "../hitbox.js";
 import { HurtBox } from "../hurtbox.js";
-import { isKeyDown, KEYS, MappedInput, MappedKey } from "../KeyboardInputHandler.js";
+import { isKeyDown, KEYS, MappedInput, MappedKey, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
@@ -39,9 +39,16 @@ export interface GameObject {
     isCoolingDown: boolean;
     ai_NextAction: Function;
     ai_TimeRangeToNextAction: number[];
+    ai_update: Function;
     mappedInput: MappedInput;
+    controller: Controller;
 }
 
+export enum Controller {
+    PLAYER,
+    AI,
+    SCRIPT
+}
 export enum GameObjectType {
     PLAYER,
     ITEM,
@@ -188,4 +195,25 @@ export function startCoolDown(gameObject: GameObject, onCooldownStart: Function,
 
 export function isCoolingDown(gameObject: GameObject): boolean {
     return gameObject.isCoolingDown;
+}
+
+function setController(gameObject: GameObject, newController: Controller): void {
+    gameObject.controller = newController;
+}
+
+export function setPlayerControlled(gameObject: GameObject): void {
+    setController(gameObject, Controller.PLAYER);
+    registerGameObjectForKeyBoardInput(gameObject);
+}
+
+export function setAIControlled(gameObject: GameObject): void {
+    setController(gameObject, Controller.AI);
+}
+
+export function setScriptControlled(gameObject: GameObject): void {
+    setController(gameObject, Controller.SCRIPT);
+}
+
+export function isControlledByAI(gameObject: GameObject): boolean {
+    return gameObject.controller === Controller.AI;
 }

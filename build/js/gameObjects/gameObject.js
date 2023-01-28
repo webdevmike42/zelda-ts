@@ -1,10 +1,16 @@
 import { NULL_ANIMATION } from "../animation.js";
 import { createBox } from "../box.js";
 import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
-import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
+import { isKeyDown, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { createVector, NULL_VECTOR, vectorDiff, vectorSum } from "../vector.js";
 import { getCollidingActiveConveyors, getConveyingVectorSum } from "./conveyor.js";
+export var Controller;
+(function (Controller) {
+    Controller[Controller["PLAYER"] = 0] = "PLAYER";
+    Controller[Controller["AI"] = 1] = "AI";
+    Controller[Controller["SCRIPT"] = 2] = "SCRIPT";
+})(Controller || (Controller = {}));
 export var GameObjectType;
 (function (GameObjectType) {
     GameObjectType[GameObjectType["PLAYER"] = 0] = "PLAYER";
@@ -129,4 +135,20 @@ export function startCoolDown(gameObject, onCooldownStart, onCooldownEnd, coolDo
 }
 export function isCoolingDown(gameObject) {
     return gameObject.isCoolingDown;
+}
+function setController(gameObject, newController) {
+    gameObject.controller = newController;
+}
+export function setPlayerControlled(gameObject) {
+    setController(gameObject, Controller.PLAYER);
+    registerGameObjectForKeyBoardInput(gameObject);
+}
+export function setAIControlled(gameObject) {
+    setController(gameObject, Controller.AI);
+}
+export function setScriptControlled(gameObject) {
+    setController(gameObject, Controller.SCRIPT);
+}
+export function isControlledByAI(gameObject) {
+    return gameObject.controller === Controller.AI;
 }

@@ -1,4 +1,4 @@
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPlayerControlled, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { getMappedInput, isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
@@ -32,13 +32,14 @@ export function createPlayer(x, y) {
     setHealth(player, 8);
     setMaxHealth(player, 8);
     setViewVector(player, PLAYER_DEFAULT_VIEW_VECTOR);
-    proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE), ["bliblablub"]);
     player.hasSword = false;
     player.keys = 2;
     player.rupees = 106;
     player.bombs = 17;
     player.ignoreConveyor = false;
     player.coolDownDurationInMS = 500;
+    setPlayerControlled(player);
+    proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE), ["bliblablub"]);
     return player;
 }
 function addPlayerStates(player) {

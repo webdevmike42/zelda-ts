@@ -4,9 +4,9 @@ import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { createRandom4DirectionViewVector, createVector, get4DirectionVector, NULL_VECTOR, reverseVector, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setAIControlled, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject } from "../gameObjects/gameObjectFactory.js";
-import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, releaseAllKeys } from "../KeyboardInputHandler.js";
+import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, releaseAllKeys, reverseMovementInput } from "../KeyboardInputHandler.js";
 import { createBoxInFront } from "../box.js";
 import { createBullet } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
@@ -23,8 +23,13 @@ export function createRedOktorok(x, y) {
     setMaxHealth(oktorok, OKTOROK_HEALTH);
     addRedOktorokAnimations(oktorok);
     addOktorokStates(oktorok);
+    initOktorokAI(oktorok);
+    setAIControlled(oktorok);
     proposeDesignatedState(oktorok, oktorok.defaultState);
     //registerGameObjectForKeyBoardInput(oktorok);
+    return oktorok;
+}
+function initOktorokAI(oktorok) {
     oktorok.ai_TimeRangeToNextAction[0] = 200;
     oktorok.ai_TimeRangeToNextAction[1] = 500;
     oktorok.ai_NextAction = (oktorok) => {
@@ -37,8 +42,13 @@ export function createRedOktorok(x, y) {
         }
         setTimeout(oktorok.ai_NextAction, getRandomInt(oktorok.ai_TimeRangeToNextAction[0], oktorok.ai_TimeRangeToNextAction[1]), oktorok);
     };
+    oktorok.ai_update = (oktorok) => {
+        if (oktorok.hitSolid) {
+            reverseMovementInput(getMappedInput(oktorok));
+            console.log("AI can react to solid collision"); //should reverse input
+        }
+    };
     oktorok.ai_NextAction(oktorok);
-    return oktorok;
 }
 function addOktorokStates(oktorok) {
     const idleState = createOktorokIdleState(oktorok);
