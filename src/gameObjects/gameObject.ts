@@ -3,7 +3,7 @@ import { Box, createBox } from "../box.js";
 import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
 import { HitBox } from "../hitbox.js";
 import { HurtBox } from "../hurtbox.js";
-import { isKeyDown, KEYS } from "../KeyboardInputHandler.js";
+import { isKeyDown, KEYS, MappedInput, MappedKey } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
@@ -36,7 +36,10 @@ export interface GameObject {
     ignoreConveyor: boolean;
     hitSolid: boolean;
     coolDownDurationInMS: number;
-    isCoolingDown: boolean
+    isCoolingDown: boolean;
+    ai_NextAction: Function;
+    ai_TimeRangeToNextAction: number[];
+    mappedInput: MappedInput;
 }
 
 export enum GameObjectType {
@@ -105,12 +108,12 @@ export function getCenter(gameObject: GameObject): Vector {
     return createVector(position.x + Math.floor(gameObject.width / 2), position.y + Math.floor(gameObject.height / 2));
 }
 
-export function createMovementVector(): Vector {
+export function createMovementVector(mappedInput: MappedInput): Vector {
     let movementVector: Vector = { ...NULL_VECTOR };
-    if (isKeyDown(KEYS.UP)) movementVector = vectorSum(movementVector, createVector(0, -1))
-    if (isKeyDown(KEYS.LEFT)) movementVector = vectorSum(movementVector, createVector(-1, 0))
-    if (isKeyDown(KEYS.DOWN)) movementVector = vectorSum(movementVector, createVector(0, 1))
-    if (isKeyDown(KEYS.RIGHT)) movementVector = vectorSum(movementVector, createVector(1, 0))
+    if (isKeyDown(mappedInput, KEYS.UP)) movementVector = vectorSum(movementVector, createVector(0, -1))
+    if (isKeyDown(mappedInput, KEYS.LEFT)) movementVector = vectorSum(movementVector, createVector(-1, 0))
+    if (isKeyDown(mappedInput, KEYS.DOWN)) movementVector = vectorSum(movementVector, createVector(0, 1))
+    if (isKeyDown(mappedInput, KEYS.RIGHT)) movementVector = vectorSum(movementVector, createVector(1, 0))
     return movementVector;
 }
 

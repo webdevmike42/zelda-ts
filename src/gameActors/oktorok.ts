@@ -6,14 +6,15 @@ import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../
 import { getCurrentGameObjects } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, getCurrentState } from "../state.js";
 import { createRandom4DirectionViewVector, createVector, get4DirectionVector, NULL_VECTOR, reverseVector, Vector, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS } from "../KeyboardInputHandler.js";
+import { getMappedInput, isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, pressKey, registerGameObjectForKeyBoardInput, releaseAllKeys, releaseKey } from "../KeyboardInputHandler.js";
 import { Item } from "../gameObjects/item.js";
 import { Box, createBoxInFront } from "../box.js";
 import { Bullet, createBullet } from "../gameObjects/bullet.js";
+import { getRandomInt } from "../utils.js";
 
-const OKTOROK_WIDTH = 16, OKTOROK_HEIGHT = 16, OKTOROK_HEALTH = 1, OKTOROK_DAMAGE = 1, OKTOROK_BULLET_WIDTH = 8, OKTOROK_BULLET_HEIGHT = 8, OKTOROK_BULLET_SPEED = 200;
+const OKTOROK_WIDTH = 16, OKTOROK_HEIGHT = 16, OKTOROK_HEALTH = 1, OKTOROK_DAMAGE = 1, OKTOROK_BULLET_WIDTH = 8, OKTOROK_BULLET_HEIGHT = 8, OKTOROK_MOVING_SPEED = 50, OKTOROK_BULLET_SPEED = 200;
 
 export function createRedOktorok(x: number, y: number): GameObject {
     const oktorok: GameObject = createGameObject(GameObjectType.OKTOROK);
@@ -27,14 +28,34 @@ export function createRedOktorok(x: number, y: number): GameObject {
     setMaxHealth(oktorok, OKTOROK_HEALTH);
     addRedOktorokAnimations(oktorok);
     addOktorokStates(oktorok);
-    proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.IDLE));
+    proposeDesignatedState(oktorok, oktorok.defaultState);
+    //registerGameObjectForKeyBoardInput(oktorok);
+
+    oktorok.ai_TimeRangeToNextAction[0] = 200;
+    oktorok.ai_TimeRangeToNextAction[1] = 500;
+    oktorok.ai_NextAction = (oktorok: GameObject) => {
+
+        releaseAllKeys(getMappedInput(oktorok));
+
+        if (Math.random() < 0.75) {
+            pressAndHoldRandomMovementKey(getMappedInput(oktorok));
+        } else {
+            pressAndHoldKey(getMappedInput(oktorok), KEYS.ACTION);
+        }
+
+        setTimeout(oktorok.ai_NextAction, getRandomInt(oktorok.ai_TimeRangeToNextAction[0], oktorok.ai_TimeRangeToNextAction[1]), oktorok)
+    }
+
+    oktorok.ai_NextAction(oktorok);
+
     return oktorok;
 }
 
 function addOktorokStates(oktorok: GameObject): void {
     const idleState: State = createOktorokIdleState(oktorok);
+    const movingState: State = createOktorokMovingState(oktorok);
     addState(oktorok, CommonStateTypes.IDLE, idleState);
-    addState(oktorok, CommonStateTypes.MOVING, createOktorokMovingState(oktorok));
+    addState(oktorok, CommonStateTypes.MOVING, movingState);
     addState(oktorok, CommonStateTypes.HIT, createOktorokHitState(oktorok));
     addState(oktorok, CommonStateTypes.DEATH, createOktorokDeathState(oktorok));
     addState(oktorok, CommonStateTypes.ACTION, createOktorokActionState(oktorok));
@@ -49,12 +70,12 @@ function createOktorokIdleState(oktorok: GameObject): State {
         setMovementVector(oktorok, { ...NULL_VECTOR });
     }
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-        if (isAnyMovementKeyDown()) {
+        if (isAnyMovementKeyDown(getMappedInput(oktorok))) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.MOVING));
             return;
         }
 
-        if (!isCoolingDown(oktorok) && isKeyDown(KEYS.ACTION)) {
+        if (!isCoolingDown(oktorok) && isKeyDown(getMappedInput(oktorok), KEYS.ACTION)) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
             return;
         }
@@ -63,24 +84,74 @@ function createOktorokIdleState(oktorok: GameObject): State {
 }
 
 function createOktorokMovingState(oktorok: GameObject): State {
-    let movingSpeed: number = 100;
     const state = createEmptyState(CommonStateTypes.MOVING);
+    let changeDirection: boolean = true;
+    let shoot: boolean = false;
+    state.enter = () => {
+        changeDirection = true;
+        shoot = false;
+        //setTimeout(() => shoot = true, 3000);
+
+        //setViewVector(oktorok, createVector(1,0));
+
+        //change4Direction(oktorok);
+        setMovementVector(oktorok, vectorScalarProduct(OKTOROK_MOVING_SPEED, getViewVector(oktorok)));
+    }
+
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-        if (!isCoolingDown(oktorok) && isKeyDown(KEYS.ACTION)) {
+
+        if (!isCoolingDown(oktorok) && isKeyDown(getMappedInput(oktorok), KEYS.ACTION)) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
             return;
         }
+        /*
+                if (shoot) {
+                    proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.ACTION));
+                    return;
+                }
+        
+                if (changeDirection) {
+                    setViewVector(oktorok, createRandom4DirectionViewVector());
+                    changeDirection = false;
+                    setTimeout(() => changeDirection = true, 1000);
+                }
+                */
 
-        if (!isAnyMovementKeyDown()) {
+        if (!isAnyMovementKeyDown(getMappedInput(oktorok))) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.IDLE));
             return;
         }
 
-        //const movementVector = createMovementVector();
-        const movementVector = createRandom4DirectionViewVector();
-        setMovementVector(oktorok, vectorScalarProduct(movingSpeed, movementVector));
+
+        if (oktorok.hitSolid /*&& ! isCoolingDown(oktorok)*/) {
+            //console.log("reversed direction")
+            //startCoolDown(oktorok,() => {},() =>{},1000);
+            //oktorok.hitSolid = false;
+            //setMovementVector(oktorok, reverseVector(getMovementVector(oktorok)))
+            setViewVector(oktorok, reverseVector(getViewVector(oktorok)));
+        }
+        //else
+        const movementVector = createMovementVector(getMappedInput(oktorok));
+        setMovementVector(oktorok, vectorScalarProduct(OKTOROK_MOVING_SPEED, movementVector));
         setViewVector(oktorok, get4DirectionVector(movementVector));
         updateCurrentAnimationBasedOnViewVector(oktorok);
+
+
+    }
+    return state;
+}
+
+function createOktorokActionState(oktorok: GameObject): State {
+    let durationInMS: number = 50;
+    const state: State = createEmptyState(CommonStateTypes.ACTION);
+    state.name = "oktorok action state";
+    state.enter = () => {
+        console.log("enter oktorok action state")
+        updateCurrentAnimationBasedOnViewVector(oktorok);
+        setMovementVector(oktorok, { ...NULL_VECTOR });
+        setTimeout(proposeDesignatedState, durationInMS, oktorok, getState(oktorok, CommonStateTypes.MOVING));
+        spawnOktorokBullet(oktorok);
+        startOktorokActionCoolDown(oktorok);
     }
     return state;
 }
@@ -111,7 +182,6 @@ function createOktorokHitState(oktorok: GameObject): State {
 function isHitBoxOfOwnBullet(oktorok: GameObject, hitBox: HitBox): boolean {
     if (hitBox.owner.type === GameObjectType.BULLET) {
         const bullet: Bullet = hitBox.owner as Bullet;
-        console.log(bullet.owner === oktorok)
         return bullet.owner === oktorok;
     }
     return false;
@@ -123,26 +193,11 @@ function createOktorokDeathState(oktorok: GameObject): State {
 
     state.enter = () => {
         console.log("enter redOktorok death")
-        setMovementVector(oktorok,{...NULL_VECTOR});
+        setMovementVector(oktorok, { ...NULL_VECTOR });
         disableHurtBox(oktorok);
         disableHitBox(oktorok);
-        setTimeout(setVisible,2000,oktorok,false);
+        setTimeout(setVisible, 2000, oktorok, false);
     };
-    return state;
-}
-
-function createOktorokActionState(oktorok: GameObject): State {
-    let durationInMS: number = 50;
-    const state: State = createEmptyState(CommonStateTypes.ACTION);
-    state.name = "oktorok action state";
-    state.enter = () => {
-
-        updateCurrentAnimationBasedOnViewVector(oktorok);
-        setMovementVector(oktorok, { ...NULL_VECTOR });
-        setTimeout(proposeDesignatedState, durationInMS, oktorok, getState(oktorok, CommonStateTypes.IDLE));
-        spawnOktorokBullet(oktorok);
-        startOktorokActionCoolDown(oktorok);
-    }
     return state;
 }
 
@@ -215,7 +270,7 @@ function createOktorokBulletActionState(oktorokBullet: Bullet): State {
     const state: State = createEmptyState(CommonStateTypes.ACTION);
     state.name = "BULLET action state";
     state.enter = () => {
-        console.log("enter " + state.name)
+        //console.log("enter " + state.name)
         //setMovementVector(oktorokBullet, vectorScalarProduct(OKTOROK_BULLET_SPEED, {...getViewVector(oktorokBullet.owner)}));
     }
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
@@ -225,4 +280,10 @@ function createOktorokBulletActionState(oktorokBullet: Bullet): State {
             */
     }
     return state;
+}
+
+function change4Direction(oktorok: GameObject): void {
+    //console.log("changed direction");
+    setViewVector(oktorok, createRandom4DirectionViewVector());
+    //setTimeout(change4Direction, 1000, oktorok);
 }

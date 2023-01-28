@@ -59,15 +59,15 @@ export function getCenter(gameObject) {
     const position = getPosition(gameObject);
     return createVector(position.x + Math.floor(gameObject.width / 2), position.y + Math.floor(gameObject.height / 2));
 }
-export function createMovementVector() {
+export function createMovementVector(mappedInput) {
     let movementVector = Object.assign({}, NULL_VECTOR);
-    if (isKeyDown(KEYS.UP))
+    if (isKeyDown(mappedInput, KEYS.UP))
         movementVector = vectorSum(movementVector, createVector(0, -1));
-    if (isKeyDown(KEYS.LEFT))
+    if (isKeyDown(mappedInput, KEYS.LEFT))
         movementVector = vectorSum(movementVector, createVector(-1, 0));
-    if (isKeyDown(KEYS.DOWN))
+    if (isKeyDown(mappedInput, KEYS.DOWN))
         movementVector = vectorSum(movementVector, createVector(0, 1));
-    if (isKeyDown(KEYS.RIGHT))
+    if (isKeyDown(mappedInput, KEYS.RIGHT))
         movementVector = vectorSum(movementVector, createVector(1, 0));
     return movementVector;
 }

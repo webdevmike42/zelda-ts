@@ -4,6 +4,7 @@ import { getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox,
 import { Player, playerCollectItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes, HitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
+import { createMappedInput, KEYS, MappedKey } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_STATE, proposeDesignatedState, State, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
@@ -33,8 +34,11 @@ export function createGameObject(type: GameObjectType): GameObject {
         isVisible: true,
         ignoreConveyor: false,
         hitSolid: false,
-        coolDownDurationInMS:0,
-        isCoolingDown:false
+        coolDownDurationInMS: 0,
+        isCoolingDown: false,
+        ai_NextAction: () => { },
+        ai_TimeRangeToNextAction: [0, 0],
+        mappedInput: createMappedInput()
     }
 }
 
@@ -48,7 +52,7 @@ function addToGlobalList(gameObject: GameObject): void {
     globalGameObjects.push(gameObject);
 }
 
-export function addToCurrentGameObjects(gameObject:GameObject):void{
+export function addToCurrentGameObjects(gameObject: GameObject): void {
     getCurrentGameObjects().push(gameObject);
 }
 
@@ -64,11 +68,11 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
             }
         }
 
-        if (gameObject.type === GameObjectType.PLAYER){
+        if (gameObject.type === GameObjectType.PLAYER) {
             playerCollectItems(getCollidingCollectableItems(gameObject));
         }
 
-        if(hasDesignatedState(gameObject)){
+        if (hasDesignatedState(gameObject)) {
             switchToState(gameObject, gameObject.designatedState);
         }
 

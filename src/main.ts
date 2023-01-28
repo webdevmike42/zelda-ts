@@ -1,4 +1,4 @@
-import { createPlayer, getPlayer, isPlayerDead } from "./gameActors/player.js"
+import { createPlayer, getPlayer, hasPlayerPressedStart, isPlayerDead } from "./gameActors/player.js"
 import { drawGameObjects, updateGameObjects } from "./gameObjects/gameObjectFactory.js"
 import { createHudDtoFromGameObject, drawHUD, loadHud } from "./hud.js"
 import { initKeyBoardInputHandler, isKeyPressed, KEYS } from "./KeyboardInputHandler.js"
@@ -61,7 +61,7 @@ function updateGame(currentGameTime: number, timeSinceLastTick: number): void {
             if (isPlayerDead())
                 setGameState(GameState.GAME_OVER);
 
-            if (isKeyPressed(KEYS.START)) {
+            if (hasPlayerPressedStart()) {
                 gameState = GameState.PAUSING;
             } else {
                 updateGameObjects(currentGameTime, timeSinceLastTick);
@@ -73,7 +73,7 @@ function updateGame(currentGameTime: number, timeSinceLastTick: number): void {
             console.log("game paused");
             break;
         case GameState.PAUSED:
-            if (isKeyPressed(KEYS.START)) {
+            if (hasPlayerPressedStart()) {
                 console.log("game unpausing...");
                 gameState = GameState.UNPAUSING;
             }
@@ -89,7 +89,6 @@ function updateGame(currentGameTime: number, timeSinceLastTick: number): void {
             break;
     }
 }
-
 
 function drawGame(): void {
     drawCurrentScreen();

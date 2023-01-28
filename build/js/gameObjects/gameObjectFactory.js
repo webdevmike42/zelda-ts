@@ -4,6 +4,7 @@ import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from 
 import { playerCollectItems } from "../gameActors/player.js";
 import { getCollidingHitBoxes } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
+import { createMappedInput } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_STATE, proposeDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
@@ -32,7 +33,10 @@ export function createGameObject(type) {
         ignoreConveyor: false,
         hitSolid: false,
         coolDownDurationInMS: 0,
-        isCoolingDown: false
+        isCoolingDown: false,
+        ai_NextAction: () => { },
+        ai_TimeRangeToNextAction: [0, 0],
+        mappedInput: createMappedInput()
     };
 }
 export function createGlobalGameObject(type) {

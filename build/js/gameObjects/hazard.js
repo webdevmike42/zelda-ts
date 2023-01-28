@@ -81,6 +81,7 @@ function createDynamicHazardMovingState(hazard) {
     const state = createEmptyState(CommonStateTypes.MOVING);
     state.update = (currentGameTime, timeSinceLastTick) => {
         if (hazard.hitSolid) {
+            console.log("hazard reversed direction");
             movementVector = reverseVector(movementVector);
         }
         setMovementVector(hazard, movementVector);

@@ -36,7 +36,6 @@ function createBulletMovingState(bullet) {
         setMovementVector(bullet, movementVector);
     };
     state.update = () => {
-        console.log("BULLET");
         if (bullet.hitSolid)
             proposeDesignatedState(bullet, getState(bullet, CommonStateTypes.DEATH));
         else

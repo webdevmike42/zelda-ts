@@ -1,5 +1,5 @@
 import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isGameObjectDead, setBounds, setCurrentAnimation, setGameObjectPosition, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
-import { isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
+import { getMappedInput, isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { addState, createEmptyState, getState, CommonStateTypes, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { addAnimation, createAnimation, getAnimation } from "../animation.js";
 import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, vectorScalarProduct, vectorSum } from "../vector.js";
@@ -59,11 +59,12 @@ function createPlayerIdleState(player) {
         setMovementVector(player, Object.assign({}, NULL_VECTOR));
     };
     state.update = (currentGameTime, timeSinceLastTick) => {
-        if (isAnyMovementKeyDown()) {
+        //console.log(isAnyMovementKeyDown(getMappedInput(player)));
+        if (isAnyMovementKeyDown(getMappedInput(player))) {
             proposeDesignatedState(player, getState(player, CommonStateTypes.MOVING));
             return;
         }
-        if (isKeyPressed(KEYS.ACTION)) {
+        if (isKeyPressed(getMappedInput(player), KEYS.ACTION)) {
             const collidingObjects = getCollidingGameObjects(player, createBoxInFront(player, player.width, player.height), getCurrentGameObjects());
             const pushBoxes = filterGameObjects(GameObjectType.PUSH_BOX, collidingObjects);
             if (pushBoxes.length > 0)
@@ -78,7 +79,7 @@ function createPlayerIdleState(player) {
             }
             return;
         }
-        if (isKeyPressed(KEYS.DASH)) {
+        if (isKeyPressed(getMappedInput(player), KEYS.DASH)) {
             const majorItem = filterGameObjects(GameObjectType.ITEM, getCurrentGameObjects())[0];
             setGameObjectPosition(majorItem, createVector(majorItem.position.x, majorItem.position.y + 20));
             //console.log(getPosition(majorItem));
@@ -93,15 +94,15 @@ function createPlayerMovingState(player) {
     state.name = "player moving state";
     state.enter = () => { };
     state.update = (currentGameTime, timeSinceLastTick) => {
-        if (isKeyPressed(KEYS.ACTION)) {
+        if (isKeyPressed(getMappedInput(player), KEYS.ACTION)) {
             proposeDesignatedState(player, getState(player, CommonStateTypes.ACTION));
             return;
         }
-        if (!isAnyMovementKeyDown()) {
+        if (!isAnyMovementKeyDown(getMappedInput(player))) {
             proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
             return;
         }
-        const movementVector = createMovementVector();
+        const movementVector = createMovementVector(getMappedInput(player));
         setMovementVector(player, vectorScalarProduct(movingSpeed, movementVector));
         setViewVector(player, get4DirectionVector(movementVector));
         updateCurrentAnimationBasedOnViewVector(player);
@@ -197,10 +198,10 @@ function createPlayerPushingState(player) {
         grabPushBox(pushBox, player);
     };
     state.update = () => {
-        if (!isKeyDown(KEYS.ACTION)) {
+        if (!isKeyDown(getMappedInput(player), KEYS.ACTION)) {
             proposeDesignatedState(player, getState(player, CommonStateTypes.IDLE));
         }
-        const movementVector = createMovementVector();
+        const movementVector = createMovementVector(getMappedInput(player));
         setMovementVector(player, vectorScalarProduct(pushingSpeed, movementVector));
         setViewVector(player, get4DirectionVector(movementVector));
         updateCurrentAnimationBasedOnViewVector(player);
@@ -293,4 +294,7 @@ export function getPlayer() {
 }
 function startPlayerCoolDown(player) {
     startCoolDown(player, disableHurtBox, enableHurtBox);
+}
+export function hasPlayerPressedStart() {
+    return isKeyPressed(getMappedInput(player), KEYS.START);
 }

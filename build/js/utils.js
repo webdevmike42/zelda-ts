@@ -33,3 +33,6 @@ export function getRandomInt(min, max) {
 export function toRadians(degrees) {
     return degrees * (Math.PI / 180);
 }
+export function getRandomValueFromArray(arr) {
+    return arr[getRandomInt(0, arr.length - 1)];
+}

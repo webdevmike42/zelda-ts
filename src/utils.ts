@@ -46,3 +46,7 @@ export function getRandomInt(min: number, max: number): number {
 export function toRadians(degrees: number): number {
     return degrees * (Math.PI / 180);
 }
+
+export function getRandomValueFromArray<T>(arr: T[]): T {
+    return arr[getRandomInt(0, arr.length - 1)];
+}
