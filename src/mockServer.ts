@@ -2361,7 +2361,7 @@ export function loadScreenById(screenId: number) {
             break;
 
         case 119:
-            
+            /*
             screen.tileMap = [
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -2380,8 +2380,8 @@ export function loadScreenById(screenId: number) {
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             ]
 
-
-            /*
+*/
+            
                 screen.tileMap = [
                     [22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22],
                     [22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22],
@@ -2398,7 +2398,7 @@ export function loadScreenById(screenId: number) {
                     [61, 61, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 61, 61],
                     [61, 61, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 61, 61],
                     [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]];
-    */
+    
             screen.gameObjects = [
                 //createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
                 //createPushBox(120, 80),

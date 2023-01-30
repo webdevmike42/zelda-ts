@@ -25,8 +25,10 @@ let quitGame: boolean = false;
 function startNewGame(): void {
     if ((canvas = document.getElementById("myCanvas") as HTMLCanvasElement) !== null && (ctx = canvas.getContext("2d")) !== null) {
         initKeyBoardInputHandler();
-        //init(ctx, "./resources/tiles-overworld.png");
-        init(ctx, "./resources/gfx/Overworld.png");
+        init(ctx, "./resources/tiles-overworld.png",
+        { tileWidth: 16, tileHeight: 16, tileCountPerRow: 18, tileFrameThickness: 1, tileSetFrameThickness: 1 });
+        /*init(ctx, "./resources/gfx/Overworld.png",
+            { tileWidth: 16, tileHeight: 16, tileCountPerRow: 40, tileFrameThickness: 0, tileSetFrameThickness: 0 });*/
         loadHud(ctx, "./resources/pausescreen.png");
         createPlayer(100, 100);
         switchToScreen(START_SCREEN_ID);

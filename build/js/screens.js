@@ -6,32 +6,37 @@ export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
 export const WORLD_MAP_ROWS = 8;
 export const WORLD_MAP_COLS = 16;
-export const TILE_WIDTH = 16;
-export const TILE_HEIGHT = 16;
+export let TILE_WIDTH = 16;
+export let TILE_HEIGHT = 16;
 //export const TILE_COUNT_PER_ROW = 18;
-export const TILE_COUNT_PER_ROW = 40;
-export const TILE_FRAME_THICKNESS = 1; //border between two frames in pixels
+export let TILE_COUNT_PER_ROW = 40;
+export let TILE_FRAME_THICKNESS = 1; //border between two frames in pixels
 //export const TILESET_FRAME_THICKNESS = 1; //outer border of tileset in pixels
-export const TILESET_FRAME_THICKNESS = 0; //outer border of tileset in pixels
+export let TILESET_FRAME_THICKNESS = 0; //outer border of tileset in pixels
 export const EMPTY_SCREEN_ID = -1;
 export const START_SCREEN_ID = 119;
+let tileSetMetaData;
 let tileMapImage;
 let ctx;
 let currentScreen;
 let currentGameObjects = [];
 let screens;
-export function init(renderingContext, imageUrl) {
+function setTileSetMetaData(newTileSetMetaData) {
+    tileSetMetaData = newTileSetMetaData;
+}
+export function init(renderingContext, imageUrl, tileSetMetaData) {
     tileMapImage = new Image();
     tileMapImage.src = imageUrl;
     ctx = renderingContext;
+    setTileSetMetaData(tileSetMetaData);
     screens = getAllScreensAsArray();
 }
 export function renderTileMap(tileMapDataArray) {
     for (let i = 0; i < tileMapDataArray.length; i++) {
         for (let j = 0; j < tileMapDataArray[i].length; j++) {
-            const calcSrcX = (tileMapDataArray[i][j] % TILE_COUNT_PER_ROW) * (TILE_WIDTH + TILE_FRAME_THICKNESS) + TILESET_FRAME_THICKNESS;
-            const calcSrcY = Math.floor(tileMapDataArray[i][j] / TILE_COUNT_PER_ROW) * (TILE_HEIGHT + TILE_FRAME_THICKNESS) + TILESET_FRAME_THICKNESS;
-            ctx.drawImage(tileMapImage, calcSrcX, calcSrcY, TILE_WIDTH, TILE_HEIGHT, j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+            const calcSrcX = (tileMapDataArray[i][j] % tileSetMetaData.tileCountPerRow) * (tileSetMetaData.tileWidth + tileSetMetaData.tileFrameThickness) + tileSetMetaData.tileSetFrameThickness;
+            const calcSrcY = Math.floor(tileMapDataArray[i][j] / tileSetMetaData.tileCountPerRow) * (tileSetMetaData.tileHeight + tileSetMetaData.tileFrameThickness) + tileSetMetaData.tileSetFrameThickness;
+            ctx.drawImage(tileMapImage, calcSrcX, calcSrcY, tileSetMetaData.tileWidth, tileSetMetaData.tileHeight, j * tileSetMetaData.tileWidth, i * tileSetMetaData.tileHeight, tileSetMetaData.tileWidth, tileSetMetaData.tileHeight);
         }
     }
 }
