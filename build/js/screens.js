@@ -6,13 +6,6 @@ export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
 export const WORLD_MAP_ROWS = 8;
 export const WORLD_MAP_COLS = 16;
-export let TILE_WIDTH = 16;
-export let TILE_HEIGHT = 16;
-//export const TILE_COUNT_PER_ROW = 18;
-export let TILE_COUNT_PER_ROW = 40;
-export let TILE_FRAME_THICKNESS = 1; //border between two frames in pixels
-//export const TILESET_FRAME_THICKNESS = 1; //outer border of tileset in pixels
-export let TILESET_FRAME_THICKNESS = 0; //outer border of tileset in pixels
 export const EMPTY_SCREEN_ID = -1;
 export const START_SCREEN_ID = 119;
 let tileSetMetaData;
@@ -21,15 +14,15 @@ let ctx;
 let currentScreen;
 let currentGameObjects = [];
 let screens;
-function setTileSetMetaData(newTileSetMetaData) {
-    tileSetMetaData = newTileSetMetaData;
-}
 export function init(renderingContext, imageUrl, tileSetMetaData) {
     tileMapImage = new Image();
     tileMapImage.src = imageUrl;
     ctx = renderingContext;
     setTileSetMetaData(tileSetMetaData);
     screens = getAllScreensAsArray();
+}
+function setTileSetMetaData(newTileSetMetaData) {
+    tileSetMetaData = newTileSetMetaData;
 }
 export function renderTileMap(tileMapDataArray) {
     for (let i = 0; i < tileMapDataArray.length; i++) {
@@ -77,7 +70,7 @@ function addCollisionObjectsFromTileMap(tileMapDataArray, collisionCells) {
         let arr = tileMapDataArray[row];
         arr.forEach((tile, col) => {
             if (collisionCells.indexOf(tile) !== -1) {
-                solidDummies.push(createSolidDummy(col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT));
+                solidDummies.push(createSolidDummy(col * tileSetMetaData.tileWidth, row * tileSetMetaData.tileHeight, tileSetMetaData.tileWidth, tileSetMetaData.tileHeight));
             }
         });
     }

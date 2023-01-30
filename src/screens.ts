@@ -1,19 +1,12 @@
-import { GameObject, GameObjectType, isVisible } from "./gameObjects/gameObject.js";
+import { GameObject, isVisible } from "./gameObjects/gameObject.js";
 import { getAllScreensAsArray, loadScreenById } from "./mockServer.js";
-import { createSolidDummy, filterGameObjects, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js"
-import { hitBoxes, removeAllHitBoxes, setHitBoxesFromGameObjects } from "./hitbox.js";
+import { createSolidDummy, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js"
+import { removeAllHitBoxes, setHitBoxesFromGameObjects } from "./hitbox.js";
 
 export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
 export const WORLD_MAP_ROWS = 8;
 export const WORLD_MAP_COLS = 16;
-export let TILE_WIDTH = 16;
-export let TILE_HEIGHT = 16;
-//export const TILE_COUNT_PER_ROW = 18;
-export let TILE_COUNT_PER_ROW = 40;
-export let TILE_FRAME_THICKNESS = 1; //border between two frames in pixels
-//export const TILESET_FRAME_THICKNESS = 1; //outer border of tileset in pixels
-export let TILESET_FRAME_THICKNESS = 0; //outer border of tileset in pixels
 export const EMPTY_SCREEN_ID = -1;
 export const START_SCREEN_ID = 119;
 let tileSetMetaData:TileSetMetaData;
@@ -42,16 +35,17 @@ export interface TileSetMetaData{
     tileSetFrameThickness: number
 }
 
-function setTileSetMetaData(newTileSetMetaData:TileSetMetaData):void{
-    tileSetMetaData = newTileSetMetaData;
-}
-
 export function init(renderingContext: CanvasRenderingContext2D, imageUrl: string, tileSetMetaData:TileSetMetaData): void {
     tileMapImage = new Image();
     tileMapImage.src = imageUrl;
     ctx = renderingContext;
     setTileSetMetaData(tileSetMetaData);
     screens = getAllScreensAsArray();
+}
+
+
+function setTileSetMetaData(newTileSetMetaData:TileSetMetaData):void{
+    tileSetMetaData = newTileSetMetaData;
 }
 
 export function renderTileMap(tileMapDataArray: number[][]) {
@@ -119,7 +113,7 @@ function addCollisionObjectsFromTileMap(tileMapDataArray: number[][], collisionC
         let arr = tileMapDataArray[row];
         arr.forEach((tile, col) => {
             if (collisionCells.indexOf(tile) !== -1) {
-                solidDummies.push(createSolidDummy(col * TILE_WIDTH, row * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT));
+                solidDummies.push(createSolidDummy(col * tileSetMetaData.tileWidth, row * tileSetMetaData.tileHeight, tileSetMetaData.tileWidth, tileSetMetaData.tileHeight));
             }
         });
     }

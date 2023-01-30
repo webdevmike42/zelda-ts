@@ -6,10 +6,12 @@ import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPositi
 import { createGameObject, setSolid } from "./gameObjectFactory.js";
 import { Item } from "./item.js";
 
-export interface Chest extends GameObject{
-    isOpen:boolean,
-    isLocked:boolean,
-    item:Item
+const SMALL_CHEST_WIDTH = 16, SMALL_CHEST_HEIGHT = 16;
+
+export interface Chest extends GameObject {
+    isOpen: boolean,
+    isLocked: boolean,
+    item: Item
 }
 
 enum ChestStates {
@@ -17,17 +19,22 @@ enum ChestStates {
     CLOSED = "Closed"
 }
 
-export function createChest(x: number, y: number, isLocked:boolean = false, isOpen: boolean = false): Chest {
-    const chest:Chest = createGameObject(GameObjectType.CHEST) as Chest;
+export function createSmallChest(x: number, y: number, isLocked: boolean = false, isOpen: boolean = false): Chest {
+    const smallChest: Chest = createChest(x,y,SMALL_CHEST_WIDTH, SMALL_CHEST_HEIGHT,isLocked,isOpen);
+    addSmallChestAnimations(smallChest);
+    proposeDesignatedState(smallChest, getState(smallChest, isOpen ? ChestStates.OPEN : ChestStates.CLOSED));
+    return smallChest;
+}
+
+function createChest(x: number, y: number, width: number, height: number, isLocked: boolean = false, isOpen: boolean = false): Chest {
+    const chest: Chest = createGameObject(GameObjectType.CHEST) as Chest;
     setPosition(chest, createVector(x, y));
-    setBounds(chest, 16, 16);
+    setBounds(chest, width, height);
     setSolid(chest);
     addChestStates(chest);
-    addChestAnimations(chest);
     setCollisionBoxFromBoundingBox(chest);
     chest.isOpen = isOpen;
     chest.isLocked = isLocked;
-    switchToState(chest, getState(chest, isOpen ? ChestStates.OPEN : ChestStates.CLOSED));
     return chest;
 }
 
@@ -38,21 +45,22 @@ function addChestStates(chest: Chest): void {
     setDefaultState(chest, closedState);
 }
 
-function addChestAnimations(chest: Chest): void {
-    chest.animations = new Map<string, Animation>();
-    addAnimation(chest, createAnimation(ChestStates.OPEN, "./resources/link.png", getPosition(chest), chest.width, chest.height, [{ srcX: 91, srcY: 0 }], 1, false));
-    addAnimation(chest, createAnimation(ChestStates.CLOSED, "./resources/link.png", getPosition(chest), chest.width, chest.height, [{ srcX: 30, srcY: 0 }], 1, false));
+function addSmallChestAnimations(smallChest: Chest): void {
+    addAnimation(smallChest, createAnimation(ChestStates.OPEN, "./resources/gfx/objects.png", getPosition(smallChest), smallChest.width, smallChest.height, [{ srcX: 16, srcY: 0 }], 1, false));
+    addAnimation(smallChest, createAnimation(ChestStates.CLOSED, "./resources/gfx/objects.png", getPosition(smallChest), smallChest.width, smallChest.height, [{ srcX: 0, srcY: 0 }], 1, false));
 }
 
 function createChestOpenState(chest: Chest): State {
     const state: State = createEmptyState(ChestStates.OPEN);
     state.name = "chest open state";
     state.enter = () => {
+        console.log("enter " + state.name)
+        console.log(chest.animations)
         chest.isOpen = true;
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.OPEN));
     }
     state.update = () => {
-        
+
     }
     state.exit = () => {
     };
@@ -63,11 +71,12 @@ function createChestClosedState(chest: Chest): State {
     const state: State = createEmptyState(ChestStates.CLOSED);
     state.name = "chest closed state";
     state.enter = () => {
+        console.log("enter " + state.name)
         chest.isOpen = false;
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.CLOSED));
     }
     state.update = () => {
-        
+
     }
     state.exit = () => {
     };
@@ -75,10 +84,10 @@ function createChestClosedState(chest: Chest): State {
 }
 
 
-export function openChest(chest:Chest):void{
-    proposeDesignatedState(chest,getState(chest, ChestStates.OPEN));
+export function openChest(chest: Chest): void {
+    proposeDesignatedState(chest, getState(chest, ChestStates.OPEN));
 }
 
-export function closeChest(chest:Chest):void{
-    proposeDesignatedState(chest,getState(chest, ChestStates.CLOSED));
+export function closeChest(chest: Chest): void {
+    proposeDesignatedState(chest, getState(chest, ChestStates.CLOSED));
 }

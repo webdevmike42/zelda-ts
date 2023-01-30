@@ -2,6 +2,7 @@ import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObj
 import { createSword } from "./gameObjects/item.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
+import { createSmallChest } from "./gameObjects/chest.js";
 export function loadScreenById(screenId) {
     const screen = {
         id: screenId,
@@ -2316,21 +2317,22 @@ export function loadScreenById(screenId) {
                 [61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61]
             ];
             screen.gameObjects = [
-            //createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
-            //createPushBox(120, 80),
-            //createDynamicHazard(100,130,16,16,1),
-            //createRedOktorok(80, 170)
-            //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
-            /*
-            createFloorSwitch(120, 100, 16, 16, false, () => {
-                openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
-            }, () => {
-                if (filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects()).length > 0)
-                    closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
-            }),
-            */
-            //createDoor(70, 130, 16, 16, false)
-            //createStaticHazard(120,140,16,16,1)
+                createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
+                createSmallChest(120, 120)
+                //createPushBox(120, 80),
+                //createDynamicHazard(100,130,16,16,1),
+                //createRedOktorok(80, 170)
+                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                /*
+                createFloorSwitch(120, 100, 16, 16, false, () => {
+                    openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
+                }, () => {
+                    if (filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects()).length > 0)
+                        closeDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
+                }),
+                */
+                //createDoor(70, 130, 16, 16, false)
+                //createStaticHazard(120,140,16,16,1)
             ];
             screen.persistedGameObjects = [];
             break;

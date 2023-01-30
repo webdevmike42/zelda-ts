@@ -1,25 +1,30 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
 import { createGameObject, setSolid } from "./gameObjectFactory.js";
+const SMALL_CHEST_WIDTH = 16, SMALL_CHEST_HEIGHT = 16;
 var ChestStates;
 (function (ChestStates) {
     ChestStates["OPEN"] = "Open";
     ChestStates["CLOSED"] = "Closed";
 })(ChestStates || (ChestStates = {}));
-export function createChest(x, y, isLocked = false, isOpen = false) {
+export function createSmallChest(x, y, isLocked = false, isOpen = false) {
+    const smallChest = createChest(x, y, SMALL_CHEST_WIDTH, SMALL_CHEST_HEIGHT, isLocked, isOpen);
+    addSmallChestAnimations(smallChest);
+    proposeDesignatedState(smallChest, getState(smallChest, isOpen ? ChestStates.OPEN : ChestStates.CLOSED));
+    return smallChest;
+}
+function createChest(x, y, width, height, isLocked = false, isOpen = false) {
     const chest = createGameObject(GameObjectType.CHEST);
     setPosition(chest, createVector(x, y));
-    setBounds(chest, 16, 16);
+    setBounds(chest, width, height);
     setSolid(chest);
     addChestStates(chest);
-    addChestAnimations(chest);
     setCollisionBoxFromBoundingBox(chest);
     chest.isOpen = isOpen;
     chest.isLocked = isLocked;
-    switchToState(chest, getState(chest, isOpen ? ChestStates.OPEN : ChestStates.CLOSED));
     return chest;
 }
 function addChestStates(chest) {
@@ -28,15 +33,16 @@ function addChestStates(chest) {
     addState(chest, ChestStates.CLOSED, closedState);
     setDefaultState(chest, closedState);
 }
-function addChestAnimations(chest) {
-    chest.animations = new Map();
-    addAnimation(chest, createAnimation(ChestStates.OPEN, "./resources/link.png", getPosition(chest), chest.width, chest.height, [{ srcX: 91, srcY: 0 }], 1, false));
-    addAnimation(chest, createAnimation(ChestStates.CLOSED, "./resources/link.png", getPosition(chest), chest.width, chest.height, [{ srcX: 30, srcY: 0 }], 1, false));
+function addSmallChestAnimations(smallChest) {
+    addAnimation(smallChest, createAnimation(ChestStates.OPEN, "./resources/gfx/objects.png", getPosition(smallChest), smallChest.width, smallChest.height, [{ srcX: 16, srcY: 0 }], 1, false));
+    addAnimation(smallChest, createAnimation(ChestStates.CLOSED, "./resources/gfx/objects.png", getPosition(smallChest), smallChest.width, smallChest.height, [{ srcX: 0, srcY: 0 }], 1, false));
 }
 function createChestOpenState(chest) {
     const state = createEmptyState(ChestStates.OPEN);
     state.name = "chest open state";
     state.enter = () => {
+        console.log("enter " + state.name);
+        console.log(chest.animations);
         chest.isOpen = true;
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.OPEN));
     };
@@ -50,6 +56,7 @@ function createChestClosedState(chest) {
     const state = createEmptyState(ChestStates.CLOSED);
     state.name = "chest closed state";
     state.enter = () => {
+        console.log("enter " + state.name);
         chest.isOpen = false;
         setCurrentAnimation(chest, getAnimation(chest, ChestStates.CLOSED));
     };
