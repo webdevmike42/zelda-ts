@@ -8,8 +8,11 @@ export const WORLD_MAP_ROWS = 8;
 export const WORLD_MAP_COLS = 16;
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
-export const TILE_COUNT_PER_ROW = 18;
-export const TILE_FRAME_THICKNESS = 1;
+//export const TILE_COUNT_PER_ROW = 18;
+export const TILE_COUNT_PER_ROW = 40;
+export const TILE_FRAME_THICKNESS = 1; //border between two frames in pixels
+//export const TILESET_FRAME_THICKNESS = 1; //outer border of tileset in pixels
+export const TILESET_FRAME_THICKNESS = 0; //outer border of tileset in pixels
 export const EMPTY_SCREEN_ID = -1;
 export const START_SCREEN_ID = 119;
 let tileMapImage;
@@ -26,7 +29,9 @@ export function init(renderingContext, imageUrl) {
 export function renderTileMap(tileMapDataArray) {
     for (let i = 0; i < tileMapDataArray.length; i++) {
         for (let j = 0; j < tileMapDataArray[i].length; j++) {
-            ctx.drawImage(tileMapImage, ((tileMapDataArray[i][j] % TILE_COUNT_PER_ROW) * (TILE_COUNT_PER_ROW - 1)) + TILE_FRAME_THICKNESS, (Math.floor(tileMapDataArray[i][j] / TILE_COUNT_PER_ROW) * (TILE_COUNT_PER_ROW - 1)) + TILE_FRAME_THICKNESS, TILE_WIDTH, TILE_HEIGHT, j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+            const calcSrcX = (tileMapDataArray[i][j] % TILE_COUNT_PER_ROW) * (TILE_WIDTH + TILE_FRAME_THICKNESS) + TILESET_FRAME_THICKNESS;
+            const calcSrcY = Math.floor(tileMapDataArray[i][j] / TILE_COUNT_PER_ROW) * (TILE_HEIGHT + TILE_FRAME_THICKNESS) + TILESET_FRAME_THICKNESS;
+            ctx.drawImage(tileMapImage, calcSrcX, calcSrcY, TILE_WIDTH, TILE_HEIGHT, j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
         }
     }
 }
