@@ -1,7 +1,7 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { EMPTY_SCREEN_ID, getCurrentGameObjects, switchToScreen } from "../screens.js";
-import { addState, createEmptyState, getState, setDefaultState, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, proposeDesignatedState, setDefaultState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
 import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
@@ -17,7 +17,7 @@ export function createTeleporterTrigger(x, y, width, height, targetScreenId, tar
     addTeleporterStates(teleporter);
     setCollisionBoxFromBoundingBox(teleporter);
     setTarget(teleporter, targetScreenId || EMPTY_SCREEN_ID, targetX, targetY);
-    switchToState(teleporter, getState(teleporter, TeleporterStates.ACTIVE));
+    proposeDesignatedState(teleporter, getState(teleporter, TeleporterStates.ACTIVE));
     return teleporter;
 }
 export function setTarget(teleporter, targetScreenId, targetX, targetY) {
@@ -31,9 +31,7 @@ function addTeleporterStates(teleporter) {
     setDefaultState(teleporter, activeState);
 }
 function addTeleporterAnimations(teleporter) {
-    teleporter.animations = new Map();
-    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 30 }], 1, false));
-    setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
+    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 30 }], 1, false), true);
 }
 function createTeleporterActiveState(teleporter) {
     const state = createEmptyState(TeleporterStates.ACTIVE);

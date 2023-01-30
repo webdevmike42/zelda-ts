@@ -1,7 +1,7 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCurrentGameObjects } from "../screens.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, switchToState } from "../state.js";
+import { addState, CommonStateTypes, createEmptyState, getState, proposeDesignatedState, setDefaultState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObjectType, getPosition, setBounds, setPosition, setVisible } from "./gameObject.js";
 import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
@@ -43,14 +43,13 @@ function addItemStates(item) {
 export function createSmallKey(x, y) {
     const smallKey = createCollectableMinorItem(x, y, 8, 16, ItemType.SMALL_KEY);
     addAnimation(smallKey, createAnimation("idle", "./resources/pausescreen.png", getPosition(smallKey), smallKey.width, smallKey.height, [{ srcX: 555, srcY: 137 }], 1, false));
-    switchToState(smallKey, getState(smallKey, CommonStateTypes.IDLE));
-    console.log(smallKey);
+    proposeDesignatedState(smallKey, getState(smallKey, CommonStateTypes.IDLE));
     return smallKey;
 }
 export function createSword(x, y) {
     const sword = createCollectableMajorItem(x, y, 8, 16, ItemType.SWORD);
     addAnimation(sword, createAnimation("idle", "./resources/pausescreen.png", getPosition(sword), sword.width, sword.height, [{ srcX: 555, srcY: 137 }], 1, false));
-    switchToState(sword, getState(sword, CommonStateTypes.IDLE));
+    proposeDesignatedState(sword, getState(sword, CommonStateTypes.IDLE));
     return sword;
 }
 function createItemIdleState(item) {

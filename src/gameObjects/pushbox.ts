@@ -1,7 +1,7 @@
 
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State } from "../state.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
 import { GameObject, GameObjectType, getOverallVector, getPosition, setBounds, setMovementVector, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
@@ -17,7 +17,7 @@ export function createPushBox(x: number, y: number): GameObject {
     addPushBoxStates(pushBox);
     addPushBoxAnimations(pushBox);
     setCollisionBoxFromBoundingBox(pushBox);
-    switchToState(pushBox, getState(pushBox, CommonStateTypes.IDLE));
+    proposeDesignatedState(pushBox, getState(pushBox, CommonStateTypes.IDLE));
     return pushBox;
 }
 

@@ -1,7 +1,7 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { EMPTY_SCREEN_ID, getCurrentGameObjects, switchToScreen } from "../screens.js";
-import { addState, createEmptyState, getState, setDefaultState, State, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, proposeDesignatedState, setDefaultState, State, switchToState } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
 import { createGameObject, filterGameObjects } from "./gameObjectFactory.js";
@@ -24,7 +24,7 @@ export function createTeleporterTrigger(x: number, y: number, width: number, hei
     addTeleporterStates(teleporter);
     setCollisionBoxFromBoundingBox(teleporter);
     setTarget(teleporter, targetScreenId || EMPTY_SCREEN_ID, targetX, targetY);
-    switchToState(teleporter, getState(teleporter, TeleporterStates.ACTIVE));
+    proposeDesignatedState(teleporter, getState(teleporter, TeleporterStates.ACTIVE));
     return teleporter;
 }
 
@@ -41,9 +41,7 @@ function addTeleporterStates(teleporter: Teleporter): void {
 }
 
 function addTeleporterAnimations(teleporter: Teleporter): void {
-    teleporter.animations = new Map<string, Animation>();
-    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 30 }], 1, false));
-    setCurrentAnimation(teleporter, getAnimation(teleporter, "TeleporterActive"));
+    addAnimation(teleporter, createAnimation("TeleporterActive", "./resources/link.png", getPosition(teleporter), teleporter.width, teleporter.height, [{ srcX: 0, srcY: 30 }], 1, false), true);
 }
 
 function createTeleporterActiveState(teleporter: Teleporter): State {

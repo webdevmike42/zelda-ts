@@ -2,7 +2,7 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCurrentGameObjects } from "../screens.js";
-import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
 import { createGameObject} from "./gameObjectFactory.js";
@@ -30,7 +30,7 @@ export function createFloorSwitch(x: number, y: number, width: number, height: n
     setFloorSwitchReleasedCallback(floorSwitch, onReleased);
     floorSwitch.pressed = false;
     floorSwitch.staysPressed = staysPressed;
-    switchToState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
+    proposeDesignatedState(floorSwitch, getState(floorSwitch, FloorSwitchStates.RELEASED));
     return floorSwitch;
 }
 
@@ -42,7 +42,6 @@ function addFloorSwitchStates(floorSwitch: FloorSwitch): void {
 }
 
 function addFloorSwitchAnimations(floorSwitch: FloorSwitch): void {
-    floorSwitch.animations = new Map<string, Animation>();
     addAnimation(floorSwitch, createAnimation(FloorSwitchStates.PRESSED, "./resources/tiles-overworld.png", getPosition(floorSwitch), floorSwitch.width, floorSwitch.height, [{ srcX: 103, srcY: 18 }], 1, false));
     addAnimation(floorSwitch, createAnimation(FloorSwitchStates.RELEASED, "./resources/tiles-overworld.png", getPosition(floorSwitch), floorSwitch.width, floorSwitch.height, [{ srcX: 1, srcY: 18 }], 1, false));
 }

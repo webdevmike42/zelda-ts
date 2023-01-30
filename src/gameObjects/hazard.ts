@@ -4,7 +4,7 @@ import { getPlayer } from "../gameActors/player.js";
 import { disableHitBox, enableHitBox, HitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { getCurrentGameObjects } from "../screens.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State } from "../state.js";
 import { createVector, reverseVector, vectorScalarProduct } from "../vector.js";
 import { Bullet } from "./bullet.js";
 import { createMovementVector, GameObject, GameObjectType, getPosition, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition } from "./gameObject.js";
@@ -19,9 +19,7 @@ export function createStaticHazard(x: number, y: number, width: number, height: 
     setBounds(staticHazard, width, height);
     setCollisionBoxFromBoundingBox(staticHazard);
     setHitBoxFromBoundingBox(staticHazard, damage);
-    addAnimation(staticHazard, createAnimation("StaticHazardActive", "./resources/link.png", getPosition(staticHazard), staticHazard.width, staticHazard.height, [{ srcX: 180, srcY: 151 }], 1, false));
-    setCurrentAnimation(staticHazard, getAnimation(staticHazard, "StaticHazardActive"));
-    console.dir("createStaticHazard")
+    addAnimation(staticHazard, createAnimation("StaticHazardActive", "./resources/link.png", getPosition(staticHazard), staticHazard.width, staticHazard.height, [{ srcX: 180, srcY: 151 }], 1, false),true);
     return staticHazard;
 }
 

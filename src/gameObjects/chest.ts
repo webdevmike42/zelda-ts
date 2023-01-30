@@ -1,6 +1,6 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State } from "../state.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
 import { createGameObject, setSolid } from "./gameObjectFactory.js";

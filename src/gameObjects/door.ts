@@ -1,9 +1,9 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { EMPTY_SCREEN_ID, getCurrentGameObjects, switchToScreen } from "../screens.js";
-import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, setDefaultState, proposeDesignatedState, State } from "../state.js";
 import { createVector } from "../vector.js";
-import { GameObject, GameObjectType, getPosition, setBounds, setGameObjectPosition, setPosition } from "./gameObject.js";
+import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
 import { createGameObject, setSolid } from "./gameObjectFactory.js";
 
 export interface Door extends GameObject{
@@ -25,7 +25,7 @@ export function createDoor(x: number, y: number, width: number, height: number, 
     addDoorAnimations(door);
     setCollisionBoxFromBoundingBox(door);
     door.isOpen = isOpen;
-    switchToState(door, getState(door, isOpen ? DoorStates.OPEN : DoorStates.CLOSED));
+    proposeDesignatedState(door, getState(door, isOpen ? DoorStates.OPEN : DoorStates.CLOSED));
     return door;
 }
 
@@ -37,7 +37,6 @@ function addDoorStates(door: Door): void {
 }
 
 function addDoorAnimations(door: Door): void {
-    door.animations = new Map<string, Animation>();
     addAnimation(door, createAnimation(DoorStates.OPEN, "./resources/link.png", getPosition(door), door.width, door.height, [{ srcX: 91, srcY: 0 }], 1, false));
     addAnimation(door, createAnimation(DoorStates.CLOSED, "./resources/link.png", getPosition(door), door.width, door.height, [{ srcX: 30, srcY: 0 }], 1, false));
 }

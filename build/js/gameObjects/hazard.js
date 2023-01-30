@@ -1,4 +1,4 @@
-import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
+import { addAnimation, createAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
@@ -13,9 +13,7 @@ export function createStaticHazard(x, y, width, height, damage) {
     setBounds(staticHazard, width, height);
     setCollisionBoxFromBoundingBox(staticHazard);
     setHitBoxFromBoundingBox(staticHazard, damage);
-    addAnimation(staticHazard, createAnimation("StaticHazardActive", "./resources/link.png", getPosition(staticHazard), staticHazard.width, staticHazard.height, [{ srcX: 180, srcY: 151 }], 1, false));
-    setCurrentAnimation(staticHazard, getAnimation(staticHazard, "StaticHazardActive"));
-    console.dir("createStaticHazard");
+    addAnimation(staticHazard, createAnimation("StaticHazardActive", "./resources/link.png", getPosition(staticHazard), staticHazard.width, staticHazard.height, [{ srcX: 180, srcY: 151 }], 1, false), true);
     return staticHazard;
 }
 export function createDestroyableStaticHazard(x, y, width, height, damage, health) {

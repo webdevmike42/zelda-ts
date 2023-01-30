@@ -1,7 +1,7 @@
 import { addAnimation, Animation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getCurrentGameObjects } from "../screens.js";
-import { addState, createEmptyState, getState, setDefaultState, State, switchToState } from "../state.js";
+import { addState, createEmptyState, getState, proposeDesignatedState, setDefaultState, State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorScalarProduct, vectorSum } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
@@ -30,13 +30,12 @@ export function createConveyor(x: number, y: number, width: number, height: numb
     conveyor.conveyingSpeed = conveyingSpeed;
     conveyor.conveyingVector = vectorScalarProduct(conveyingSpeed, conveyingNormalizedDirection);
     conveyor.isActive = isActive;
-    switchToState(conveyor, getState(conveyor, isActive ? ConveyorStates.ACTIVE : ConveyorStates.INACTIVE));
+    proposeDesignatedState(conveyor, getState(conveyor, isActive ? ConveyorStates.ACTIVE : ConveyorStates.INACTIVE));
 
     return conveyor;
 }
 
 function addConveyorAnimations(conveyor: Conveyor): void {
-    conveyor.animations = new Map<string, Animation>();
     addAnimation(conveyor, createAnimation("active", "./resources/link.png", getPosition(conveyor), conveyor.width, conveyor.height, [{ srcX: 91, srcY: 0 }, { srcX: 91, srcY: 30 }], 6, true));
     addAnimation(conveyor, createAnimation("inactive", "./resources/link.png", getPosition(conveyor), conveyor.width, conveyor.height, [{ srcX: 91, srcY: 0 }], 1, false));
 }
