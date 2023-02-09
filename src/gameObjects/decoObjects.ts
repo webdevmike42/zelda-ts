@@ -1,7 +1,8 @@
 import { addAnimation, createAnimation, createTextAnimation } from "../animation.js";
+import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { createVector } from "../vector.js";
 import { GameObject, GameObjectType, getPosition, setBounds, setPosition } from "./gameObject.js";
-import { createGameObject } from "./gameObjectFactory.js";
+import { createGameObject, setSolid } from "./gameObjectFactory.js";
 
 function createDecoObject(x: number, y: number, width: number, height: number): GameObject {
     const deco: GameObject = createGameObject(GameObjectType.MISC);
@@ -26,4 +27,12 @@ export function createCaveText(x: number, y: number): GameObject {
     const caveText: GameObject = createDecoObject(x, y, 16, 16);
     addAnimation(caveText, createTextAnimation("caveText", "IT'S DANGEROUS TO GO ALONE! TAKE THIS.", "white", "8px Arial", createVector(x, y), caveText.width, caveText.height, 12, false),true);
     return caveText;
+}
+
+export function createFountain(x: number, y: number): GameObject {
+    const fountain: GameObject = createDecoObject(x, y, 48, 48);
+    addAnimation(fountain, createAnimation("deco", "./resources/gfx/Overworld.png", getPosition(fountain), fountain.width, fountain.height, [{ srcX: 352, srcY: 144 },{ srcX: 400, srcY: 144 },{ srcX: 448, srcY: 144 }], 12, true), true);
+    setCollisionBoxFromBoundingBox(fountain);
+    setSolid(fountain);
+    return fountain;
 }

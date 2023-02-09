@@ -1,4 +1,4 @@
-import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObjects.js";
+import { createCaveText, createFlame, createFountain, createOldMan } from "./gameObjects/decoObjects.js";
 import { GameObject } from "./gameObjects/gameObject.js";
 import { createSword } from "./gameObjects/item.js";
 import { createPushBox } from "./gameObjects/pushbox.js";
@@ -2382,7 +2382,27 @@ export function loadScreenById(screenId: number) {
             ]
 
 */
-            
+/*
+screen.tileMap = 
+[
+
+    [39,39,39,39,39,39,39,39,39,39,39,39,39,39,39,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[29,29,29,29,29,29,30,29,29,29,29,29,29,29,29,39],
+[39,26,26,26,26,30,38,31,26,26,26,26,26,26,26,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[39,26,26,26,26,26,33,26,26,40,26,26,26,26,26,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[39,26,26,26,26,26,33,26,26,40,26,26,26,26,26,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[39,26,26,26,26,26,33,26,26,40,26,26,26,26,26,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[39,26,26,26,26,26,26,26,26,26,26,26,26,26,26,39],
+[39,39,39,39,39,39,39,26,26,39,39,39,39,39,39,39]]
+   */         
+
                 screen.tileMap = [
                     [22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22],
                     [22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22],
@@ -2402,7 +2422,8 @@ export function loadScreenById(screenId: number) {
     
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
-                createSmallChest(120,120)
+                
+                //createFountain(100,120)
                 //createPushBox(120, 80),
                 //createDynamicHazard(100,130,16,16,1),
                 //createRedOktorok(80, 170)
@@ -2421,6 +2442,7 @@ export function loadScreenById(screenId: number) {
             ];
 
             screen.persistedGameObjects = [
+                createSmallChest(120,120)
             ];
 
             break;
