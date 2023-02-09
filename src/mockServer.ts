@@ -10,6 +10,7 @@ import { createBullet } from "./gameObjects/bullet.js";
 import { getPlayer } from "./gameActors/player.js";
 import { createVector } from "./vector.js";
 import { createSmallChest } from "./gameObjects/chest.js";
+import { createStalfos } from "./gameActors/stalfos.js";
 
 export function loadScreenById(screenId: number) {
     const screen: Screen = {
@@ -2422,7 +2423,7 @@ screen.tileMap =
     
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
-                
+                createStalfos(100,120)
                 //createFountain(100,120)
                 //createPushBox(120, 80),
                 //createDynamicHazard(100,130,16,16,1),

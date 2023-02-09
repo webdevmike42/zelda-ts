@@ -3,6 +3,7 @@ import { createSword } from "./gameObjects/item.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
 import { createSmallChest } from "./gameObjects/chest.js";
+import { createStalfos } from "./gameActors/stalfos.js";
 export function loadScreenById(screenId) {
     const screen = {
         id: screenId,
@@ -2338,6 +2339,7 @@ export function loadScreenById(screenId) {
             ];
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
+                createStalfos(100, 120)
                 //createFountain(100,120)
                 //createPushBox(120, 80),
                 //createDynamicHazard(100,130,16,16,1),

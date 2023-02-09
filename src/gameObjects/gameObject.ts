@@ -62,6 +62,7 @@ export enum GameObjectType {
     CHEST,
     MISC,
     OKTOROK,
+    STALFOS,
     BULLET
 }
 
