@@ -262,9 +262,9 @@ function getDirectionNameFromViewVector(viewVector: Vector): string {
 
 function spawnOktorokBullet(oktorok: GameObject): void {
     const box: Box = createBoxInFront(oktorok, OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT);
-    addToCurrentGameObjects(
-        createBullet(getPosition(box).x, getPosition(box).y, OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, oktorok, OKTOROK_DAMAGE, OKTOROK_BULLET_SPEED, getViewVector(oktorok))
-    );
+    const bullet:Bullet = createBullet(getPosition(box).x, getPosition(box).y, OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, oktorok, OKTOROK_DAMAGE, OKTOROK_BULLET_SPEED, getViewVector(oktorok));
+    addOktorokBulletAnimations(bullet);
+    addToCurrentGameObjects(bullet);
 }
 
 function addOktorokBulletStates(oktorokBullet: Bullet): void {
@@ -274,7 +274,7 @@ function addOktorokBulletStates(oktorokBullet: Bullet): void {
 }
 
 function addOktorokBulletAnimations(oktorokBullet: Bullet): void {
-    addAnimation(oktorokBullet, createAnimation(CommonStateTypes.IDLE, "./resources/link.png", getPosition(oktorokBullet), OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, [{ srcX: 394, srcY: 228 }], 1, false), true);
+    addAnimation(oktorokBullet, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(oktorokBullet), OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, [{ srcX: 394, srcY: 228 }], 1, false), true);
 }
 
 function createOktorokBulletActionState(oktorokBullet: Bullet): State {

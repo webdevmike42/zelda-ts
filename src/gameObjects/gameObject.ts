@@ -63,6 +63,7 @@ export enum GameObjectType {
     MISC,
     OKTOROK,
     STALFOS,
+    GORIYA,
     BULLET
 }
 
