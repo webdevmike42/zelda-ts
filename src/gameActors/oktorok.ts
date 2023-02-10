@@ -267,14 +267,15 @@ function spawnOktorokBullet(oktorok: GameObject): void {
     addToCurrentGameObjects(bullet);
 }
 
+function addOktorokBulletAnimations(oktorokBullet: Bullet): void {
+    addAnimation(oktorokBullet, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(oktorokBullet), OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, [{ srcX: 394, srcY: 228 }], 1, false), true);
+}
+
+/*
 function addOktorokBulletStates(oktorokBullet: Bullet): void {
     const actionState: State = createOktorokBulletActionState(oktorokBullet);
     addState(oktorokBullet, CommonStateTypes.ACTION, actionState);
     setDefaultState(oktorokBullet, actionState);
-}
-
-function addOktorokBulletAnimations(oktorokBullet: Bullet): void {
-    addAnimation(oktorokBullet, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(oktorokBullet), OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, [{ srcX: 394, srcY: 228 }], 1, false), true);
 }
 
 function createOktorokBulletActionState(oktorokBullet: Bullet): State {
@@ -285,10 +286,10 @@ function createOktorokBulletActionState(oktorokBullet: Bullet): State {
         //setMovementVector(oktorokBullet, vectorScalarProduct(OKTOROK_BULLET_SPEED, {...getViewVector(oktorokBullet.owner)}));
     }
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-        /*
-        if(oktorokBullet.hitSolid)
-            proposeDesignatedState(oktorokBullet, getState(oktorokBullet, CommonStateTypes.DEATH));
-            */
+        
+        //if(oktorokBullet.hitSolid)
+           // proposeDesignatedState(oktorokBullet, getState(oktorokBullet, CommonStateTypes.DEATH));
+            
     }
     return state;
 }
@@ -298,3 +299,4 @@ function change4Direction(oktorok: GameObject): void {
     setViewVector(oktorok, createRandom4DirectionViewVector());
     //setTimeout(change4Direction, 1000, oktorok);
 }
+*/

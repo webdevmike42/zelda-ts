@@ -3,7 +3,7 @@ import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
-import { createRandom4DirectionViewVector, createVector, get4DirectionVector, NULL_VECTOR, reverseVector, vectorScalarProduct } from "../vector.js";
+import { createVector, get4DirectionVector, NULL_VECTOR, reverseVector, vectorScalarProduct } from "../vector.js";
 import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setAIControlled, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject } from "../gameObjects/gameObjectFactory.js";
 import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, releaseAllKeys, reverseMovementInput } from "../KeyboardInputHandler.js";
@@ -227,31 +227,35 @@ function spawnOktorokBullet(oktorok) {
     addOktorokBulletAnimations(bullet);
     addToCurrentGameObjects(bullet);
 }
-function addOktorokBulletStates(oktorokBullet) {
-    const actionState = createOktorokBulletActionState(oktorokBullet);
-    addState(oktorokBullet, CommonStateTypes.ACTION, actionState);
-    setDefaultState(oktorokBullet, actionState);
-}
 function addOktorokBulletAnimations(oktorokBullet) {
     addAnimation(oktorokBullet, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(oktorokBullet), OKTOROK_BULLET_WIDTH, OKTOROK_BULLET_HEIGHT, [{ srcX: 394, srcY: 228 }], 1, false), true);
 }
-function createOktorokBulletActionState(oktorokBullet) {
-    const state = createEmptyState(CommonStateTypes.ACTION);
+/*
+function addOktorokBulletStates(oktorokBullet: Bullet): void {
+    const actionState: State = createOktorokBulletActionState(oktorokBullet);
+    addState(oktorokBullet, CommonStateTypes.ACTION, actionState);
+    setDefaultState(oktorokBullet, actionState);
+}
+
+function createOktorokBulletActionState(oktorokBullet: Bullet): State {
+    const state: State = createEmptyState(CommonStateTypes.ACTION);
     state.name = "BULLET action state";
     state.enter = () => {
         //console.log("enter " + state.name)
         //setMovementVector(oktorokBullet, vectorScalarProduct(OKTOROK_BULLET_SPEED, {...getViewVector(oktorokBullet.owner)}));
-    };
-    state.update = (currentGameTime, timeSinceLastTick) => {
-        /*
-        if(oktorokBullet.hitSolid)
-            proposeDesignatedState(oktorokBullet, getState(oktorokBullet, CommonStateTypes.DEATH));
-            */
-    };
+    }
+    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
+        
+        //if(oktorokBullet.hitSolid)
+           // proposeDesignatedState(oktorokBullet, getState(oktorokBullet, CommonStateTypes.DEATH));
+            
+    }
     return state;
 }
-function change4Direction(oktorok) {
+
+function change4Direction(oktorok: GameObject): void {
     //console.log("changed direction");
     setViewVector(oktorok, createRandom4DirectionViewVector());
     //setTimeout(change4Direction, 1000, oktorok);
 }
+*/ 

@@ -1,22 +1,27 @@
 import { addAnimation, createAnimation } from "../animation.js";
+import { setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { disableHitBox } from "../hitbox.js";
 import { disableHurtBox } from "../hurtbox.js";
 import { removeGameObject } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, proposeDesignatedState } from "../state.js";
-import { NULL_VECTOR, vectorScalarProduct } from "../vector.js";
-import { GameObjectType, getPosition, setMovementVector, setViewVector, setVisible } from "./gameObject.js";
-import { createDynamicHazard } from "./hazard.js";
-export function createBullet(x, y, width, height, owner, damage, speed, viewVector) {
-    const bullet = createDynamicHazard(x, y, width, height, 1);
-    bullet.type = GameObjectType.BULLET;
+import { createVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
+import { GameObjectType, getPosition, setBounds, setMovementVector, setPosition, setViewVector, setVisible } from "./gameObject.js";
+import { createGameObject } from "./gameObjectFactory.js";
+export function createBullet(x, y, width, height, owner, damage, speed, viewVector, addDefaultBehavior = true) {
+    const bullet = createGameObject(GameObjectType.BULLET);
+    setPosition(bullet, createVector(x, y));
+    setBounds(bullet, width, height);
+    setCollisionBoxFromBoundingBox(bullet);
     setOwner(bullet, owner);
     setSpeed(bullet, speed);
     ignoreConveyor(bullet);
     setViewVector(bullet, viewVector);
-    addState(bullet, CommonStateTypes.MOVING, createBulletMovingState(bullet));
-    addState(bullet, CommonStateTypes.DEATH, createBulletDeathState(bullet));
-    addAnimation(bullet, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(bullet), bullet.width, bullet.height, [{ srcX: 195, srcY: 160 }], 1, false), true);
-    proposeDesignatedState(bullet, getState(bullet, CommonStateTypes.MOVING));
+    if (addDefaultBehavior) {
+        addState(bullet, CommonStateTypes.MOVING, createBulletMovingState(bullet));
+        addState(bullet, CommonStateTypes.DEATH, createBulletDeathState(bullet));
+        addAnimation(bullet, createAnimation(CommonStateTypes.MOVING, "./resources/link.png", getPosition(bullet), bullet.width, bullet.height, [{ srcX: 195, srcY: 160 }], 1, false), true);
+        proposeDesignatedState(bullet, getState(bullet, CommonStateTypes.MOVING));
+    }
     return bullet;
 }
 function ignoreConveyor(bullet) {
@@ -30,9 +35,10 @@ function setOwner(bullet, owner) {
 }
 function createBulletMovingState(bullet) {
     let movementVector = vectorScalarProduct(bullet.speed, bullet.viewVector);
-    ;
     const state = createEmptyState(CommonStateTypes.MOVING);
+    state.name = "bullet default state";
     state.enter = () => {
+        //console.log("enter " + state.name)
         setMovementVector(bullet, movementVector);
     };
     state.update = () => {
@@ -43,7 +49,7 @@ function createBulletMovingState(bullet) {
     };
     return state;
 }
-function createBulletDeathState(bullet) {
+export function createBulletDeathState(bullet) {
     const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "bullet death state";
     state.enter = () => {

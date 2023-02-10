@@ -1,6 +1,6 @@
 import { readyForNextFrame } from "./utils.js";
 import { NULL_VECTOR } from "./vector.js";
-const NULL_FRAME = { srcX: 0, srcY: 0 };
+const NULL_FRAME = { srcX: 0, srcY: 0, width: 0, height: 0 };
 const DEFAULT_FONT = "8px Arial";
 const DEFAULT_FILL_STYLE = "black";
 export const NULL_ANIMATION = Object.freeze(createAnimation("NULL_ANIMATION", "", Object.assign({}, NULL_VECTOR), 0, 0, [Object.assign({}, NULL_FRAME)], 0, false));
@@ -84,7 +84,7 @@ export function drawAnimation(animation, ctx) {
 export function drawAnimationAt(animation, ctx, x, y) {
     if (animation.image) {
         const curFrame = animation.frames[animation.currentFrameIndex];
-        ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, x, y, animation.width, animation.height);
+        ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, curFrame.width || animation.width, curFrame.height || animation.height, x, y, curFrame.width || animation.width, curFrame.height || animation.height);
         return;
     }
     if (animation.text) {

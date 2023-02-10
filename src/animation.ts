@@ -4,7 +4,9 @@ import { NULL_VECTOR, Vector } from "./vector.js";
 
 interface Frame {
     srcX: number,
-    srcY: number
+    srcY: number,
+    width?:number,
+    height?:number
 }
 
 export interface Animation {
@@ -26,7 +28,7 @@ export interface Animation {
     isTextAnimation: boolean
 }
 
-const NULL_FRAME: Frame = { srcX: 0, srcY: 0 };
+const NULL_FRAME: Frame = { srcX: 0, srcY: 0, width:0, height:0 };
 const DEFAULT_FONT: string = "8px Arial";
 const DEFAULT_FILL_STYLE: string = "black";
 export const NULL_ANIMATION: Animation = Object.freeze(createAnimation("NULL_ANIMATION", "", { ...NULL_VECTOR }, 0, 0, [{ ...NULL_FRAME }], 0, false));
@@ -123,7 +125,7 @@ export function drawAnimation(animation: Animation, ctx: CanvasRenderingContext2
 export function drawAnimationAt(animation: Animation, ctx: CanvasRenderingContext2D, x: number, y: number): void {
     if (animation.image) {
         const curFrame: Frame = animation.frames[animation.currentFrameIndex]
-        ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, animation.width, animation.height, x, y, animation.width, animation.height);
+        ctx.drawImage(animation.image, curFrame.srcX, curFrame.srcY, curFrame.width || animation.width, curFrame.height || animation.height, x, y, curFrame.width || animation.width, curFrame.height || animation.height);
         return;
     }
 

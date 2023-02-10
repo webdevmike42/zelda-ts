@@ -3,15 +3,15 @@ import { getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox,
 import { getPlayer } from "./player.js";
 import { disableHitBox, enableHitBox, HitBox, removeHitBox, setHitBoxFromBoundingBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../hurtbox.js";
-import { getCurrentGameObjects } from "../screens.js";
-import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, getCurrentState } from "../state.js";
+import { getCurrentGameObjects, removeGameObject } from "../screens.js";
+import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, getCurrentState, setCurrentState } from "../state.js";
 import { createRandom4DirectionViewVector, createVector, get4DirectionVector, NULL_VECTOR, reverseVector, Vector, vectorScalarProduct } from "../vector.js";
 import { createMovementVector, GameObject, GameObjectType, getCurrentAnimation, getMovementVector, getOverallVector, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setAIControlled, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
 import { getMappedInput, isAnyMovementKeyDown, isKeyDown, isKeyPressed, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, pressKey, registerGameObjectForKeyBoardInput, releaseAllKeys, releaseKey, reverseMovementInput } from "../KeyboardInputHandler.js";
 import { Item } from "../gameObjects/item.js";
 import { Box, createBoxInFront } from "../box.js";
-import { Bullet, createBullet } from "../gameObjects/bullet.js";
+import { Bullet, createBullet, createBulletDeathState } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
 
 const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 50, GORIYA_BULLET_SPEED = 200;
@@ -28,10 +28,10 @@ export function createRedGoriya(x: number, y: number): GameObject {
     setMaxHealth(goriya, GORIYA_HEALTH);
     addRedGoriyaAnimations(goriya);
     addGoriyaStates(goriya);
-    initGoriyaAI(goriya);
-    setAIControlled(goriya);
+    //initGoriyaAI(goriya);
+    //setAIControlled(goriya);
     proposeDesignatedState(goriya, goriya.defaultState);
-    //registerGameObjectForKeyBoardInput(goriya);
+    registerGameObjectForKeyBoardInput(goriya);
 
     return goriya;
 }
@@ -262,39 +262,60 @@ function getDirectionNameFromViewVector(viewVector: Vector): string {
 
 function spawnGoriyaBullet(goriya: GameObject): void {
     const box: Box = createBoxInFront(goriya, GORIYA_BULLET_WIDTH, GORIYA_BULLET_HEIGHT);
-    addToCurrentGameObjects(
-        createBullet(getPosition(box).x, getPosition(box).y, GORIYA_BULLET_WIDTH, GORIYA_BULLET_HEIGHT, goriya, GORIYA_DAMAGE, GORIYA_BULLET_SPEED, getViewVector(goriya))
-    );
-}
-
-function addGoriyaBulletStates(goriyaBullet: Bullet): void {
-    const actionState: State = createGoriyaBulletActionState(goriyaBullet);
-    addState(goriyaBullet, CommonStateTypes.ACTION, actionState);
-    setDefaultState(goriyaBullet, actionState);
+    const goriyaBullet: Bullet = createBullet(getPosition(box).x, getPosition(box).y, GORIYA_BULLET_WIDTH, GORIYA_BULLET_HEIGHT, goriya, GORIYA_DAMAGE, GORIYA_BULLET_SPEED, getViewVector(goriya), false);
+    addGoriyaBulletStates(goriyaBullet);
+    addGoriyaBulletAnimations(goriyaBullet);
+    proposeDesignatedState(goriyaBullet, getState(goriyaBullet, CommonStateTypes.MOVING));
+    addToCurrentGameObjects(goriyaBullet);
 }
 
 function addGoriyaBulletAnimations(goriyaBullet: Bullet): void {
-    addAnimation(goriyaBullet, createAnimation(CommonStateTypes.IDLE, "./resources/link.png", getPosition(goriyaBullet), GORIYA_BULLET_WIDTH, GORIYA_BULLET_HEIGHT, [{ srcX: 394, srcY: 228 }], 1, false), true);
+    addAnimation(goriyaBullet, createAnimation(CommonStateTypes.MOVING, "./resources/enemies.png", getPosition(goriyaBullet), GORIYA_BULLET_WIDTH, GORIYA_BULLET_HEIGHT,
+        [{ srcX: 394, srcY: 238, width: 8, height: 5 },
+        { srcX: 388, srcY: 268, width: 8, height: 8 },
+        { srcX: 390, srcY: 244, width: 5, height: 8 },
+        { srcX: 388, srcY: 279, width: 8, height: 8 },
+        { srcX: 394, srcY: 253, width: 8, height: 5 },
+        { srcX: 399, srcY: 279, width: 8, height: 8 },
+        { srcX: 401, srcY: 244, width: 5, height: 8 },
+        { srcX: 399, srcY: 269, width: 8, height: 8 }],
+        24, true), true);
 }
 
-function createGoriyaBulletActionState(goriyaBullet: Bullet): State {
-    const state: State = createEmptyState(CommonStateTypes.ACTION);
-    state.name = "BULLET action state";
+function addGoriyaBulletStates(goriyaBullet: Bullet): void {
+    const movingState: State = createGoriyaBulletMovingState(goriyaBullet);
+    addState(goriyaBullet, CommonStateTypes.MOVING, movingState);
+    addState(goriyaBullet, CommonStateTypes.DEATH, createBulletDeathState(goriyaBullet));
+    setDefaultState(goriyaBullet, movingState);
+}
+
+function createGoriyaBulletMovingState(goriyaBullet: Bullet): State {
+    const state: State = createEmptyState(CommonStateTypes.MOVING);
+    state.name = "BULLET moving state";
+    let movementVector = vectorScalarProduct(GORIYA_BULLET_SPEED, goriyaBullet.viewVector);
+
+
     state.enter = () => {
-        //console.log("enter " + state.name)
-        //setMovementVector(goriyaBullet, vectorScalarProduct(GORIYA_BULLET_SPEED, {...getViewVector(goriyaBullet.owner)}));
+        setMovementVector(goriyaBullet, vectorScalarProduct(GORIYA_BULLET_SPEED, getViewVector(goriyaBullet)));
+        setTimeout(reverseGoriyaBulletDirection, 500, goriyaBullet);
     }
-    state.update = (currentGameTime: number, timeSinceLastTick: number) => {
-        /*
-        if(goriyaBullet.hitSolid)
+    state.update = () => {
+        if (goriyaBullet.hitSolid) {
             proposeDesignatedState(goriyaBullet, getState(goriyaBullet, CommonStateTypes.DEATH));
-            */
+            return;
+        }
+
+        if (getCollidingGameObjects(goriyaBullet, getCollisionBox(goriyaBullet), [goriyaBullet.owner]).length > 0) {
+            proposeDesignatedState(goriyaBullet, getState(goriyaBullet, CommonStateTypes.DEATH));
+            return;
+        }
+
+        setMovementVector(goriyaBullet, vectorScalarProduct(GORIYA_BULLET_SPEED, getViewVector(goriyaBullet)));
     }
     return state;
 }
 
-function change4Direction(goriya: GameObject): void {
-    //console.log("changed direction");
-    setViewVector(goriya, createRandom4DirectionViewVector());
-    //setTimeout(change4Direction, 1000, goriya);
+function reverseGoriyaBulletDirection(goriyaBullet: Bullet): void {
+    setViewVector(goriyaBullet, reverseVector(getViewVector(goriyaBullet)));
+
 }
