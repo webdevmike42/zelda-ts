@@ -28,6 +28,7 @@ export var GameObjectType;
     GameObjectType[GameObjectType["STALFOS"] = 12] = "STALFOS";
     GameObjectType[GameObjectType["GORIYA"] = 13] = "GORIYA";
     GameObjectType[GameObjectType["BULLET"] = 14] = "BULLET";
+    GameObjectType[GameObjectType["NULL"] = 15] = "NULL";
 })(GameObjectType || (GameObjectType = {}));
 export function getCurrentAnimation(gameObject) {
     return gameObject.currentAnimation || gameObject.defaultAnimation || Object.assign({}, NULL_ANIMATION);
@@ -153,4 +154,8 @@ export function setScriptControlled(gameObject) {
 }
 export function isControlledByAI(gameObject) {
     return gameObject.controller === Controller.AI;
+}
+export function doDamage(gameObject, damage) {
+    if (gameObject.health)
+        gameObject.health -= damage;
 }

@@ -6,7 +6,7 @@ import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, Vecto
 import { getCollidingGameObjects, setCollisionBox } from "../collisions.js";
 import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { HitBox, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
+import { HitBox, removeHitBox, setHitBox, setHitBoxesFromGameObjects, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { Item } from "../gameObjects/item.js";
 import { addToInventory } from "../inventory.js";
@@ -131,20 +131,20 @@ function createPlayerMovingState(player: Player): State {
 
 function createPlayerActionState(player: Player): State {
     let durationInMS: number = 50;
-    let hitBox: HitBox;
+    //let hitBox: HitBox;
 
     const state: State = createEmptyState(CommonStateTypes.ACTION);
     state.name = "player action state";
     state.enter = () => {
         updateCurrentAnimationBasedOnViewVector(player);
         setMovementVector(player, { ...NULL_VECTOR });
-        hitBox = spawnHitBoxInFrontOf(player, 1);
+        spawnHitBoxInFrontOf(player, 1);
         setTimeout(proposeDesignatedState, durationInMS, player, getState(player, CommonStateTypes.IDLE));
     }
     state.update = (currentGameTime: number, timeSinceLastTick: number) => {
     }
     state.exit = () => {
-        removeHitBox(hitBox.id)
+        removeHitBox(player);
     };
     return state;
 }

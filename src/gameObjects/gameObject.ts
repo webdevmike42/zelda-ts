@@ -64,7 +64,8 @@ export enum GameObjectType {
     OKTOROK,
     STALFOS,
     GORIYA,
-    BULLET
+    BULLET,
+    NULL
 }
 
 export function getCurrentAnimation(gameObject: GameObject): Animation {
@@ -218,4 +219,9 @@ export function setScriptControlled(gameObject: GameObject): void {
 
 export function isControlledByAI(gameObject: GameObject): boolean {
     return gameObject.controller === Controller.AI;
+}
+
+export function doDamage(gameObject:GameObject, damage:number):void{
+    if(gameObject.health)
+        gameObject.health -= damage;
 }

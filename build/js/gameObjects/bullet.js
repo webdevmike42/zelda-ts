@@ -1,6 +1,6 @@
 import { addAnimation, createAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { disableHitBox } from "../hitbox.js";
+import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox } from "../hurtbox.js";
 import { removeGameObject } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, proposeDesignatedState } from "../state.js";
@@ -12,6 +12,7 @@ export function createBullet(x, y, width, height, owner, damage, speed, viewVect
     setPosition(bullet, createVector(x, y));
     setBounds(bullet, width, height);
     setCollisionBoxFromBoundingBox(bullet);
+    setHitBoxFromBoundingBox(bullet, damage);
     setOwner(bullet, owner);
     setSpeed(bullet, speed);
     ignoreConveyor(bullet);

@@ -1,16 +1,17 @@
 import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from "../animation.js";
 import { getCollidingGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getPlayer } from "./player.js";
 import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, reverseVector, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
+import { createMovementVector, doDamage, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject } from "../gameObjects/gameObjectFactory.js";
 import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, registerGameObjectForKeyBoardInput, releaseAllKeys, reverseMovementInput } from "../KeyboardInputHandler.js";
 import { createBoxInFront } from "../box.js";
 import { createBullet, createBulletDeathState } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
-const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 50, GORIYA_BULLET_SPEED = 200;
+const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 100, GORIYA_BULLET_SPEED = 200;
 export function createRedGoriya(x, y) {
     const goriya = createGameObject(GameObjectType.GORIYA);
     goriya.name = "red goriya";
@@ -148,15 +149,13 @@ function createGoriyaHitState(goriya) {
     state.init = (hitBoxArg) => {
         hitBox = hitBoxArg;
     };
-    state.enter = () => {
-        if (goriya.health && !isHitBoxOfOwnBullet(goriya, hitBox)) {
-            goriya.health -= hitBox.damage;
-        }
-    };
     state.update = () => {
-        if (isGameObjectDead(goriya)) {
-            proposeDesignatedState(goriya, getState(goriya, CommonStateTypes.DEATH));
+        if (isHitBoxOfOwnBullet(goriya, hitBox)) {
+            proposeDesignatedState(goriya, getState(goriya, CommonStateTypes.IDLE));
+            return;
         }
+        doDamage(goriya, hitBox.damage);
+        proposeDesignatedState(goriya, getState(goriya, isGameObjectDead(goriya) ? CommonStateTypes.DEATH : CommonStateTypes.IDLE));
     };
     return state;
 }
@@ -258,7 +257,8 @@ function createGoriyaBulletMovingState(goriyaBullet) {
             proposeDesignatedState(goriyaBullet, getState(goriyaBullet, CommonStateTypes.DEATH));
             return;
         }
-        if (getCollidingGameObjects(goriyaBullet, getCollisionBox(goriyaBullet), [goriyaBullet.owner]).length > 0) {
+        if (getCollidingGameObjects(goriyaBullet, getCollisionBox(goriyaBullet), [goriyaBullet.owner]).length > 0
+            || getCollidingGameObjects(goriyaBullet, getCollisionBox(goriyaBullet), [getPlayer()]).length > 0) {
             proposeDesignatedState(goriyaBullet, getState(goriyaBullet, CommonStateTypes.DEATH));
             return;
         }

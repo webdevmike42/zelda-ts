@@ -1,11 +1,13 @@
 import { Box, createBox, createBoxInFront, NULL_BOX } from "./box.js";
 import { getCollidingBoxes } from "./collisions.js";
-import { GameObject, getPosition } from "./gameObjects/gameObject.js";
+import { GameObject, GameObjectType, getPosition } from "./gameObjects/gameObject.js";
+import { createGameObject } from "./gameObjects/gameObjectFactory.js";
 import { isHurtBoxEnabled } from "./hurtbox.js";
 import { removeObjectFromArray } from "./utils.js";
-import { Vector } from "./vector.js";
+import { NULL_VECTOR, Vector } from "./vector.js";
 
 export let hitBoxes: HitBox[] = [];
+const INVALID_HITBOX_ID: number = -1;
 
 export interface HitBox extends Box {
     owner: GameObject,
@@ -23,9 +25,14 @@ function createHitBox(position: Vector, width: number, height: number, owner: Ga
     return hitBox;
 }
 
+export function setHitBox(gameObject: GameObject, hitBox: HitBox): void {
+    gameObject.hitBox = hitBox;
+}
+
 export function spawnHitBoxInFrontOf(gameObject: GameObject, damage: number): HitBox {
     const box = createBoxInFront(gameObject, gameObject.width, gameObject.height);
     const hitBox = createHitBox(box.position, box.width, box.height, gameObject, damage);
+    setHitBox(gameObject,hitBox);
     hitBoxes.push(hitBox);
     return hitBox;
 }
@@ -33,18 +40,22 @@ export function spawnHitBoxInFrontOf(gameObject: GameObject, damage: number): Hi
 export function setHitBoxFromBoundingBox(gameObject: GameObject, damage: number): void {
     const hitBox: HitBox = createHitBox(getPosition(gameObject), gameObject.width, gameObject.height, gameObject, damage);
     hitBoxes.push(hitBox);
-    gameObject.hitBox = hitBox;
+    setHitBox(gameObject,hitBox);
 }
-export function removeHitBox(hitBoxId: number): void {
-    removeObjectFromArray(hitBoxId, hitBoxes);
+export function removeHitBox(gameObject:GameObject): void {
+    if(gameObject.hitBox){
+        removeObjectFromArray(gameObject.hitBox.id, hitBoxes);
+        gameObject.hitBox = undefined;
+    }
+    
 }
 
 export function removeAllHitBoxes(): void {
     hitBoxes = [];
 }
 
-export function setHitBoxesFromGameObjects(gameObjects:GameObject[]):void{
-    hitBoxes = ((gameObjects.map((gameObject) => gameObject.hitBox)) as HitBox[]).filter(hitBox => hitBox!== undefined);
+export function setHitBoxesFromGameObjects(gameObjects: GameObject[]): void {
+    hitBoxes = ((gameObjects.map((gameObject) => gameObject.hitBox)) as HitBox[]).filter(hitBox => hitBox !== undefined);
     console.log(hitBoxes)
 }
 
@@ -66,4 +77,3 @@ export function getCollidingHitBoxes(gameObject: GameObject): HitBox[] {
         ? (getCollidingBoxes(gameObject.hurtBox || { ...NULL_BOX }, hitBoxes) as HitBox[]).filter(hb => hb.enabled && hb.owner.id !== gameObject.id)
         : [];
 }
-

@@ -20,6 +20,7 @@ export function createBullet(x: number, y: number, width: number, height: number
     setPosition(bullet, createVector(x, y));
     setBounds(bullet, width, height);
     setCollisionBoxFromBoundingBox(bullet);
+    setHitBoxFromBoundingBox(bullet, damage);
     setOwner(bullet, owner);
     setSpeed(bullet, speed);
     ignoreConveyor(bullet);

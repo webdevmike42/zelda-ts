@@ -2,7 +2,7 @@ import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../ani
 import { NULL_BOX } from "../box.js";
 import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { playerCollectItems } from "../gameActors/player.js";
-import { getCollidingHitBoxes } from "../hitbox.js";
+import { getCollidingHitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { isHurtBoxEnabled } from "../hurtbox.js";
 import { createMappedInput } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
@@ -120,20 +120,19 @@ export function drawGameObjects(ctx) {
             ctx.fillRect(box.position.x, box.position.y, box.width, box.height)
         }
         
-
-
-        if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
-            //draw hurtbox
-            ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
-            ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
-        }
-
+*/
+        /*
+                if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
+                    //draw hurtbox
+                    ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
+                    ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
+                }
+        */
         if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
+            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height);
         }
-*/
     });
 }
 export function createSolidDummy(x, y, width, height) {

@@ -4,23 +4,31 @@ import { getPosition } from "./gameObjects/gameObject.js";
 import { isHurtBoxEnabled } from "./hurtbox.js";
 import { removeObjectFromArray } from "./utils.js";
 export let hitBoxes = [];
+const INVALID_HITBOX_ID = -1;
 function createHitBox(position, width, height, owner, damage, enabled = true) {
     const hitBox = Object.assign(Object.assign({}, createBox(position.x, position.y, width, height)), { owner: owner, damage: (damage >= 0 ? damage : 0), enabled: enabled });
     return hitBox;
 }
+export function setHitBox(gameObject, hitBox) {
+    gameObject.hitBox = hitBox;
+}
 export function spawnHitBoxInFrontOf(gameObject, damage) {
     const box = createBoxInFront(gameObject, gameObject.width, gameObject.height);
     const hitBox = createHitBox(box.position, box.width, box.height, gameObject, damage);
+    setHitBox(gameObject, hitBox);
     hitBoxes.push(hitBox);
     return hitBox;
 }
 export function setHitBoxFromBoundingBox(gameObject, damage) {
     const hitBox = createHitBox(getPosition(gameObject), gameObject.width, gameObject.height, gameObject, damage);
     hitBoxes.push(hitBox);
-    gameObject.hitBox = hitBox;
+    setHitBox(gameObject, hitBox);
 }
-export function removeHitBox(hitBoxId) {
-    removeObjectFromArray(hitBoxId, hitBoxes);
+export function removeHitBox(gameObject) {
+    if (gameObject.hitBox) {
+        removeObjectFromArray(gameObject.hitBox.id, hitBoxes);
+        gameObject.hitBox = undefined;
+    }
 }
 export function removeAllHitBoxes() {
     hitBoxes = [];
