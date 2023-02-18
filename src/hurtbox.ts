@@ -9,10 +9,6 @@ export interface HurtBox extends Box {
     enabled: boolean
 }
 
-const NULL_HURTBOX = Object.freeze({
-
-})
-
 function createHurtBox(position: Vector, width: number, height: number, owner: GameObject, enabled: boolean = true) {
     return {
         ...createBox(position.x, position.y, width, height),

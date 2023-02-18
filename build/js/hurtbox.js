@@ -1,6 +1,5 @@
 import { createBox } from "./box.js";
 import { getPosition } from "./gameObjects/gameObject.js";
-const NULL_HURTBOX = Object.freeze({});
 function createHurtBox(position, width, height, owner, enabled = true) {
     return Object.assign(Object.assign({}, createBox(position.x, position.y, width, height)), { owner: owner, enabled: enabled });
 }

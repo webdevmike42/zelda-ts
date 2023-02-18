@@ -27,8 +27,9 @@ export var GameObjectType;
     GameObjectType[GameObjectType["OKTOROK"] = 11] = "OKTOROK";
     GameObjectType[GameObjectType["STALFOS"] = 12] = "STALFOS";
     GameObjectType[GameObjectType["GORIYA"] = 13] = "GORIYA";
-    GameObjectType[GameObjectType["BULLET"] = 14] = "BULLET";
-    GameObjectType[GameObjectType["NULL"] = 15] = "NULL";
+    GameObjectType[GameObjectType["BAT"] = 14] = "BAT";
+    GameObjectType[GameObjectType["BULLET"] = 15] = "BULLET";
+    GameObjectType[GameObjectType["NULL"] = 16] = "NULL";
 })(GameObjectType || (GameObjectType = {}));
 export function getCurrentAnimation(gameObject) {
     return gameObject.currentAnimation || gameObject.defaultAnimation || Object.assign({}, NULL_ANIMATION);

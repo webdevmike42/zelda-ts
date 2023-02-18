@@ -12,6 +12,7 @@ import { createVector } from "./vector.js";
 import { createSmallChest } from "./gameObjects/chest.js";
 import { createStalfos } from "./gameActors/stalfos.js";
 import { createRedGoriya } from "./gameActors/goriya.js";
+import { createRedbat } from "./gameActors/bat.js";
 
 export function loadScreenById(screenId: number) {
     const screen: Screen = {
@@ -2425,6 +2426,7 @@ screen.tileMap =
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
                 createRedGoriya(150,180)
+                //createRedbat(150,180)
                 //createRedOktorok(100, 140)
                 //createStalfos(100,120)
                 //createFountain(100,120)
