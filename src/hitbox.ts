@@ -1,7 +1,6 @@
 import { Box, createBox, createBoxInFront, NULL_BOX } from "./box.js";
 import { getCollidingBoxes } from "./collisions.js";
-import { GameObject, GameObjectType, getPosition } from "./gameObjects/gameObject.js";
-import { createGameObject } from "./gameObjects/gameObjectFactory.js";
+import { GameObject, getPosition } from "./gameObjects/gameObject.js";
 import { isHurtBoxEnabled } from "./hurtbox.js";
 import { removeObjectFromArray } from "./utils.js";
 import { NULL_VECTOR, Vector } from "./vector.js";

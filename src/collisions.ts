@@ -1,8 +1,6 @@
 import { Box, createBox, NULL_BOX } from "./box.js";
 import { GameObject, GameObjectType, getBoundingBox } from "./gameObjects/gameObject.js";
 import { isSolid } from "./gameObjects/gameObjectFactory.js";
-import { getCollidingHitBoxes, HitBox, isHitBoxEnabled } from "./hitbox.js";
-import { HurtBox, isHurtBoxEnabled } from "./hurtbox.js";
 import { getCurrentGameObjects } from "./screens.js";
 import { addTestResult } from "./tests.js";
 import { NULL_VECTOR, Vector, vectorSum } from "./vector.js";
@@ -14,38 +12,6 @@ interface CornerCollisions {
     bottomleft: boolean,
     bottomright: boolean
 }
-
-export interface CollisionData {
-    gameObject: GameObject,
-    collidingHitBox?: HitBox,     //store refernce separately in case it is removed from GameObject before in same tick
-    collidingHurtBox?: HurtBox    //store refernce separately in case it is removed from GameObject before in same tick
-}
-
-/*
-export function getCollisionData(collisionBox: Box, collidingGameObject: GameObject): CollisionData {
-    if(boxesOverlap(collisionBox,getCollisionBox(collidingGameObject))){
-        const collisionData: CollisionData = {
-            gameObject: collidingGameObject,
-            collidingHitBox: undefined,
-            collidingHurtBox: undefined
-        };
-
-    }
-    
-
-    
-
-    if (isHitBoxEnabled(collidingGameObject) && boxesOverlap(collisionBox, collidingGameObject.hitBox || { ...NULL_BOX })) {
-        collisionData.collidingHitBox = collidingGameObject.hitBox;
-    }
-
-    if (isHurtBoxEnabled(collidingGameObject) && boxesOverlap(collisionBox, collidingGameObject.hurtBox || { ...NULL_BOX })) {
-        collisionData.collidingHurtBox = collidingGameObject.hurtBox;
-    }
-
-    return collisionData;
-}
-*/
 
 function pointCollidedWithCollisionBox(x: number, y: number, collisionBox: Box): boolean {
     return boxesOverlap(createBox(x, y, 1, 1), collisionBox);

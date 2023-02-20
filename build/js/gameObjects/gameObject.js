@@ -1,6 +1,6 @@
 import { NULL_ANIMATION } from "../animation.js";
 import { createBox } from "../box.js";
-import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox } from "../collisions.js";
+import { getCollidingSolidGameObjects, getCollisionBox, getProspectedCollisionBox } from "../collisions.js";
 import { isKeyDown, KEYS, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { createVector, NULL_VECTOR, vectorDiff, vectorSum } from "../vector.js";

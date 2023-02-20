@@ -2,7 +2,6 @@ import { createCaveText, createFlame, createOldMan } from "./gameObjects/decoObj
 import { createSword } from "./gameObjects/item.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, WORLD_MAP_COLS } from "./screens.js";
-import { createRedOktorok } from "./gameActors/oktorok.js";
 import { createSmallChest } from "./gameObjects/chest.js";
 import { createRedGoriya } from "./gameActors/goriya.js";
 export function loadScreenById(screenId) {
@@ -2342,7 +2341,7 @@ export function loadScreenById(screenId) {
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
                 createRedGoriya(150, 180),
                 //createRedbat(150,180)
-                createRedOktorok(100, 140),
+                //createRedOktorok(100, 140),
                 //createStalfos(100,120)
                 //createFountain(100,120)
                 //createPushBox(120, 80),

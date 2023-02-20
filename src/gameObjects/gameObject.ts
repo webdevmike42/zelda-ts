@@ -1,9 +1,9 @@
 import { Animation, NULL_ANIMATION } from "../animation.js";
 import { Box, createBox } from "../box.js";
-import { getCollidingSolidGameObjects, getProspectedCollisionBox, getCollisionBox, CollisionData } from "../collisions.js";
+import { getCollidingSolidGameObjects, getCollisionBox, getProspectedCollisionBox } from "../collisions.js";
 import { HitBox } from "../hitbox.js";
 import { HurtBox } from "../hurtbox.js";
-import { isKeyDown, KEYS, MappedInput, MappedKey, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
+import { isKeyDown, KEYS, MappedInput, registerGameObjectForKeyBoardInput } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects } from "../screens.js";
 import { State } from "../state.js";
 import { createVector, NULL_VECTOR, Vector, vectorDiff, vectorSum } from "../vector.js";
@@ -21,10 +21,6 @@ export interface GameObject {
     width: number,
     height: number,
     collisionBox: Box;
-    collisionData?:CollisionData[];
-    collidingGameObjects:GameObject[];
-    collidingHitBoxes:HitBox[];
-    collidingHurtBoxes:HurtBox[];
     animations?: Map<string, Animation>;
     currentAnimation?: Animation,
     defaultAnimation?: Animation,

@@ -32,10 +32,6 @@ export function createGameObject(type: GameObjectType): GameObject {
         width: 0,
         height: 0,
         collisionBox: { ...NULL_BOX },
-        collisionData: undefined,
-        collidingGameObjects: [],
-        collidingHitBoxes: [],
-        collidingHurtBoxes: [],
         isVisible: true,
         ignoreConveyor: false,
         hitSolid: false,
@@ -68,7 +64,33 @@ function updateAI(gameObject: GameObject): void {
 }
 
 export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
+    handleHitBoxHurtBoxCollisions(timeSinceLastTick);
+    getCurrentGameObjects()
+        .forEach(gameObject => updateGameObject(gameObject, currentGameTime, timeSinceLastTick));
+}
 
+function updateGameObject(gameObject: GameObject, currentGameTime: number, timeSinceLastTick: number): void {
+    if (isControlledByAI(gameObject)) {
+        updateAI(gameObject);
+    }
+
+    updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+
+    if (gameObject.type === GameObjectType.PLAYER) {
+        playerCollectItems(getCollidingCollectableItems(gameObject));
+    }
+
+    if (hasDesignatedState(gameObject)) {
+        switchToState(gameObject, gameObject.designatedState);
+    }
+
+    let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
+    moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
+
+    updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
+}
+
+function handleHitBoxHurtBoxCollisions(timeSinceLastTick: number) {
     const prospectedEnabledHurtBoxes: HurtBox[] = hurtBoxes
         .filter(hurtBox => isHurtBoxEnabled(hurtBox.owner))
         .map(hurtBox => {
@@ -88,85 +110,12 @@ export function updateGameObjects(currentGameTime: number, timeSinceLastTick: nu
     prospectedEnabledHurtBoxes
         .forEach(hurtBox => {
             const collidingEnabledHitBoxes: HitBox[] = (getCollidingBoxes(hurtBox, prospectedEnabledHitBoxes) as HitBox[])
-                .filter(hitBox => hitBox.owner.id !== hurtBox.owner.id && !isHitBoxOfOwnBullet(hurtBox.owner, hitBox))
+                .filter(hitBox => hitBox.owner.id !== hurtBox.owner.id && !isHitBoxOfOwnBullet(hurtBox.owner, hitBox));
 
             if (collidingEnabledHitBoxes.length > 0)
                 proposeDesignatedState(hurtBox.owner, getState(hurtBox.owner, CommonStateTypes.HIT), collidingEnabledHitBoxes[0]);
         });
-
-    getCurrentGameObjects().forEach(gameObject => {
-
-        if (isControlledByAI(gameObject)) {
-            updateAI(gameObject);
-        }
-
-        if (gameObject.collidingHitBoxes.length > 0) {
-
-        }
-
-        /*
-        if (isHurtBoxEnabled(gameObject)) {
-            const chb: HitBox[] = getCollidingHitBoxes(gameObject);
-            if (chb.length > 0) {
-                proposeDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb[0]);
-            }
-        }
-
-        if (isHitBoxEnabled(gameObject)) {
-
-            const chb: HurtBox[] = getCollidingHurtBoxes(gameObject);
-            chb.forEach(hurtBox => {
-                proposeDesignatedState(hurtBox.owner, getState(hurtBox.owner, CommonStateTypes.HIT), gameObject.hitBox);
-            });
-        }
-*/
-        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
-
-
-
-        if (gameObject.type === GameObjectType.PLAYER) {
-            playerCollectItems(getCollidingCollectableItems(gameObject));
-        }
-
-        if (hasDesignatedState(gameObject)) {
-            switchToState(gameObject, gameObject.designatedState);
-        }
-
-        let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
-        moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
-
-        updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
-    });
 }
-
-
-/*
-export function updateGameObjects(currentGameTime: number, timeSinceLastTick: number): void {
-    getCurrentGameObjects().forEach(gameObject => {
-        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
-
-        if (isHurtBoxEnabled(gameObject)) {
-            const chb: HitBox[] = getCollidingHitBoxes(gameObject);
-            if (chb.length > 0) {
-                setDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb);
-            }
-        }
-
-        if (gameObject.type === GameObjectType.PLAYER)
-            playerPickUpItems(getCollidingCollectableItems(gameObject));
-
-
-        if (gameObject.designatedState !== null) {
-            switchToState(gameObject, gameObject.designatedState);
-            gameObject.designatedState = null;
-        }
-
-        let resolvedMovementVector: Vector = getVectorFrameFraction(getOverallVector(gameObject), timeSinceLastTick);
-        moveGameObject(gameObject, getResolvedSolidCollisionVector(gameObject, resolvedMovementVector));
-
-        updateAnimation(getCurrentAnimation(gameObject), currentGameTime);
-    });
-}*/
 
 function updateGameObjectCurrentState(gameObject: GameObject, currentGameTime: number, timeSinceLastTick: number): void {
     getCurrentState(gameObject).update(currentGameTime, timeSinceLastTick);
@@ -178,28 +127,18 @@ export function drawGameObjects(ctx: CanvasRenderingContext2D): void {
         drawAnimationAt(curAnimation, ctx, getPosition(gameObject).x + getOffsetX(curAnimation), getPosition(gameObject).y + getOffsetY(curAnimation));
 
         /*
-        if(gameObject.type === GameObjectType.PLAYER){
-            const player:Player = gameObject as Player;
-            ctx.fillStyle = "rgba(0, 0, 100, 0.5)";
-            const box : Box = createBoxInFront(player,player.width, player.height);
-            ctx.fillRect(box.position.x, box.position.y, box.width, box.height)
-        }
-        
-*/
-
         if (gameObject.hurtBox && isHurtBoxEnabled(gameObject)) {
             //draw hurtbox
             ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
             ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height)
         }
 
-
         if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
             //draw hitbox
             ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
             ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
         }
-
+        */
     });
 }
 
@@ -216,39 +155,6 @@ export function createSolidDummy(x: number, y: number, width: number, height: nu
 export function filterGameObjects(filterType: GameObjectType, gameObjectArray: GameObject[]): GameObject[] {
     return gameObjectArray.filter(gameObject => gameObject.type === filterType);
 }
-
-
-/*
- 
-export function updateGameObjects(currentGameTime, timeSinceLastTick) {
-    gameObjects.forEach(gameObject => {
-        prepareTick(gameObject);
-        //todo: deal with movementMapper
-        
-        if (isControlledByAI(gameObject)) {
-            updateFakeEnemyAI(gameObject, currentGameTime);
-        }
- 
-        //Options:
-        //1. state zurückbekommen und dann im if-statement im switchGameObjectState ausführen (state bekommen darf nichts verändern (player health, game sounds))
-        //zusätzlich namen der funktionen ändern weil "handle" normalerweise command-funct ist
-        //2. direkt in handle funktionen änderungen durchführen, aber nichts zurückgeben und im nachhinein wahrscheinlich den currentstate vom gameobject abfragen
-        const newState = handleHurtBoxCollisions(gameObject) || handleGameObjectInput(gameObject) || updateGameObjectState(gameObject, currentGameTime, timeSinceLastTick)
- 
-        if (newState) {
-            switchGameObjectState(gameObject, newState);
-            return;//todo: gehts auch ohne return an dieser Stelle? machen die weiteren handle()-Aufrufe vl sogar Sinn?!
-        }
- 
-        handleEnvironmentVectorUpdate(gameObject);
-        handleItemPickup(gameObject);
-        handleMovementUpdate(gameObject, timeSinceLastTick);
- 
-        handleAnimationUpdate(gameObject, currentGameTime);
-    });
-}
- 
-*/
 
 export function setSolid(gameObject: GameObject, isSolid: boolean = true): void {
     gameObject.isSolid = isSolid;
