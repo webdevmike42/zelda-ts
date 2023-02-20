@@ -1,7 +1,7 @@
 import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
 import { boxOverlapSome, getProspectedCollisionBox, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { isHitBoxOfOwnBullet } from "../gameActors/goriya.js";
+import { isHitBoxOfOwnBullet } from "../gameActors/enemy.js";
 import { playerCollectItems } from "../gameActors/player.js";
 import { createHitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
 import { createHurtBox, hurtBoxes, isHurtBoxEnabled } from "../hurtbox.js";

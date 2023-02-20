@@ -4,12 +4,13 @@ import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, reverseVector, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setAIControlled, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, setAIControlled, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject } from "../gameObjects/gameObjectFactory.js";
 import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, releaseAllKeys, reverseMovementInput } from "../KeyboardInputHandler.js";
 import { createBoxInFront } from "../box.js";
 import { createBullet } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
+import { createEnemyHitState } from "./enemy.js";
 const OKTOROK_WIDTH = 16, OKTOROK_HEIGHT = 16, OKTOROK_HEALTH = 1, OKTOROK_DAMAGE = 1, OKTOROK_BULLET_WIDTH = 8, OKTOROK_BULLET_HEIGHT = 8, OKTOROK_MOVING_SPEED = 50, OKTOROK_BULLET_SPEED = 200;
 export function createRedOktorok(x, y) {
     const oktorok = createGameObject(GameObjectType.OKTOROK);
@@ -55,7 +56,7 @@ function addOktorokStates(oktorok) {
     const movingState = createOktorokMovingState(oktorok);
     addState(oktorok, CommonStateTypes.IDLE, idleState);
     addState(oktorok, CommonStateTypes.MOVING, movingState);
-    addState(oktorok, CommonStateTypes.HIT, createOktorokHitState(oktorok));
+    addState(oktorok, CommonStateTypes.HIT, createEnemyHitState(oktorok));
     addState(oktorok, CommonStateTypes.DEATH, createOktorokDeathState(oktorok));
     addState(oktorok, CommonStateTypes.ACTION, createOktorokActionState(oktorok));
     setDefaultState(oktorok, idleState);
@@ -141,13 +142,16 @@ function createOktorokActionState(oktorok) {
     };
     return state;
 }
-function createOktorokHitState(oktorok) {
-    const state = createEmptyState(CommonStateTypes.HIT);
-    let hitBox;
+/*
+function createOktorokHitState(oktorok: GameObject): State {
+    const state: State = createEmptyState(CommonStateTypes.HIT);
+    let hitBox: HitBox;
     state.name = "oktorok hit state";
-    state.init = (hitBoxArg) => {
+
+    state.init = (hitBoxArg: HitBox) => {
         hitBox = hitBoxArg;
-    };
+    }
+
     state.enter = () => {
         if (oktorok.health && !isHitBoxOfOwnBullet(oktorok, hitBox)) {
             oktorok.health -= hitBox.damage;
@@ -157,16 +161,18 @@ function createOktorokHitState(oktorok) {
         if (isGameObjectDead(oktorok)) {
             proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.DEATH));
         }
-    };
+    }
     return state;
 }
-function isHitBoxOfOwnBullet(oktorok, hitBox) {
+
+function isHitBoxOfOwnBullet(oktorok: GameObject, hitBox: HitBox): boolean {
     if (hitBox.owner.type === GameObjectType.BULLET) {
-        const bullet = hitBox.owner;
+        const bullet: Bullet = hitBox.owner as Bullet;
         return bullet.owner === oktorok;
     }
     return false;
 }
+*/
 function createOktorokDeathState(oktorok) {
     const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "oktorok death state";

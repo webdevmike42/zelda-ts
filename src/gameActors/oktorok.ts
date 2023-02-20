@@ -13,6 +13,7 @@ import { Item } from "../gameObjects/item.js";
 import { Box, createBoxInFront } from "../box.js";
 import { Bullet, createBullet } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
+import { createEnemyHitState } from "./enemy.js";
 
 const OKTOROK_WIDTH = 16, OKTOROK_HEIGHT = 16, OKTOROK_HEALTH = 1, OKTOROK_DAMAGE = 1, OKTOROK_BULLET_WIDTH = 8, OKTOROK_BULLET_HEIGHT = 8, OKTOROK_MOVING_SPEED = 50, OKTOROK_BULLET_SPEED = 200;
 
@@ -67,7 +68,7 @@ function addOktorokStates(oktorok: GameObject): void {
     const movingState: State = createOktorokMovingState(oktorok);
     addState(oktorok, CommonStateTypes.IDLE, idleState);
     addState(oktorok, CommonStateTypes.MOVING, movingState);
-    addState(oktorok, CommonStateTypes.HIT, createOktorokHitState(oktorok));
+    addState(oktorok, CommonStateTypes.HIT, createEnemyHitState(oktorok));
     addState(oktorok, CommonStateTypes.DEATH, createOktorokDeathState(oktorok));
     addState(oktorok, CommonStateTypes.ACTION, createOktorokActionState(oktorok));
     setDefaultState(oktorok, idleState);
@@ -167,7 +168,7 @@ function createOktorokActionState(oktorok: GameObject): State {
     return state;
 }
 
-
+/*
 function createOktorokHitState(oktorok: GameObject): State {
     const state: State = createEmptyState(CommonStateTypes.HIT);
     let hitBox: HitBox;
@@ -197,6 +198,7 @@ function isHitBoxOfOwnBullet(oktorok: GameObject, hitBox: HitBox): boolean {
     }
     return false;
 }
+*/
 
 function createOktorokDeathState(oktorok: GameObject): State {
     const state: State = createEmptyState(CommonStateTypes.DEATH);

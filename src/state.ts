@@ -31,6 +31,10 @@ export function createEmptyState(type?: string): State {
     return { ...NULL_STATE, type: type || CommonStateTypes.NULL };
 }
 
+export function createEmptyHitState():State{
+    return createEmptyState(CommonStateTypes.HIT);
+}
+
 export function switchToState(gameObject: GameObject, newState: State) {
     exitCurrentState(gameObject);
     setCurrentState(gameObject, newState);

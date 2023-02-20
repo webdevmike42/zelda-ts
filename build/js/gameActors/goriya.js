@@ -5,12 +5,13 @@ import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, reverseVector, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, doDamage, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, isGameObjectDead, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject } from "../gameObjects/gameObjectFactory.js";
 import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, registerGameObjectForKeyBoardInput, releaseAllKeys, reverseMovementInput } from "../KeyboardInputHandler.js";
 import { createBoxInFront } from "../box.js";
 import { createBullet, createBulletDeathState } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
+import { createEnemyHitState } from "./enemy.js";
 const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 100, GORIYA_BULLET_SPEED = 200;
 export function createRedGoriya(x, y) {
     const goriya = createGameObject(GameObjectType.GORIYA);
@@ -56,7 +57,7 @@ function addGoriyaStates(goriya) {
     const movingState = createGoriyaMovingState(goriya);
     addState(goriya, CommonStateTypes.IDLE, idleState);
     addState(goriya, CommonStateTypes.MOVING, movingState);
-    addState(goriya, CommonStateTypes.HIT, createGoriyaHitState(goriya));
+    addState(goriya, CommonStateTypes.HIT, createEnemyHitState(goriya));
     addState(goriya, CommonStateTypes.DEATH, createGoriyaDeathState(goriya));
     addState(goriya, CommonStateTypes.ACTION, createGoriyaActionState(goriya));
     setDefaultState(goriya, idleState);
@@ -142,33 +143,41 @@ function createGoriyaActionState(goriya) {
     };
     return state;
 }
-function createGoriyaHitState(goriya) {
-    const state = createEmptyState(CommonStateTypes.HIT);
-    let hitBox;
+/*
+function createGoriyaHitState(goriya: GameObject): State {
+    const state: State = createEmptyState(CommonStateTypes.HIT);
+    let hitBox: HitBox;
     state.name = "goriya hit state";
-    state.init = (hitBoxArg) => {
+
+    state.init = (hitBoxArg: HitBox) => {
         hitBox = hitBoxArg;
-    };
+    }
+
     state.update = () => {
         if (!isHitByPlayer(hitBox) || isHitBoxOfOwnBullet(goriya, hitBox)) {
             proposeDesignatedState(goriya, getState(goriya, CommonStateTypes.IDLE));
             return;
         }
+
         doDamage(goriya, hitBox.damage);
         proposeDesignatedState(goriya, getState(goriya, isGameObjectDead(goriya) ? CommonStateTypes.DEATH : CommonStateTypes.IDLE));
-    };
+    }
     return state;
 }
-function isHitByPlayer(hitBox) {
+
+
+function isHitByPlayer(hitBox:HitBox):boolean{
     return hitBox.owner.type === GameObjectType.PLAYER;
 }
-export function isHitBoxOfOwnBullet(goriya, hitBox) {
+
+export function isHitBoxOfOwnBullet(goriya: GameObject, hitBox: HitBox): boolean {
     if (hitBox.owner.type === GameObjectType.BULLET) {
-        const bullet = hitBox.owner;
+        const bullet: Bullet = hitBox.owner as Bullet;
         return bullet.owner === goriya;
     }
     return false;
 }
+*/
 function createGoriyaDeathState(goriya) {
     const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "goriya death state";

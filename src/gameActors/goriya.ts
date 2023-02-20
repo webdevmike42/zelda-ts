@@ -13,6 +13,7 @@ import { Item } from "../gameObjects/item.js";
 import { Box, createBoxInFront, NULL_BOX } from "../box.js";
 import { Bullet, createBullet, createBulletDeathState } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
+import { createEnemyHitState } from "./enemy.js";
 
 const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 100, GORIYA_BULLET_SPEED = 200;
 
@@ -67,7 +68,7 @@ function addGoriyaStates(goriya: GameObject): void {
     const movingState: State = createGoriyaMovingState(goriya);
     addState(goriya, CommonStateTypes.IDLE, idleState);
     addState(goriya, CommonStateTypes.MOVING, movingState);
-    addState(goriya, CommonStateTypes.HIT, createGoriyaHitState(goriya));
+    addState(goriya, CommonStateTypes.HIT, createEnemyHitState(goriya));
     addState(goriya, CommonStateTypes.DEATH, createGoriyaDeathState(goriya));
     addState(goriya, CommonStateTypes.ACTION, createGoriyaActionState(goriya));
     setDefaultState(goriya, idleState);
@@ -167,7 +168,7 @@ function createGoriyaActionState(goriya: GameObject): State {
     return state;
 }
 
-
+/*
 function createGoriyaHitState(goriya: GameObject): State {
     const state: State = createEmptyState(CommonStateTypes.HIT);
     let hitBox: HitBox;
@@ -189,6 +190,7 @@ function createGoriyaHitState(goriya: GameObject): State {
     return state;
 }
 
+
 function isHitByPlayer(hitBox:HitBox):boolean{
     return hitBox.owner.type === GameObjectType.PLAYER;
 }
@@ -200,7 +202,7 @@ export function isHitBoxOfOwnBullet(goriya: GameObject, hitBox: HitBox): boolean
     }
     return false;
 }
-
+*/
 function createGoriyaDeathState(goriya: GameObject): State {
     const state: State = createEmptyState(CommonStateTypes.DEATH);
     state.name = "goriya death state";

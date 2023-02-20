@@ -18,6 +18,9 @@ export const NULL_STATE = Object.freeze({
 export function createEmptyState(type) {
     return Object.assign(Object.assign({}, NULL_STATE), { type: type || CommonStateTypes.NULL });
 }
+export function createEmptyHitState() {
+    return createEmptyState(CommonStateTypes.HIT);
+}
 export function switchToState(gameObject, newState) {
     exitCurrentState(gameObject);
     setCurrentState(gameObject, newState);
