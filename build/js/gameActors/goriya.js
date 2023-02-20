@@ -143,41 +143,6 @@ function createGoriyaActionState(goriya) {
     };
     return state;
 }
-/*
-function createGoriyaHitState(goriya: GameObject): State {
-    const state: State = createEmptyState(CommonStateTypes.HIT);
-    let hitBox: HitBox;
-    state.name = "goriya hit state";
-
-    state.init = (hitBoxArg: HitBox) => {
-        hitBox = hitBoxArg;
-    }
-
-    state.update = () => {
-        if (!isHitByPlayer(hitBox) || isHitBoxOfOwnBullet(goriya, hitBox)) {
-            proposeDesignatedState(goriya, getState(goriya, CommonStateTypes.IDLE));
-            return;
-        }
-
-        doDamage(goriya, hitBox.damage);
-        proposeDesignatedState(goriya, getState(goriya, isGameObjectDead(goriya) ? CommonStateTypes.DEATH : CommonStateTypes.IDLE));
-    }
-    return state;
-}
-
-
-function isHitByPlayer(hitBox:HitBox):boolean{
-    return hitBox.owner.type === GameObjectType.PLAYER;
-}
-
-export function isHitBoxOfOwnBullet(goriya: GameObject, hitBox: HitBox): boolean {
-    if (hitBox.owner.type === GameObjectType.BULLET) {
-        const bullet: Bullet = hitBox.owner as Bullet;
-        return bullet.owner === goriya;
-    }
-    return false;
-}
-*/
 function createGoriyaDeathState(goriya) {
     const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "goriya death state";

@@ -1,6 +1,6 @@
 import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
-import { boxOverlapSome, getProspectedCollisionBox, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { getCollidingBoxes, getProspectedCollisionBox, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { isHitBoxOfOwnBullet } from "../gameActors/enemy.js";
 import { playerCollectItems } from "../gameActors/player.js";
 import { createHitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
@@ -61,21 +61,26 @@ function updateAI(gameObject) {
     gameObject.ai_update(gameObject);
 }
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
-    const prospectedHurtBoxes = hurtBoxes.map(hurtBox => {
+    const prospectedEnabledHurtBoxes = hurtBoxes
+        .filter(hurtBox => isHurtBoxEnabled(hurtBox.owner))
+        .map(hurtBox => {
         const diffVector = getVectorFrameFraction(getMovementVector(hurtBox.owner), timeSinceLastTick);
         const prospectedBox = getProspectedCollisionBox(hurtBox, diffVector);
         return createHurtBox(prospectedBox.position, prospectedBox.width, prospectedBox.height, hurtBox.owner, hurtBox.enabled);
     });
-    const prospectedHitBoxes = hitBoxes.filter(hb => isHitBoxEnabled(hb.owner)).map(hitBox => {
+    const prospectedEnabledHitBoxes = hitBoxes
+        .filter(hb => isHitBoxEnabled(hb.owner))
+        .map(hitBox => {
         const diffVector = getVectorFrameFraction(getMovementVector(hitBox.owner), timeSinceLastTick);
         const prospectedBox = getProspectedCollisionBox(hitBox, diffVector);
         return createHitBox(prospectedBox.position, prospectedBox.width, prospectedBox.height, hitBox.owner, hitBox.damage, hitBox.enabled);
     });
-    prospectedHurtBoxes.filter(hurtBox => isHurtBoxEnabled(hurtBox.owner)).forEach(hurtBox => {
-        if (boxOverlapSome(hurtBox, prospectedHitBoxes.filter(hitBox => hitBox.owner.id !== hurtBox.owner.id &&
-            !isHitBoxOfOwnBullet(hurtBox.owner, hitBox)))) {
-            proposeDesignatedState(hurtBox.owner, getState(hurtBox.owner, CommonStateTypes.HIT), prospectedHitBoxes[0]); //ACHTUNG: prospectedHitBoxes[0] nur Platzhalter!!!!!
-        }
+    prospectedEnabledHurtBoxes
+        .forEach(hurtBox => {
+        const collidingEnabledHitBoxes = getCollidingBoxes(hurtBox, prospectedEnabledHitBoxes)
+            .filter(hitBox => hitBox.owner.id !== hurtBox.owner.id && !isHitBoxOfOwnBullet(hurtBox.owner, hitBox));
+        if (collidingEnabledHitBoxes.length > 0)
+            proposeDesignatedState(hurtBox.owner, getState(hurtBox.owner, CommonStateTypes.HIT), collidingEnabledHitBoxes[0]);
     });
     getCurrentGameObjects().forEach(gameObject => {
         if (isControlledByAI(gameObject)) {

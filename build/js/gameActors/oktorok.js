@@ -142,37 +142,6 @@ function createOktorokActionState(oktorok) {
     };
     return state;
 }
-/*
-function createOktorokHitState(oktorok: GameObject): State {
-    const state: State = createEmptyState(CommonStateTypes.HIT);
-    let hitBox: HitBox;
-    state.name = "oktorok hit state";
-
-    state.init = (hitBoxArg: HitBox) => {
-        hitBox = hitBoxArg;
-    }
-
-    state.enter = () => {
-        if (oktorok.health && !isHitBoxOfOwnBullet(oktorok, hitBox)) {
-            oktorok.health -= hitBox.damage;
-        }
-    };
-    state.update = () => {
-        if (isGameObjectDead(oktorok)) {
-            proposeDesignatedState(oktorok, getState(oktorok, CommonStateTypes.DEATH));
-        }
-    }
-    return state;
-}
-
-function isHitBoxOfOwnBullet(oktorok: GameObject, hitBox: HitBox): boolean {
-    if (hitBox.owner.type === GameObjectType.BULLET) {
-        const bullet: Bullet = hitBox.owner as Bullet;
-        return bullet.owner === oktorok;
-    }
-    return false;
-}
-*/
 function createOktorokDeathState(oktorok) {
     const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "oktorok death state";

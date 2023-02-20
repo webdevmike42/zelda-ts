@@ -8,6 +8,7 @@ export function createEnemyHitState(enemy) {
         hitBox = hitBoxArg;
     };
     state.update = () => {
+        console.log("ABCDE" + hitBox.owner.name);
         if (!isHitByPlayer(hitBox) || isHitBoxOfOwnBullet(enemy, hitBox)) {
             proposeDesignatedState(enemy, getState(enemy, CommonStateTypes.IDLE));
             return;
