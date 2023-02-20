@@ -8,10 +8,11 @@ var PushBoxStates;
 (function (PushBoxStates) {
     PushBoxStates["PUSHED"] = "Pushed";
 })(PushBoxStates || (PushBoxStates = {}));
+const PUSH_BOX_WIDTH = 16, PUSH_BOX_HEIGHT = 16;
 export function createPushBox(x, y) {
     const pushBox = createGameObject(GameObjectType.PUSH_BOX);
     setPosition(pushBox, createVector(x, y));
-    setBounds(pushBox, 16, 16);
+    setBounds(pushBox, PUSH_BOX_WIDTH, PUSH_BOX_HEIGHT);
     addPushBoxStates(pushBox);
     addPushBoxAnimations(pushBox);
     setCollisionBoxFromBoundingBox(pushBox);
@@ -25,8 +26,8 @@ function addPushBoxStates(pushBox) {
     setDefaultState(pushBox, idleState);
 }
 function addPushBoxAnimations(pushBox) {
-    addAnimation(pushBox, createAnimation(CommonStateTypes.IDLE, "./resources/link.png", getPosition(pushBox), pushBox.width, pushBox.height, [{ srcX: 30, srcY: 0 }], 1, false));
-    addAnimation(pushBox, createAnimation(PushBoxStates.PUSHED, "./resources/link.png", getPosition(pushBox), pushBox.width, pushBox.height, [{ srcX: 91, srcY: 0 }], 1, false));
+    addAnimation(pushBox, createAnimation(CommonStateTypes.IDLE, "./resources/dungeon-green.png", getPosition(pushBox), pushBox.width, pushBox.height, [{ srcX: 64, srcY: 80 }], 1, false));
+    addAnimation(pushBox, createAnimation(PushBoxStates.PUSHED, "./resources/dungeon-green.png", getPosition(pushBox), pushBox.width, pushBox.height, [{ srcX: 64, srcY: 80 }], 1, false));
 }
 function createPushBoxIdleState(pushBox) {
     const state = createEmptyState(CommonStateTypes.IDLE);

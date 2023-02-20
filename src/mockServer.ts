@@ -5,7 +5,7 @@ import { createPushBox } from "./gameObjects/pushbox.js";
 import { createTeleporterTrigger } from "./gameObjects/teleporter.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, Screen, WORLD_MAP_COLS } from "./screens.js";
 import { createRedOktorok } from "./gameActors/oktorok.js";
-import { createDynamicHazard } from "./gameObjects/hazard.js";
+import { createDestroyableStaticHazard, createDynamicHazard } from "./gameObjects/hazard.js";
 import { createBullet } from "./gameObjects/bullet.js";
 import { getPlayer } from "./gameActors/player.js";
 import { createVector } from "./vector.js";
@@ -2427,13 +2427,12 @@ screen.tileMap =
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
                 createRedGoriya(150,180),
                 //createRedbat(150,180)
-                //createRedOktorok(100, 140),
-                //createStalfos(100,120)
+                createRedOktorok(100, 140),
+                createStalfos(100,120),
                 //createFountain(100,120)
-                //createPushBox(120, 80),
-                //createDynamicHazard(100,130,16,16,1),
+                createDynamicHazard(100,130,16,16,1),
                 
-                //createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
+                createDestroyableStaticHazard(70, 170, 48, 32, 1, 10),
                 /*
                 createFloorSwitch(120, 100, 16, 16, false, () => {
                     openDoor(filterGameObjects(GameObjectType.DOOR, getCurrentGameObjects())[0] as Door)
@@ -2448,7 +2447,8 @@ screen.tileMap =
             ];
 
             screen.persistedGameObjects = [
-                createSmallChest(120,120)
+                createSmallChest(160,160),
+                createPushBox(120, 100)
             ];
 
             break;

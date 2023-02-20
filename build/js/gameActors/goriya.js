@@ -5,14 +5,14 @@ import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
 import { disableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, getCurrentState } from "../state.js";
 import { createVector, get4DirectionVector, NULL_VECTOR, reverseVector, vectorScalarProduct } from "../vector.js";
-import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
+import { createMovementVector, GameObjectType, getCurrentAnimation, getPosition, getViewVector, isCoolingDown, setAIControlled, setBounds, setHealth, setMaxHealth, setMovementVector, setPosition, setViewVector, setVisible, startCoolDown } from "../gameObjects/gameObject.js";
 import { addToCurrentGameObjects, createGameObject } from "../gameObjects/gameObjectFactory.js";
-import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, registerGameObjectForKeyBoardInput, releaseAllKeys, reverseMovementInput } from "../KeyboardInputHandler.js";
+import { getMappedInput, isAnyMovementKeyDown, isKeyDown, KEYS, pressAndHoldKey, pressAndHoldRandomMovementKey, releaseAllKeys, reverseMovementInput } from "../KeyboardInputHandler.js";
 import { createBoxInFront } from "../box.js";
 import { createBullet, createBulletDeathState } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
 import { createEnemyHitState } from "./enemy.js";
-const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 100, GORIYA_BULLET_SPEED = 200;
+const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 40, GORIYA_BULLET_SPEED = 200;
 export function createRedGoriya(x, y) {
     const goriya = createGameObject(GameObjectType.GORIYA);
     goriya.name = "red goriya";
@@ -25,10 +25,10 @@ export function createRedGoriya(x, y) {
     setMaxHealth(goriya, GORIYA_HEALTH);
     addRedGoriyaAnimations(goriya);
     addGoriyaStates(goriya);
-    //initGoriyaAI(goriya);
-    //setAIControlled(goriya);
+    initGoriyaAI(goriya);
+    setAIControlled(goriya);
     proposeDesignatedState(goriya, goriya.defaultState);
-    registerGameObjectForKeyBoardInput(goriya);
+    //registerGameObjectForKeyBoardInput(goriya);
     return goriya;
 }
 function initGoriyaAI(goriya) {
@@ -36,7 +36,7 @@ function initGoriyaAI(goriya) {
     goriya.ai_TimeRangeToNextAction[1] = 500;
     goriya.ai_NextAction = (goriya) => {
         releaseAllKeys(getMappedInput(goriya));
-        if (Math.random() < 0.75) {
+        if (Math.random() < 0.85) {
             pressAndHoldRandomMovementKey(getMappedInput(goriya));
         }
         else {

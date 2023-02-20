@@ -15,7 +15,7 @@ import { Bullet, createBullet, createBulletDeathState } from "../gameObjects/bul
 import { getRandomInt } from "../utils.js";
 import { createEnemyHitState } from "./enemy.js";
 
-const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 100, GORIYA_BULLET_SPEED = 200;
+const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 40, GORIYA_BULLET_SPEED = 200;
 
 export function createRedGoriya(x: number, y: number): GameObject {
     const goriya: GameObject = createGameObject(GameObjectType.GORIYA);
@@ -29,10 +29,10 @@ export function createRedGoriya(x: number, y: number): GameObject {
     setMaxHealth(goriya, GORIYA_HEALTH);
     addRedGoriyaAnimations(goriya);
     addGoriyaStates(goriya);
-    //initGoriyaAI(goriya);
-    //setAIControlled(goriya);
+    initGoriyaAI(goriya);
+    setAIControlled(goriya);
     proposeDesignatedState(goriya, goriya.defaultState);
-    registerGameObjectForKeyBoardInput(goriya);
+    //registerGameObjectForKeyBoardInput(goriya);
 
     return goriya;
 }
@@ -44,7 +44,7 @@ function initGoriyaAI(goriya: GameObject): void {
 
         releaseAllKeys(getMappedInput(goriya));
 
-        if (Math.random() < 0.75) {
+        if (Math.random() < 0.85) {
             pressAndHoldRandomMovementKey(getMappedInput(goriya));
         } else {
             pressAndHoldKey(getMappedInput(goriya), KEYS.ACTION);
