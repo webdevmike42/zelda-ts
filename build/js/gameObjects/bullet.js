@@ -1,11 +1,10 @@
 import { addAnimation, createAnimation } from "../animation.js";
 import { setCollisionBoxFromBoundingBox } from "../collisions.js";
-import { disableHitBox, setHitBoxFromBoundingBox } from "../hitbox.js";
-import { disableHurtBox } from "../hurtbox.js";
+import { setHitBoxFromBoundingBox } from "../hitbox.js";
 import { removeGameObject } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, proposeDesignatedState } from "../state.js";
-import { createVector, NULL_VECTOR, vectorScalarProduct } from "../vector.js";
-import { GameObjectType, getPosition, setBounds, setMovementVector, setPosition, setViewVector, setVisible } from "./gameObject.js";
+import { createVector, vectorScalarProduct } from "../vector.js";
+import { GameObjectType, getPosition, setBounds, setMovementVector, setPosition, setViewVector } from "./gameObject.js";
 import { createGameObject } from "./gameObjectFactory.js";
 export function createBullet(x, y, width, height, owner, damage, speed, viewVector, addDefaultBehavior = true) {
     const bullet = createGameObject(GameObjectType.BULLET);
@@ -54,10 +53,12 @@ export function createBulletDeathState(bullet) {
     const state = createEmptyState(CommonStateTypes.DEATH);
     state.name = "bullet death state";
     state.enter = () => {
-        setMovementVector(bullet, Object.assign({}, NULL_VECTOR));
+        /*
+        setMovementVector(bullet,{...NULL_VECTOR})
         disableHurtBox(bullet);
         disableHitBox(bullet);
         setVisible(bullet, false);
+        */
         removeGameObject(bullet);
     };
     return state;

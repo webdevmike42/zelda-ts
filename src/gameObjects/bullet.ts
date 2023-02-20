@@ -71,10 +71,12 @@ export function createBulletDeathState(bullet: GameObject): State {
     state.name = "bullet death state";
 
     state.enter = () => {
+        /*
         setMovementVector(bullet,{...NULL_VECTOR})
         disableHurtBox(bullet);
         disableHitBox(bullet);
         setVisible(bullet, false);
+        */
         removeGameObject(bullet);
     };
     return state;

@@ -6,7 +6,7 @@ import { createVector, get4DirectionVector, normalizedVector, NULL_VECTOR, Vecto
 import { getCollidingGameObjects, setCollisionBox } from "../collisions.js";
 import { createBox, createBoxInFront } from "../box.js";
 import { createGlobalGameObject, filterGameObjects } from "../gameObjects/gameObjectFactory.js";
-import { HitBox, removeHitBox, setHitBox, setHitBoxesFromGameObjects, spawnHitBoxInFrontOf } from "../hitbox.js";
+import { HitBox, removeHitBox, spawnHitBoxInFrontOf } from "../hitbox.js";
 import { disableHurtBox, enableHurtBox, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { Item } from "../gameObjects/item.js";
 import { addToInventory } from "../inventory.js";

@@ -1,7 +1,8 @@
 import { GameObject, isVisible } from "./gameObjects/gameObject.js";
 import { getAllScreensAsArray, loadScreenById } from "./mockServer.js";
 import { createSolidDummy, getGlobalGameObjects } from "./gameObjects/gameObjectFactory.js"
-import { removeAllHitBoxes, setHitBoxesFromGameObjects } from "./hitbox.js";
+import { removeAllHitBoxes, removeHitBox, setHitBoxesFromGameObjects } from "./hitbox.js";
+import { removeHurtBox } from "./hurtbox.js";
 
 export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 240;
@@ -100,6 +101,8 @@ export function getCurrentVisibleGameObjects(): GameObject[] {
 }
 
 export function removeGameObject(gameObject: GameObject): void {
+    removeHitBox(gameObject);
+    removeHurtBox(gameObject);
     currentGameObjects = currentGameObjects.filter(go => go.id !== gameObject.id);
 }
 

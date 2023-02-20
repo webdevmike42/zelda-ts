@@ -2425,9 +2425,9 @@ screen.tileMap =
     
             screen.gameObjects = [
                 createTeleporterTrigger(64, 80, 16, 16, 128, 128, 200),
-                createRedGoriya(150,180)
+                createRedGoriya(150,180),
                 //createRedbat(150,180)
-                //createRedOktorok(100, 140)
+                createRedOktorok(100, 140),
                 //createStalfos(100,120)
                 //createFountain(100,120)
                 //createPushBox(120, 80),

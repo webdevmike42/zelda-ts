@@ -15,7 +15,7 @@ export interface HitBox extends Box {
     enabled: boolean
 }
 
-function createHitBox(position: Vector, width: number, height: number, owner: GameObject, damage: number, enabled: boolean = true) {
+export function createHitBox(position: Vector, width: number, height: number, owner: GameObject, damage: number, enabled: boolean = true) {
     const hitBox = {
         ...createBox(position.x, position.y, width, height),
         owner: owner,
@@ -25,7 +25,7 @@ function createHitBox(position: Vector, width: number, height: number, owner: Ga
     return hitBox;
 }
 
-export function setHitBox(gameObject: GameObject, hitBox: HitBox): void {
+function setHitBox(gameObject: GameObject, hitBox: HitBox): void {
     gameObject.hitBox = hitBox;
 }
 
@@ -42,12 +42,12 @@ export function setHitBoxFromBoundingBox(gameObject: GameObject, damage: number)
     hitBoxes.push(hitBox);
     setHitBox(gameObject,hitBox);
 }
+
 export function removeHitBox(gameObject:GameObject): void {
     if(gameObject.hitBox){
         removeObjectFromArray(gameObject.hitBox.id, hitBoxes);
         gameObject.hitBox = undefined;
-    }
-    
+    }   
 }
 
 export function removeAllHitBoxes(): void {
@@ -72,8 +72,8 @@ export function isHitBoxEnabled(gameObject: GameObject): boolean {
     return gameObject.hitBox?.enabled || false;
 }
 
-export function getCollidingHitBoxes(gameObject: GameObject): HitBox[] {
+export function getCollidingHitBoxes(gameObject: GameObject, hitBoxesArray:HitBox[] = hitBoxes): HitBox[] {
     return (gameObject.hurtBox && isHurtBoxEnabled(gameObject))
-        ? (getCollidingBoxes(gameObject.hurtBox || { ...NULL_BOX }, hitBoxes) as HitBox[]).filter(hb => hb.enabled && hb.owner.id !== gameObject.id)
+        ? (getCollidingBoxes(gameObject.hurtBox || { ...NULL_BOX }, hitBoxesArray) as HitBox[]).filter(hb => hb.enabled && hb.owner.id !== gameObject.id)
         : [];
 }

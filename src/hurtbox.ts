@@ -1,5 +1,7 @@
-import { Box, createBox, createBoxInFront } from "./box.js";
+import { Box, createBox, createBoxInFront, NULL_BOX } from "./box.js";
+import { getCollidingBoxes } from "./collisions.js";
 import { GameObject, getPosition } from "./gameObjects/gameObject.js";
+import { isHitBoxEnabled } from "./hitbox.js";
 import { removeObjectFromArray } from "./utils.js";
 import { Vector } from "./vector.js";
 
@@ -9,7 +11,9 @@ export interface HurtBox extends Box {
     enabled: boolean
 }
 
-function createHurtBox(position: Vector, width: number, height: number, owner: GameObject, enabled: boolean = true) {
+export let hurtBoxes: HurtBox[] = [];
+
+export function createHurtBox(position: Vector, width: number, height: number, owner: GameObject, enabled: boolean = true) {
     return {
         ...createBox(position.x, position.y, width, height),
         owner: owner,
@@ -20,6 +24,7 @@ function createHurtBox(position: Vector, width: number, height: number, owner: G
 export function setHurtBoxFromBoundingBox(gameObject: GameObject, enabled: boolean = true): void {
     const hurtBox: HurtBox = createHurtBox(getPosition(gameObject), gameObject.width, gameObject.height, gameObject, enabled);
     gameObject.hurtBox = hurtBox;
+    hurtBoxes.push(hurtBox);
 }
 
 export function disableHurtBox(gameObject: GameObject): void {
@@ -37,4 +42,17 @@ function setHurtBoxEnabled(hurtBox: HurtBox | undefined, isEnabled: boolean): vo
 
 export function isHurtBoxEnabled(gameObject: GameObject): boolean {
     return gameObject.hurtBox?.enabled || false;
+}
+
+export function getCollidingHurtBoxes(gameObject: GameObject): HurtBox[] {
+    return (gameObject.hitBox && isHitBoxEnabled(gameObject))
+        ? (getCollidingBoxes(gameObject.hitBox || { ...NULL_BOX }, hurtBoxes) as HurtBox[]).filter(hb => hb.enabled && hb.owner.id !== gameObject.id)
+        : [];
+}
+
+export function removeHurtBox(gameObject:GameObject): void {
+    if(gameObject.hurtBox){
+        removeObjectFromArray(gameObject.hurtBox.id, hurtBoxes);
+        gameObject.hurtBox = undefined;
+    }   
 }

@@ -2,7 +2,7 @@ import { addAnimation, createAnimation, getAnimation, setCurrentAnimation } from
 import { boxesOverlap, getCollidingBoxes, getCollidingGameObjects, getCollidingSolidGameObjects, getCollisionBox, setCollisionBoxFromBoundingBox } from "../collisions.js";
 import { getPlayer, Player } from "./player.js";
 import { disableHitBox, enableHitBox, HitBox, setHitBoxFromBoundingBox, spawnHitBoxInFrontOf } from "../hitbox.js";
-import { disableHurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../hurtbox.js";
+import { disableHurtBox, HurtBox, isHurtBoxEnabled, setHurtBoxFromBoundingBox } from "../hurtbox.js";
 import { getCurrentGameObjects, removeGameObject } from "../screens.js";
 import { addState, CommonStateTypes, createEmptyState, getState, setDefaultState, proposeDesignatedState, State, getCurrentState, setCurrentState } from "../state.js";
 import { createRandom4DirectionViewVector, createVector, get4DirectionVector, NULL_VECTOR, reverseVector, Vector, vectorScalarProduct } from "../vector.js";
@@ -14,7 +14,7 @@ import { Box, createBoxInFront, NULL_BOX } from "../box.js";
 import { Bullet, createBullet, createBulletDeathState } from "../gameObjects/bullet.js";
 import { getRandomInt } from "../utils.js";
 
-const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 40, GORIYA_BULLET_SPEED = 200;
+const GORIYA_WIDTH = 16, GORIYA_HEIGHT = 16, GORIYA_HEALTH = 1, GORIYA_DAMAGE = 1, GORIYA_BULLET_WIDTH = 8, GORIYA_BULLET_HEIGHT = 8, GORIYA_MOVING_SPEED = 100, GORIYA_BULLET_SPEED = 200;
 
 export function createRedGoriya(x: number, y: number): GameObject {
     const goriya: GameObject = createGameObject(GameObjectType.GORIYA);
@@ -178,7 +178,7 @@ function createGoriyaHitState(goriya: GameObject): State {
     }
 
     state.update = () => {
-        if (isHitBoxOfOwnBullet(goriya, hitBox)) {
+        if (!isHitByPlayer(hitBox) || isHitBoxOfOwnBullet(goriya, hitBox)) {
             proposeDesignatedState(goriya, getState(goriya, CommonStateTypes.IDLE));
             return;
         }
@@ -189,7 +189,11 @@ function createGoriyaHitState(goriya: GameObject): State {
     return state;
 }
 
-function isHitBoxOfOwnBullet(goriya: GameObject, hitBox: HitBox): boolean {
+function isHitByPlayer(hitBox:HitBox):boolean{
+    return hitBox.owner.type === GameObjectType.PLAYER;
+}
+
+export function isHitBoxOfOwnBullet(goriya: GameObject, hitBox: HitBox): boolean {
     if (hitBox.owner.type === GameObjectType.BULLET) {
         const bullet: Bullet = hitBox.owner as Bullet;
         return bullet.owner === goriya;
@@ -303,7 +307,7 @@ function createGoriyaBulletMovingState(goriyaBullet: Bullet): State {
         }
 
         if (bulletCollidedWithOwner(goriyaBullet) || bulletCollidedWithPlayerHurtBox(goriyaBullet)) {
-            //console.log("death")
+            console.log("death")
             proposeDesignatedState(goriyaBullet, getState(goriyaBullet, CommonStateTypes.DEATH));
             return;
         }
@@ -318,18 +322,8 @@ function bulletCollidedWithOwner(bullet: Bullet) {
 }
 
 function bulletCollidedWithPlayerHurtBox(bullet: Bullet): boolean {
-    const player: Player = getPlayer();
-    let result: boolean = false;
-    if (player.hurtBox){
-        //result = boxesOverlap(getCollisionBox(bullet), player.hurtBox)
-        result = getCollidingBoxes(getCollisionBox(bullet), [player.hurtBox || { ...NULL_BOX }]).length > 0
-        if(result === true){
-            console.log(result)
-            console.log(player.hurtBox)//isHurtBoxEnabled(player))
-        }
-    }
-
-    return result;//isHurtBoxEnabled(player) && (getCollidingBoxes(getCollisionBox(bullet), [player.hurtBox || { ...NULL_BOX }]).length > 0);
+    const playerHurtBox: HurtBox | undefined = getPlayer().hurtBox
+    return bullet.hitBox !== undefined && playerHurtBox !== undefined && boxesOverlap(bullet.hitBox, playerHurtBox);
 }
 
 function reverseGoriyaBulletDirection(goriyaBullet: Bullet): void {

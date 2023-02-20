@@ -1,16 +1,17 @@
 import { drawAnimationAt, getOffsetX, updateAnimation, getOffsetY } from "../animation.js";
 import { NULL_BOX } from "../box.js";
-import { getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { boxOverlapSome, getProspectedCollisionBox, getResolvedSolidCollisionVector, setCollisionBoxFromBoundingBox } from "../collisions.js";
+import { isHitBoxOfOwnBullet } from "../gameActors/goriya.js";
 import { playerCollectItems } from "../gameActors/player.js";
-import { getCollidingHitBoxes } from "../hitbox.js";
-import { isHurtBoxEnabled } from "../hurtbox.js";
+import { createHitBox, hitBoxes, isHitBoxEnabled } from "../hitbox.js";
+import { createHurtBox, hurtBoxes, isHurtBoxEnabled } from "../hurtbox.js";
 import { createMappedInput } from "../KeyboardInputHandler.js";
 import { getCurrentGameObjects, getCurrentVisibleGameObjects } from "../screens.js";
 import { CommonStateTypes, getCurrentState, getState, hasDesignatedState, NULL_STATE, proposeDesignatedState, switchToState } from "../state.js";
 import { addTestResult } from "../tests.js";
 import { getVectorFrameFraction } from "../utils.js";
 import { createVector, NULL_VECTOR } from "../vector.js";
-import { Controller, GameObjectType, getCurrentAnimation, getOverallVector, getPosition, isControlledByAI, moveGameObject, setBounds, setPosition } from "./gameObject.js";
+import { Controller, GameObjectType, getCurrentAnimation, getMovementVector, getOverallVector, getPosition, isControlledByAI, moveGameObject, setBounds, setPosition } from "./gameObject.js";
 import { getCollidingCollectableItems } from "./item.js";
 const globalGameObjects = [];
 let id = 0;
@@ -29,6 +30,10 @@ export function createGameObject(type) {
         width: 0,
         height: 0,
         collisionBox: Object.assign({}, NULL_BOX),
+        collisionData: undefined,
+        collidingGameObjects: [],
+        collidingHitBoxes: [],
+        collidingHurtBoxes: [],
         isVisible: true,
         ignoreConveyor: false,
         hitSolid: false,
@@ -56,17 +61,45 @@ function updateAI(gameObject) {
     gameObject.ai_update(gameObject);
 }
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
+    const prospectedHurtBoxes = hurtBoxes.map(hurtBox => {
+        const diffVector = getVectorFrameFraction(getMovementVector(hurtBox.owner), timeSinceLastTick);
+        const prospectedBox = getProspectedCollisionBox(hurtBox, diffVector);
+        return createHurtBox(prospectedBox.position, prospectedBox.width, prospectedBox.height, hurtBox.owner, hurtBox.enabled);
+    });
+    const prospectedHitBoxes = hitBoxes.filter(hb => isHitBoxEnabled(hb.owner)).map(hitBox => {
+        const diffVector = getVectorFrameFraction(getMovementVector(hitBox.owner), timeSinceLastTick);
+        const prospectedBox = getProspectedCollisionBox(hitBox, diffVector);
+        return createHitBox(prospectedBox.position, prospectedBox.width, prospectedBox.height, hitBox.owner, hitBox.damage, hitBox.enabled);
+    });
+    prospectedHurtBoxes.filter(hurtBox => isHurtBoxEnabled(hurtBox.owner)).forEach(hurtBox => {
+        if (boxOverlapSome(hurtBox, prospectedHitBoxes.filter(hitBox => hitBox.owner.id !== hurtBox.owner.id &&
+            !isHitBoxOfOwnBullet(hurtBox.owner, hitBox)))) {
+            proposeDesignatedState(hurtBox.owner, getState(hurtBox.owner, CommonStateTypes.HIT), prospectedHitBoxes[0]); //ACHTUNG: prospectedHitBoxes[0] nur Platzhalter!!!!!
+        }
+    });
     getCurrentGameObjects().forEach(gameObject => {
         if (isControlledByAI(gameObject)) {
             updateAI(gameObject);
         }
-        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
+        if (gameObject.collidingHitBoxes.length > 0) {
+        }
+        /*
         if (isHurtBoxEnabled(gameObject)) {
-            const chb = getCollidingHitBoxes(gameObject);
+            const chb: HitBox[] = getCollidingHitBoxes(gameObject);
             if (chb.length > 0) {
                 proposeDesignatedState(gameObject, getState(gameObject, CommonStateTypes.HIT), chb[0]);
             }
         }
+
+        if (isHitBoxEnabled(gameObject)) {
+
+            const chb: HurtBox[] = getCollidingHurtBoxes(gameObject);
+            chb.forEach(hurtBox => {
+                proposeDesignatedState(hurtBox.owner, getState(hurtBox.owner, CommonStateTypes.HIT), gameObject.hitBox);
+            });
+        }
+*/
+        updateGameObjectCurrentState(gameObject, currentGameTime, timeSinceLastTick);
         if (gameObject.type === GameObjectType.PLAYER) {
             playerCollectItems(getCollidingCollectableItems(gameObject));
         }
@@ -126,13 +159,11 @@ export function drawGameObjects(ctx) {
             ctx.fillStyle = "rgba(0, 100, 0, 0.5)";
             ctx.fillRect(gameObject.hurtBox.position.x, gameObject.hurtBox.position.y, gameObject.hurtBox.width, gameObject.hurtBox.height);
         }
-        /*
-                if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
-                    //draw hitbox
-                    ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
-                    ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height)
-                }
-        */
+        if (gameObject.hitBox && isHitBoxEnabled(gameObject)) {
+            //draw hitbox
+            ctx.fillStyle = "rgba(100, 0, 0, 0.5)";
+            ctx.fillRect(gameObject.hitBox.position.x, gameObject.hitBox.position.y, gameObject.hitBox.width, gameObject.hitBox.height);
+        }
     });
 }
 export function createSolidDummy(x, y, width, height) {
@@ -147,7 +178,7 @@ export function filterGameObjects(filterType, gameObjectArray) {
     return gameObjectArray.filter(gameObject => gameObject.type === filterType);
 }
 /*
-
+ 
 export function updateGameObjects(currentGameTime, timeSinceLastTick) {
     gameObjects.forEach(gameObject => {
         prepareTick(gameObject);
@@ -156,26 +187,26 @@ export function updateGameObjects(currentGameTime, timeSinceLastTick) {
         if (isControlledByAI(gameObject)) {
             updateFakeEnemyAI(gameObject, currentGameTime);
         }
-
+ 
         //Options:
         //1. state zurückbekommen und dann im if-statement im switchGameObjectState ausführen (state bekommen darf nichts verändern (player health, game sounds))
         //zusätzlich namen der funktionen ändern weil "handle" normalerweise command-funct ist
         //2. direkt in handle funktionen änderungen durchführen, aber nichts zurückgeben und im nachhinein wahrscheinlich den currentstate vom gameobject abfragen
         const newState = handleHurtBoxCollisions(gameObject) || handleGameObjectInput(gameObject) || updateGameObjectState(gameObject, currentGameTime, timeSinceLastTick)
-
+ 
         if (newState) {
             switchGameObjectState(gameObject, newState);
             return;//todo: gehts auch ohne return an dieser Stelle? machen die weiteren handle()-Aufrufe vl sogar Sinn?!
         }
-
+ 
         handleEnvironmentVectorUpdate(gameObject);
         handleItemPickup(gameObject);
         handleMovementUpdate(gameObject, timeSinceLastTick);
-
+ 
         handleAnimationUpdate(gameObject, currentGameTime);
     });
 }
-
+ 
 */
 export function setSolid(gameObject, isSolid = true) {
     gameObject.isSolid = isSolid;

@@ -294,6 +294,7 @@ export function getPlayer() {
     return player;
 }
 function startPlayerCoolDown(player) {
+    console.log("COOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL");
     startCoolDown(player, disableHurtBox, enableHurtBox);
 }
 export function hasPlayerPressedStart() {

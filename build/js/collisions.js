@@ -4,6 +4,31 @@ import { isSolid } from "./gameObjects/gameObjectFactory.js";
 import { getCurrentGameObjects } from "./screens.js";
 import { addTestResult } from "./tests.js";
 import { NULL_VECTOR, vectorSum } from "./vector.js";
+/*
+export function getCollisionData(collisionBox: Box, collidingGameObject: GameObject): CollisionData {
+    if(boxesOverlap(collisionBox,getCollisionBox(collidingGameObject))){
+        const collisionData: CollisionData = {
+            gameObject: collidingGameObject,
+            collidingHitBox: undefined,
+            collidingHurtBox: undefined
+        };
+
+    }
+    
+
+    
+
+    if (isHitBoxEnabled(collidingGameObject) && boxesOverlap(collisionBox, collidingGameObject.hitBox || { ...NULL_BOX })) {
+        collisionData.collidingHitBox = collidingGameObject.hitBox;
+    }
+
+    if (isHurtBoxEnabled(collidingGameObject) && boxesOverlap(collisionBox, collidingGameObject.hurtBox || { ...NULL_BOX })) {
+        collisionData.collidingHurtBox = collidingGameObject.hurtBox;
+    }
+
+    return collisionData;
+}
+*/
 function pointCollidedWithCollisionBox(x, y, collisionBox) {
     return boxesOverlap(createBox(x, y, 1, 1), collisionBox);
 }
