@@ -2,7 +2,7 @@
 
 This is my attempt on building a 2D Zelda-like adventure without any 3rd party engines or libraries - just plain typescript!
 
-The latest version from 20th Feb 2023 supports:
+The latest version includes:
 * whole overworld map from NES Zelda
 * easy support of different tilesets and images
 * 8 direction movement
@@ -21,12 +21,14 @@ The latest version from 20th Feb 2023 supports:
 * conveyor
 * teleporter
 * objects can be normal (they reset when re-entering a screen), persistent or global
+* overworld music and some audios
 
 Not everything from the list is active in the demo, just remove/add things in "mockserver.ts" 
 
 Controls:
 8-direction movement: WASD
 Action: K
+Dash: L (not yet used in demo)
 
 Concepts:
 I am not a professional developer, but I tried to stick to the following concepts:
